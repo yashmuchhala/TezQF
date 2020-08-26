@@ -1,16 +1,26 @@
 {
   "name": "tezqf",
   "version": "0.1.0",
+  "description": "Quadratic Funding built in the Tezos eco-system with a Decentralized Autonomous Organization",
   "private": true,
   "dependencies": {
+    "@taquito/taquito": "^6.3.5-beta.0",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
+    "@thanos-wallet/dapp": "^0.6.0",
+    "bootswatch": "^4.5.2",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.3"
   },
   "scripts": {
+    "compile-dev": "node ./utils/scripts/compile.js",
+    "deploy-dev": "node ./utils/scripts/deploy.js",
+    "deploy": "node ./utils/scripts/main.js",
+    "test-contracts": "node ./utils/scripts/test.js",
+    "test-contracts-verbose": "node ./utils/scripts/test.js --verbose",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
@@ -30,5 +40,60 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  }
+  },
+  "peerDependencies": {
+    "@testing-library/dom": "^7.22.6",
+    "typescript": "^4.0.2"
+  },
+  "devDependencies": {
+    "@taquito/signer": "^6.3.5-beta.0",
+    "bs58check": "^2.1.2",
+    "chalk": "^4.1.0",
+    "conseiljs": "^5.0.4",
+    "conseiljs-softsigner": "^5.0.3",
+    "libsodium-wrappers-sumo": "^0.7.8",
+    "node-fetch": "^2.6.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yashmuchhala/TezQF.git"
+  },
+  "keywords": [
+    "tezos",
+    "smartpy",
+    "blockchain",
+    "quadratic-funding",
+    "xtz",
+    "smart-contracts",
+    "dao"
+  ],
+  "author": "Tezos India Foundation",
+  "contributors": [
+    {
+      "name": "Anshu Jalan",
+      "email": "placeholder@example.com",
+      "url": "https://placeholder.com"
+    },
+    {
+      "name": "Guna Shekhar Proddaturi",
+      "email": "placeholder@example.com",
+      "url": "https://placeholder.com"
+    },
+    {
+      "name": "Yash Muchhala",
+      "email": "muchhala.yash@gmail.com",
+      "url": "https://github.com/yashmuchhala"
+    },
+    {
+      "name": "Dibyo Majumder",
+      "email": "dibyomajumder23@gmail.com",
+      "url": "https://github.com/dibyo007dev"
+    },
+    {
+      "name": "Aditya Gautam",
+      "email": "placeholder@example.com",
+      "url": "https://placeholder.com"
+    }
+  ],
+  "license": "MIT"
 }

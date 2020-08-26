@@ -1,0 +1,30 @@
+Creating contract
+ -> (Pair 12 123)
+ => ./contracts/tests/build/demo/Welcome_interpreted/testContractTypes.0.0.tz 2
+ => ./contracts/tests/build/demo/Welcome_interpreted/testContractCode.0.0.tz 35
+ => ./contracts/tests/build/demo/Welcome_interpreted/testContractCode.0.0.tz.json 36
+ => ./contracts/tests/build/demo/Welcome_interpreted/testPrettyPrint.0.0.py 10
+Executing myEntryPoint(12)...
+ -> (Pair 24 123)
+Executing myEntryPoint(13)...
+ -> (Pair 37 123)
+Executing myEntryPoint(14)...
+ -> (Pair 51 123)
+Executing myEntryPoint(50)...
+ -> (Pair 101 123)
+Executing myEntryPoint(50)...
+ -> (Pair 151 123)
+Executing myEntryPoint(50)...
+ -> --- Expected failure in transaction --- WrongCondition in line 18: self.data.myParameter1 <= 123
+Verifying sp.contract_data(0).myParameter1 == 151...
+ => ./contracts/tests/build/demo/Welcome_interpreted/testVerify.7.tz 23
+ OK
+Creating contract
+ -> (Pair 1 151)
+ => ./contracts/tests/build/demo/Welcome_interpreted/testContractTypes.1.8.tz 2
+ => ./contracts/tests/build/demo/Welcome_interpreted/testContractCode.1.8.tz 35
+ => ./contracts/tests/build/demo/Welcome_interpreted/testContractCode.1.8.tz.json 36
+ => ./contracts/tests/build/demo/Welcome_interpreted/testPrettyPrint.1.8.py 10
+Verifying sp.contract_data(1).myParameter2 == 151...
+ => ./contracts/tests/build/demo/Welcome_interpreted/testVerify.9.tz 23
+ OK

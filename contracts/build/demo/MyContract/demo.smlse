@@ -1,0 +1,7 @@
+(storage (record 11 (myParameter1 (literal (intOrNat 12) 11)) (myParameter2 (literal (intOrNat 123) 11)))
+storage_type (())
+messages ((myEntryPoint True ((verify (le (attr (data) "myParameter1" 18) (literal (intOrNat 123) 18) 18) False 18) (set (attr (data) "myParameter1" 18) (add (attr (data) "myParameter1" 18) (params 17) 19) 19))))
+flags ()
+globals ()
+storage_layout ()
+entry_points_layout ())

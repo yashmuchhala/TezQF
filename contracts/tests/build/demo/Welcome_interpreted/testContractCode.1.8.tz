@@ -1,0 +1,35 @@
+parameter int;
+storage   (pair (int %myParameter1) (int %myParameter2));
+code
+  {
+    DUP;        # pair @parameter @storage : pair @parameter @storage
+    CDR;        # @storage : pair @parameter @storage
+    SWAP;       # pair @parameter @storage : @storage
+    CAR;        # @parameter : @storage
+    # == myEntryPoint ==
+    # sp.verify(self.data.myParameter1 <= 123) # @parameter : @storage
+    PUSH int 123; # int : @parameter : @storage
+    DIG 2;      # @storage : int : @parameter
+    DUP;        # @storage : @storage : int : @parameter
+    DUG 3;      # @storage : int : @parameter : @storage
+    CAR;        # int : int : @parameter : @storage
+    COMPARE;    # int : @parameter : @storage
+    LE;         # bool : @parameter : @storage
+    IF
+      {}
+      {
+        PUSH string "WrongCondition: self.data.myParameter1 <= 123"; # string : @parameter : @storage
+        FAILWITH;   # FAILED
+      }; # @parameter : @storage
+    SWAP;       # @storage : @parameter
+    # self.data.myParameter1 += params # @storage : @parameter
+    DUP;        # @storage : @storage : @parameter
+    CDR;        # int : @storage : @parameter
+    SWAP;       # @storage : int : @parameter
+    CAR;        # int : int : @parameter
+    DIG 2;      # @parameter : int : int
+    ADD;        # int : int
+    PAIR;       # pair int int
+    NIL operation; # list operation : pair int int
+    PAIR;       # pair (list operation) (pair int int)
+  };
