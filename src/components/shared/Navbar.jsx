@@ -21,32 +21,24 @@ const Navbar = (props) => {
           <div className="collapse navbar-collapse">
             <ul className="navbar-nav ml-auto">
               <li className="nav-item">
-                <Link to="/contribute">
-                  <a className="nav-link" href="/contribute">
-                    Contribute
-                  </a>
+                <Link to="/contribute" className="nav-link">
+                  Contribute
                 </Link>
               </li>
               <li className="nav-item">
-                <Link to="/sponsor">
-                  <a className="nav-link" href="/sponsor">
-                    Sponsor
-                  </a>
+                <Link to="/sponsor" className="nav-link">
+                  Sponsor
                 </Link>
               </li>
               <li className="nav-item">
-                <Link to="/archive">
-                  <a className="nav-link" href="/archive">
-                    Archive
-                  </a>
+                <Link to="/archive" className="nav-link">
+                  Archive
                 </Link>
               </li>
 
               <li className="nav-item">
-                <Link to="/archive">
-                  <a className="nav-link" href="/me">
-                    {props.wallet.account}
-                  </a>
+                <Link to="/archive" className="nav-link">
+                  {props.wallet.account}
                 </Link>
               </li>
             </ul>
