@@ -14,7 +14,7 @@ async function compileContract(filename, className, params) {
       function (error, stdout, stderr) {
         console.log("stdout: " + stdout);
         console.log("stderr: " + stderr);
-        resolve("OK");
+        resolve();
         if (error !== null) {
           console.log("exec error: " + error);
           reject(error);
