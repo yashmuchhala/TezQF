@@ -32,6 +32,12 @@ async function main() {
     const daoContractAddress = daoContract.address;
     console.log("Deployed DAO Contract at:", daoContractAddress);
     // Compile and deploy token and round manager
+    console.log("Compiling CrowdSale Contract");
+    await compileContract(
+      "main",
+      "CrowdSale",
+      `(sp.address('${admin.publicKeyHash}'), sp.address('${daoContractAddress}'))`
+    );
     console.log("Compiling QuadToken Contract");
     await compileContract(
       "main",
@@ -46,6 +52,12 @@ async function main() {
       `(sp.address('${daoContractAddress}'))`
     );
 
+    console.log("Deploying CrowdSale Contract");
+    const crowdSaleContract = await deployContract(
+      "main",
+      "CrowdSale",
+      "admin"
+    );
     console.log("Deploying QuadToken Contract");
     const tokenContract = await deployContract("main", "QuadToken", "admin");
     console.log("Deployed QuadToken Contract at:", tokenContract.address);
@@ -61,7 +73,9 @@ async function main() {
     var configFile = JSON.parse(
       fs.readFileSync("./contractsConfig.json").toString()
     );
+
     configFile.daoContractAddress = daoContract.address;
+    configFile.crowdSaleContractAddress = crowdSaleContract.address;
     configFile.tokenContractAddress = tokenContract.address;
     configFile.roundManagerContractAddress = roundManagerContract.address;
     fs.writeFile(

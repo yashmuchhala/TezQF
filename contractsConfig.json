@@ -17,6 +17,7 @@
     "node": "https://carthagenet.smartpy.io"
   },
   "daoContractAddress": "kz1-dao-test",
+  "crowdSaleContractAddress": "kz1-cs-test",
   "tokenContractAddress": "kz1-token-test",
   "roundManagerContractAddress": "kz1-rm-test"
 }
