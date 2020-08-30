@@ -19,6 +19,14 @@ A Quadratic Funding scheme governed by a Decentralized Autonomous Organization b
 
 ![Diagram](https://i.ibb.co/phpB844/architecture-2.jpg)
 
+## Code Structure
+
+- Contracts Directory: `contracts/src/main.py`
+- SmartPy CLI: `utils/smartpy-cli`
+- Account Credentials Directory: `utils/keystore/`
+- Reactjs Directory: `src/index.js`
+- Compile, deploy and test scripts: `utils/scripts/`
+
 ## Contributors
 
 - Anshu Jalan
