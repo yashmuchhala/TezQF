@@ -1,40 +1,36 @@
-import Navbar from "./Navbar";
-import React, { Component } from "react";
-
+import React, { useState, useEffect } from "react";
 import { ThanosWallet } from "@thanos-wallet/dapp";
 
-export class Layout extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      wallet: {
-        status: "not connected",
-        account: "",
-      },
-      tezos: null,
-    };
-  }
+import Navbar from "./Navbar";
 
-  async componentDidMount() {
-    if (await ThanosWallet.isAvailable()) {
-      const wallet = new ThanosWallet("My Super DApp");
-      await wallet.connect("carthagenet");
-      const tezos = wallet.toTezos();
-      const accountPkh = await tezos.wallet.pkh();
-      this.setState({
-        wallet: { status: "connected", account: accountPkh },
-        tezos: tezos,
-      });
-    }
-  }
-  render() {
-    return (
-      <div>
-        <Navbar wallet={this.state.wallet} />
-        <div className="container">{this.props.children}</div>
-      </div>
-    );
-  }
-}
+const Layout = (props) => {
+  const [wallet, setWallet] = useState({
+    status: "not connected",
+    account: "",
+  });
+  const [tezos, setTezos] = useState();
+
+  useEffect(() => {
+    const connectThanos = async () => {
+      if (await ThanosWallet.isAvailable()) {
+        const wallet = new ThanosWallet("TezQF");
+        await wallet.connect("carthagenet");
+        const tezos = wallet.toTezos();
+        const accountPkh = await tezos.wallet.pkh();
+        setWallet({ status: "connected", account: accountPkh });
+        setTezos(tezos);
+      }
+    };
+
+    connectThanos();
+  }, []);
+
+  return (
+    <div>
+      <Navbar wallet={wallet} />
+      <div className="container">{props.children}</div>
+    </div>
+  );
+};
 
 export default Layout;
