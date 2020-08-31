@@ -5,6 +5,7 @@ import Layout from "./components/shared/Layout";
 import Home from "./containers/Home";
 import Archive from "./containers/Archive";
 import Contribute from "./containers/Contribute";
+import Project from "./containers/Project";
 import Sponsor from "./containers/Sponsor";
 import Profile from "./containers/Profile";
 
@@ -14,7 +15,8 @@ const App = () => {
       <Layout>
         <Switch>
           <Route path="/" exact component={Home} />
-          <Route path="/contribute" component={Contribute} />
+          <Route exact path="/contribute/:id" component={Project} />
+          <Route exact path="/contribute" component={Contribute} />
           <Route path="/sponsor" component={Sponsor} />
           <Route path="/archive" component={Archive} />
           <Route path="/profile" component={Profile} />
