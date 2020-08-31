@@ -24,7 +24,7 @@ async function compileContract(filename, className, params) {
   });
 }
 // (async () => {
-// const params = "(12, 123)"
-//   await compileContract("demo", "MyContract", params);
+//   const params = `(sp.address('${admin.publicKeyHash}'))`;
+//   await compileContract("main", "DAO", params);
 // })();
 module.exports = compileContract;

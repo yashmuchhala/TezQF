@@ -1,8 +1,4 @@
 var fs = require("fs");
-const conseiljs = require("conseiljs");
-const fetch = require("node-fetch");
-var log = require("loglevel");
-
 const compileContract = require("./compile");
 const deployContract = require("./deploy");
 const config = require("../../contractsConfig.json");
@@ -13,12 +9,6 @@ require.extensions[".tz"] = function (module, filename) {
 };
 
 async function main() {
-  const logger = log.getLogger("conseiljs");
-  logger.setLevel(5, false);
-
-  conseiljs.registerLogger(logger);
-  conseiljs.registerFetch(fetch);
-
   // Compile and deploy DAO Contract
   try {
     console.log("Compiling DAO Contract");
@@ -31,18 +21,19 @@ async function main() {
     const daoContract = await deployContract("main", "DAO", "admin");
     const daoContractAddress = daoContract.address;
     console.log("Deployed DAO Contract at:", daoContractAddress);
-    // Compile and deploy token and round manager
+
     console.log("Compiling CrowdSale Contract");
     await compileContract(
       "main",
       "CrowdSale",
-      `(sp.address('${admin.publicKeyHash}'), sp.address('${daoContractAddress}'))`
+      `(sp.address('${admin.publicKeyHash}'), 100000, sp.address('${daoContractAddress}'))`
     );
+
     console.log("Compiling QuadToken Contract");
     await compileContract(
       "main",
       "QuadToken",
-      `(sp.address('${daoContractAddress}'))`
+      `(sp.address('${admin.publicKeyHash}'), sp.address('${daoContractAddress}'))`
     );
 
     console.log("Compiling RM Contract");
@@ -52,22 +43,29 @@ async function main() {
       `(sp.address('${daoContractAddress}'))`
     );
 
+    // CrowdSale deployment
     console.log("Deploying CrowdSale Contract");
     const crowdSaleContract = await deployContract(
       "main",
       "CrowdSale",
       "admin"
     );
+    console.log("Deployed CrowdSale Contract at:", crowdSaleContract.address);
+
+    // QuadToken deployment
     console.log("Deploying QuadToken Contract");
     const tokenContract = await deployContract("main", "QuadToken", "admin");
     console.log("Deployed QuadToken Contract at:", tokenContract.address);
+
+    // RM deployment
     console.log("Deploying RM contract");
     const roundManagerContract = await deployContract(
       "main",
       "RoundManager",
       "admin"
     );
-    console.log("Deployed QuadToken Contract at:", tokenContract.address);
+    console.log("Deployed RM Contract at:", roundManagerContract.address);
+
     console.log("Updating config file");
     // Update the contract addresses
     var configFile = JSON.parse(

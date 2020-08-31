@@ -1,0 +1,2 @@
+Storage: sp.TRecord(admin = sp.TAddress, daoMultiSig = sp.TAddress, price = sp.TNat, token = sp.TOption(sp.TAddress)).layout((("admin", "daoMultiSig"), ("price", "token")))
+Params: sp.TVariant(buyTokens = sp.TNat, setTokenContract = sp.TAddress).layout(("buyTokens", "setTokenContract"))

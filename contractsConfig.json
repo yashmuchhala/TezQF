@@ -16,8 +16,7 @@
   "interactionConfig": {
     "node": "https://carthagenet.smartpy.io"
   },
-  "daoContractAddress": "kz1-dao-test",
-  "crowdSaleContractAddress": "kz1-cs-test",
-  "tokenContractAddress": "kz1-token-test",
-  "roundManagerContractAddress": "kz1-rm-test"
+  "daoContractAddress": "KT1LhadE7iBfTcaQ2DUsJrR7WhSpeiSEZAHR",
+  "crowdSaleContractAddress": "KT1AKRmimhk3Tqnpwn6zU3FhrRTP51PhvXGR",
+  "tokenContractAddress": "KT1D1WpYiMUjam3LUFWdXaMbvjdwQ9kAm3WT"
 }
