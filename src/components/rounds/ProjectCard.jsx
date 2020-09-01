@@ -13,7 +13,7 @@ const ProjectCard = ({ details }) => {
         <div class="card-body">
           <h5 class="card-title">{details.title}</h5>
           <p class="card-text">{details.description}</p>
-          <Link to={`/contribute/${details.id}`}>
+          <Link to={`/rounds/contribute/${details.id}`}>
             <button class="btn btn-primary btn-block">Contribute</button>
           </Link>
         </div>
