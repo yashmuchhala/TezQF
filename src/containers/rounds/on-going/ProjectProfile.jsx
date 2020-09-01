@@ -43,7 +43,7 @@ const ProjectProfile = () => {
         </div>
         {/* Project funding */}
         <div className="col-4 d-flex flex-column align-items-center justify-content-center">
-          {dummyProjects[id - 1].disputed ? (
+          {dummyProjects[id - 1].disqualified ? (
             <h1 className="text-danger">*DISQUALIFIED*</h1>
           ) : (
             <>
