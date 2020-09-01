@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 
 import { dummyProjects } from "../../../data/dummyProjects";
 
-const Project = () => {
+const ProjectProfile = () => {
   const { id } = useParams();
   // State to maintain active tab
   const [activeTab, setActiveTab] = useState(0);
@@ -139,4 +139,4 @@ const Project = () => {
   );
 };
 
-export default Project;
+export default ProjectProfile;

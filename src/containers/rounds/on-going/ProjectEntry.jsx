@@ -1,6 +1,6 @@
 import React from "react";
 
-const Enter = () => {
+const ProjectEntry = () => {
   return (
     <div className="container d-flex align-items-center flex-column mb-5">
       {/* Header */}
@@ -90,4 +90,4 @@ const Enter = () => {
   );
 };
 
-export default Enter;
+export default ProjectEntry;

@@ -5,9 +5,9 @@ import Home from "./containers/Home";
 
 //Rounds
 import Archive from "./containers/rounds/archive/Archive";
-import Contribute from "./containers/rounds/on-going/Contribute";
-import Enter from "./containers/rounds/on-going/Enter";
-import Project from "./containers/rounds/on-going/Project";
+import Projects from "./containers/rounds/on-going/Projects";
+import ProjectEntry from "./containers/rounds/on-going/ProjectEntry";
+import ProjectProfile from "./containers/rounds/on-going/ProjectProfile";
 import Profile from "./containers/rounds/on-going/Profile";
 import RoundsHome from "./containers/rounds/RoundsHome";
 import Sponsor from "./containers/rounds/Sponsor";
@@ -24,9 +24,13 @@ const App = () => {
           <Route path="/" exact component={Home} />
           {/* Rounds Routes */}
           <Route path="/rounds" exact component={RoundsHome} />
-          <Route exact path="/rounds/contribute/:id" component={Project} />
-          <Route exact path="/rounds/contribute" component={Contribute} />
-          <Route exact path="/rounds/enter" component={Enter} />
+          <Route
+            exact
+            path="/rounds/contribute/:id"
+            component={ProjectProfile}
+          />
+          <Route exact path="/rounds/contribute" component={Projects} />
+          <Route exact path="/rounds/enter" component={ProjectEntry} />
           <Route path="/rounds/sponsor" component={Sponsor} />
           <Route path="/rounds/archive" component={Archive} />
           <Route path="/rounds/profile" component={Profile} />
