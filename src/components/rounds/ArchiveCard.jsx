@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const ArchiveCard = ({ details }) => {
   return (
@@ -33,6 +34,9 @@ const ArchiveCard = ({ details }) => {
               </div>
             </div>
           )}
+          <Link to={`/rounds/archive/${details.id}`}>
+            <button class="btn btn-primary btn-block">View</button>
+          </Link>
         </div>
       </div>
     </div>

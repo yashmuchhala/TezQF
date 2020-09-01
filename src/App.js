@@ -5,6 +5,7 @@ import Home from "./containers/Home";
 
 //Rounds
 import Archive from "./containers/rounds/archive/Archive";
+import ArchiveProfile from "./containers/rounds/archive/ArchiveProfile";
 import Projects from "./containers/rounds/on-going/Projects";
 import ProjectEntry from "./containers/rounds/on-going/ProjectEntry";
 import ProjectProfile from "./containers/rounds/on-going/ProjectProfile";
@@ -32,6 +33,7 @@ const App = () => {
           <Route exact path="/rounds/contribute" component={Projects} />
           <Route exact path="/rounds/enter" component={ProjectEntry} />
           <Route path="/rounds/sponsor" component={Sponsor} />
+          <Route path="/rounds/archive/:id" component={ArchiveProfile} />
           <Route path="/rounds/archive" component={Archive} />
           <Route path="/rounds/profile" component={Profile} />
           {/* Governance Routes */}

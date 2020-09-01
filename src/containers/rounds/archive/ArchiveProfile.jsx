@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 
 import { dummyProjects } from "../../../data/dummyProjects";
 
-const ProjectProfile = () => {
+const ArchiveProfile = () => {
   const { id } = useParams();
   // State to maintain active tab
   const [activeTab, setActiveTab] = useState(0);
@@ -24,11 +24,13 @@ const ProjectProfile = () => {
       <div className="row mb-5">
         {/* Project Image */}
         <div className="col-4">
+          <h5 className="text-danger text-center">*Archived*</h5>
           <img
             src={dummyProjects[id - 1].image}
             height="100%"
             width="100%"
             alt="Project Background"
+            className="justify-self-center"
           />
         </div>
         {/* Project Overview */}
@@ -51,8 +53,10 @@ const ProjectProfile = () => {
                 {dummyProjects[id - 1].amount} tz
               </h1>
               <p>Received from a total of 180 contributors</p>
-              <button className="btn btn-primary btn-block">Contribute</button>
-              <p className="align-self-end">! Dispute</p>
+              <h1 className="font-weight-light text-primary mb-0">
+                {dummyProjects[id - 1].clr} tz
+              </h1>
+              <p className="font-weight-bold">Final CLR Match</p>
             </>
           )}
         </div>
@@ -139,4 +143,4 @@ const ProjectProfile = () => {
   );
 };
 
-export default ProjectProfile;
+export default ArchiveProfile;
