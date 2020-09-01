@@ -2,37 +2,7 @@ import React from "react";
 
 import ProjectCard from "../components/shared/ProjectCard";
 
-const dummyProjects = [
-  {
-    id: 1,
-    image:
-      "https://image.freepik.com/free-photo/abstract-connected-dots-lines-blue-background_34629-424.jpg",
-    title: "Title 1",
-    description:
-      "A short description of the project limited to a number of characters.",
-  },
-  {
-    id: 2,
-    image:
-      "https://image.freepik.com/free-photo/abstract-connected-dots-lines-blue-background_34629-424.jpg",
-    title: "Title 2",
-    description: "Desc 2",
-  },
-  {
-    id: 3,
-    image:
-      "https://image.freepik.com/free-photo/abstract-connected-dots-lines-blue-background_34629-424.jpg",
-    title: "Title 3",
-    description: "Desc 3",
-  },
-  {
-    id: 4,
-    image:
-      "https://image.freepik.com/free-photo/abstract-connected-dots-lines-blue-background_34629-424.jpg",
-    title: "Title 4",
-    description: "Desc 4",
-  },
-];
+import { dummyProjects } from "../data/dummyProjects";
 
 const Contribute = () => {
   const renderProjects = dummyProjects.map((details) => (

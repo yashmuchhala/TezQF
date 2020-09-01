@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const ProjectCard = ({ details }) => {
   return (
@@ -12,7 +13,9 @@ const ProjectCard = ({ details }) => {
         <div class="card-body">
           <h5 class="card-title">{details.title}</h5>
           <p class="card-text">{details.description}</p>
-          <button class="btn btn-primary btn-block">Contribute</button>
+          <Link to={`/contribute/${details.id}`}>
+            <button class="btn btn-primary btn-block">Contribute</button>
+          </Link>
         </div>
       </div>
     </div>
