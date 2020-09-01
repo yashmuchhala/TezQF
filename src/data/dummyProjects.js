@@ -11,6 +11,7 @@ export const dummyProjects = [
     github: "https://github.com/MyProject",
     address: "tz1VWWRqfpoFjP1qDF5oAk22A8bg9WP1Mp2L",
     amount: 10000,
+    disputed: true,
     contributors: [
       {
         address: "tz1VWWRqfpoFjP1qDF5oAk22A8bg9WP1Mp2L",

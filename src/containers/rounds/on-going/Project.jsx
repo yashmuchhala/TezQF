@@ -43,12 +43,18 @@ const Project = () => {
         </div>
         {/* Project funding */}
         <div className="col-4 d-flex flex-column align-items-center justify-content-center">
-          <h1 className="font-weight-light">
-            {dummyProjects[id - 1].amount} tz
-          </h1>
-          <p>Received from a total of 180 contributors</p>
-          <button className="btn btn-primary btn-block">Contribute</button>
-          <p className="align-self-end">! Dispute</p>
+          {dummyProjects[id - 1].disputed ? (
+            <h1 className="text-danger">*DISQUALIFIED*</h1>
+          ) : (
+            <>
+              <h1 className="font-weight-light">
+                {dummyProjects[id - 1].amount} tz
+              </h1>
+              <p>Received from a total of 180 contributors</p>
+              <button className="btn btn-primary btn-block">Contribute</button>
+              <p className="align-self-end">! Dispute</p>
+            </>
+          )}
         </div>
       </div>
 
@@ -100,10 +106,25 @@ const Project = () => {
           className={`tab-pane ${activeTab === 1 ? `active` : null}`}
           id="description"
         >
-          <p className="text-center text-success font-weight-bold">
-            {dummyProjects[id - 1].contributors.length} Contributors
-          </p>
-          <ul className="list-group list-group-flush">{renderContributors}</ul>
+          {dummyProjects[id - 1].disputed ? (
+            <>
+              <h2 className="font-weight-light text-center">
+                This project was disqualified for PLAGIARISM.
+              </h2>
+              <h2 className="font-weight-light text-center">
+                View the dispute statement here.
+              </h2>
+            </>
+          ) : (
+            <>
+              <p className="text-center text-success font-weight-bold">
+                {dummyProjects[id - 1].contributors.length} Contributors
+              </p>
+              <ul className="list-group list-group-flush">
+                {renderContributors}
+              </ul>
+            </>
+          )}
         </div>
 
         {/* Comments Tab */}
