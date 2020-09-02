@@ -278,16 +278,19 @@ class Expr:
     def is_variant(self, name):
         return Expr("isVariant", [self, name, get_line_no()])
 
-    def open_some(self):
-        return self.open_variant("Some")
+    def open_some(self, message = None):
+        return self.open_variant("Some", message)
 
-    def open_variant(self, name):
-        try:
-            return self.opens[name]
-        except KeyError:
-            result = Expr("openVariant", [self, name, get_line_no()])
-            self.opens[name] = result
-            return result
+    def open_variant(self, name, message = None):
+        if message is None:
+            try:
+                return self.opens[name]
+            except KeyError:
+                result = Expr("openVariant", [self, name, "None" if message is None else spExpr(message), get_line_no()])
+                self.opens[name] = result
+                return result
+        else:
+            return Expr("openVariant", [self, name, "None" if message is None else spExpr(message), get_line_no()])
 
     def append(self, other):
         raise Exception(
@@ -997,7 +1000,7 @@ class PreparedMessage:
         data["time"] = self.time
         data["amount"] = self.amount
         data["level"] = self.level
-        data["show"] = True
+        data["show"] = self.show
         data["valid"] = self.valid
         return [data]
 
@@ -1076,6 +1079,7 @@ class ExecMessage:
         now=None,
         level=None,
         valid=True,
+        show=True,
         chain_id=None,
     ):
         sp.profile(self.message + " begin " + str(get_line_no()))
@@ -1118,6 +1122,7 @@ class ExecMessage:
         result.message = self.message
         result.params = self.params.export()
         result.valid = valid
+        result.show = show
         sp.profile(self.message + " end")
         return result
 
@@ -1351,6 +1356,16 @@ class Contract:
         else:
             raise Exception("Storage already set on contract (line %i)" % (get_line_no()))
 
+    def set_initial_balance(self, balance):
+        if isinstance(balance, pyInt):
+            raise Exception(
+                "balance should be in tez or mutez and not int (use sp.tez(..) or sp.mutez(..))"
+            )
+        if self.__initial_balance is None:
+            self.__initial_balance = balance
+        else:
+            raise Exception("Balance already set on contract (line %i)" % (get_line_no()))
+
     def init_internal(self):
         self.currentBlock = None
         if not hasattr(self, "verbose"):
@@ -1369,6 +1384,8 @@ class Contract:
             self.messages_collected = False
         if not hasattr(self, "storage"):
             self.storage = None
+        if not hasattr(self, "__initial_balance"):
+            self.__initial_balance = None
         if not hasattr(self, "storage_type"):
             self.storage_type = None
         if not hasattr(self, "storage_layout"):
@@ -1470,7 +1487,7 @@ class Contract:
     def export(self):
         if self.exception_optimization_level is not None:
             self.add_flag("Exception_%s" % self.exception_optimization_level)
-        result = "(storage %s\nstorage_type (%s)\nmessages (%s)\nflags (%s)\nglobals (%s)\nstorage_layout %s\nentry_points_layout %s)" % (
+        result = "(storage %s\nstorage_type (%s)\nmessages (%s)\nflags (%s)\nglobals (%s)\nstorage_layout %s\nentry_points_layout %s\nbalance %s)" % (
             (self.storage.export() if self.storage is not None else "()"),
             ("%s" % (self.storage_type.export()) if self.storage_type is not None else "()"),
             (
@@ -1488,6 +1505,7 @@ class Contract:
             ),
             (self.storage_layout if self.storage_layout is not None else "()"),
             (self.entry_points_layout if self.entry_points_layout is not None else "()"),
+            (self.__initial_balance.export() if self.__initial_balance is not None else "()"),
         )
         if self.verbose:
             alert("Creating\n\n%s" % result)
@@ -1606,7 +1624,7 @@ def implicit_account(key_hash):
 default_verify_message = None
 wrap_verify_messages = None
 
-def verify(cond, ghost=False, message=None):
+def verify(cond, message=None, ghost=False):
     if message is None:
         message = default_verify_message
     if wrap_verify_messages is not None and message is not None:

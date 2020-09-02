@@ -127,7 +127,7 @@ case "$1" in
     "local-install-custom" )
         install_from download "$2" "$3" ;;
     "local-install-auto" )
-        install_from download https://smartpy.io/dev-20200824-49d2e75aa10f51a9194ba744ee19d27731d85e2d/cli "$2" ;;
+        install_from download https://smartpy.io/dev-20200830-c5ff990e1a430240fad527324bb33eeae811f71a/cli "$2" ;;
     "local-install-from" )
         shift
         install_from cp "$1" "$2" ;;
