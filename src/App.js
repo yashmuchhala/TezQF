@@ -16,6 +16,7 @@ import Sponsor from "./containers/rounds/Sponsor";
 //Governance
 import Disputes from "./containers/governance/Disputes";
 import Executive from "./containers/governance/Executive";
+import ExecutiveVoting from "./containers/governance/ExecutiveVoting";
 
 const App = () => {
   return (
@@ -37,6 +38,11 @@ const App = () => {
           <Route path="/rounds/archive" component={Archive} />
           <Route path="/rounds/profile" component={Profile} />
           {/* Governance Routes */}
+          <Route
+            exact
+            path="/governance/executive/:id"
+            component={ExecutiveVoting}
+          />
           <Route exact path="/governance/executive" component={Executive} />
           <Route exact path="/governance/disputes" component={Disputes} />
         </Switch>

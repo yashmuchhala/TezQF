@@ -1,6 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import Moment from "react-moment";
+import { Link } from "react-router-dom";
 
 const ArchivedProposal = ({ proposal }) => {
   return (
@@ -14,9 +15,12 @@ const ArchivedProposal = ({ proposal }) => {
               <Moment format="DD-MM-YYYY">{proposal.start}</Moment> {" to "}
               <Moment format="DD-MM-YYYY">{proposal.end}</Moment>
               {". "}
-              <a href="!#" className="text-blue">
+              <Link
+                to={`/governance/executive/${proposal.id}`}
+                className="text-blue"
+              >
                 Read more.
-              </a>
+              </Link>
             </p>
           </div>
 

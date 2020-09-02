@@ -1,12 +1,14 @@
 import React from "react";
 import Moment from "react-moment";
 import ArchivedProposal from "../../components/governance/ArchivedProposal";
+import { Link } from "react-router-dom";
 
 //Dummy data
 import { executive } from "../../data/executive";
 
 const Executive = () => {
-  const { activeProposal, archivedProposals } = executive;
+  const activeProposal = executive[executive.length - 1];
+  const archivedProposals = executive.slice(0, -1);
 
   return (
     <div>
@@ -44,9 +46,12 @@ const Executive = () => {
                 {" to "}
                 <Moment format="DD-MM-YYYY">{activeProposal.end}</Moment>
                 {". "}
-                <a href="!#" className="text-blue">
+                <Link
+                  to={`/governance/executive/${activeProposal.id}`}
+                  className="text-blue"
+                >
                   Read more.
-                </a>
+                </Link>
               </p>
             </div>
             <div className="col-sm-3">
