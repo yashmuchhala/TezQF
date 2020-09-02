@@ -1,6 +1,7 @@
 import React from "react";
 import { useParams } from "react-router-dom";
 import Moment from "react-moment";
+import DisputeVotingModal from "../../components/governance/DisputeVotingModal";
 
 //Dummy data
 import { disputes } from "../../data/disputes";
@@ -18,7 +19,13 @@ const DisputeVoting = () => {
     if (dispute.resolved === 0) {
       return (
         <>
-          <button className="btn btn-outline-success btn-block">Vote</button>
+          <button
+            data-toggle="modal"
+            data-target="#dispute-voting-model"
+            className="btn btn-outline-success btn-block"
+          >
+            Vote
+          </button>
           <p className="mt-1 text-center text-secondary">
             {dispute.votesYes} votes in support.
           </p>
@@ -134,6 +141,9 @@ const DisputeVoting = () => {
           </div>
         </div>
       </div>
+
+      {/* Voting Modal */}
+      <DisputeVotingModal dispute={dispute} />
     </div>
   );
 };

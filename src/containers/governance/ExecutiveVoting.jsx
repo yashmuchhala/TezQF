@@ -1,6 +1,7 @@
 import React from "react";
 import { useParams } from "react-router-dom";
 import Moment from "react-moment";
+import ExecutiveVotingModal from "../../components/governance/ExecutiveVotingModal";
 
 //Dummy data
 import { executive } from "../../data/executive";
@@ -16,7 +17,13 @@ const ExecutiveVoting = () => {
     if (proposal.resolved === 0) {
       return (
         <>
-          <button className="btn btn-outline-success btn-block">Vote</button>
+          <button
+            data-toggle="modal"
+            data-target="#executive-voting-model"
+            className="btn btn-outline-success btn-block"
+          >
+            Vote
+          </button>
           <p className="mt-1 text-center text-secondary">
             {proposal.votesYes} votes in support.
           </p>
@@ -155,6 +162,9 @@ const ExecutiveVoting = () => {
           </div>
         </div>
       </div>
+
+      {/* Voting Modal */}
+      <ExecutiveVotingModal proposal={proposal} />
     </div>
   );
 };
