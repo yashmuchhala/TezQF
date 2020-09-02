@@ -11,6 +11,25 @@ export const dummyProjects = [
     github: "https://github.com/MyProject",
     address: "tz1VWWRqfpoFjP1qDF5oAk22A8bg9WP1Mp2L",
     amount: 10000,
+    disqualified: true,
+    contributors: [
+      {
+        address: "tz1VWWRqfpoFjP1qDF5oAk22A8bg9WP1Mp2L",
+        amount: 25,
+      },
+      {
+        address: "tz1VWWRqfpoFjP1qDF5oAk22A8bg9WP1Mp2L",
+        amount: 29,
+      },
+      {
+        address: "tz1VWWRqfpoFjP1qDF5oAk22A8bg9WP1Mp2L",
+        amount: 25,
+      },
+      {
+        address: "tz1VWWRqfpoFjP1qDF5oAk22A8bg9WP1Mp2L",
+        amount: 25,
+      },
+    ],
   },
   {
     id: 2,
@@ -23,6 +42,25 @@ export const dummyProjects = [
     github: "https://github.com/MyProject",
     address: "tz1VWWRqfpoFjP1qDF5oAk22A8bg9WP1Mp2L",
     amount: 10000,
+    clr: 9100,
+    contributors: [
+      {
+        address: "tz1VWWRqfpoFjP1qDF5oAk22A8bg9WP1Mp2L",
+        amount: 25,
+      },
+      {
+        address: "tz1VWWRqfpoFjP1qDF5oAk22A8bg9WP1Mp2L",
+        amount: 29,
+      },
+      {
+        address: "tz1VWWRqfpoFjP1qDF5oAk22A8bg9WP1Mp2L",
+        amount: 25,
+      },
+      {
+        address: "tz1VWWRqfpoFjP1qDF5oAk22A8bg9WP1Mp2L",
+        amount: 25,
+      },
+    ],
   },
   {
     id: 3,
@@ -35,6 +73,8 @@ export const dummyProjects = [
     github: "https://github.com/MyProject",
     address: "tz1VWWRqfpoFjP1qDF5oAk22A8bg9WP1Mp2L",
     amount: 10000,
+    clr: 9100,
+    contributors: [],
   },
   {
     id: 4,
@@ -47,5 +87,7 @@ export const dummyProjects = [
     github: "https://github.com/MyProject",
     address: "tz1VWWRqfpoFjP1qDF5oAk22A8bg9WP1Mp2L",
     amount: 10000,
+    clr: 9100,
+    contributors: [],
   },
 ];

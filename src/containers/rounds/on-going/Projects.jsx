@@ -1,10 +1,10 @@
-import React from 'react';
+import React from "react";
 
-import ProjectCard from '../../../components/rounds/ProjectCard';
+import ProjectCard from "../../../components/rounds/ProjectCard";
 
-import { dummyProjects } from '../../../data/dummyProjects';
+import { dummyProjects } from "../../../data/dummyProjects";
 
-const Contribute = () => {
+const Projects = () => {
   const renderProjects = dummyProjects.map((details) => (
     <ProjectCard details={details} />
   ));
@@ -12,12 +12,12 @@ const Contribute = () => {
   return (
     <div>
       {/* Header */}
-      <h1 className='font-weight-light'>Funding Round 5</h1>
-      <h4 className='font-weight-lighter'>
+      <h1 className="font-weight-light">Funding Round 5</h1>
+      <h4 className="font-weight-lighter">
         The community has contributed over $14000 till now! Help your favourite
         projects in getting ahead!
       </h4>
-      <h5 className='font-weight-lighter'>
+      <h5 className="font-weight-lighter">
         <em>Ends in 25D 12H 20M</em>
       </h5>
 
@@ -25,9 +25,9 @@ const Contribute = () => {
 
       {/* Body - Divided into 2 columns*/}
       {/* Column 1 for filtering, Column 2 for displaying projects */}
-      <div className='row'>
+      <div className="row">
         {/* Filters column */}
-        <div className='col-3'>
+        <div className="col-3">
           <h5>Filter Projects</h5>
           <div>Defi</div>
           <div>Tech</div>
@@ -35,21 +35,21 @@ const Contribute = () => {
         </div>
 
         {/* Projects column */}
-        <div className='col'>
+        <div className="col">
           {/* Search input with button */}
-          <div className='input-group'>
-            <div className='input-group mb-3'>
+          <div className="input-group">
+            <div className="input-group mb-3">
               <input
-                type='text'
-                className='form-control'
-                placeholder='Search'
-                aria-label='Search'
+                type="text"
+                className="form-control"
+                placeholder="Search"
+                aria-label="Search"
               />
-              <div className='input-group-append'>
+              <div className="input-group-append">
                 <button
-                  className='btn btn-success'
-                  type='button'
-                  id='button-addon2'
+                  className="btn btn-success"
+                  type="button"
+                  id="button-addon2"
                 >
                   Search
                 </button>
@@ -58,8 +58,8 @@ const Contribute = () => {
           </div>
 
           {/* Projects */}
-          <div className='container-fluid'>
-            <div className='row'>{renderProjects}</div>
+          <div className="container-fluid">
+            <div className="row">{renderProjects}</div>
           </div>
         </div>
       </div>
@@ -67,4 +67,4 @@ const Contribute = () => {
   );
 };
 
-export default Contribute;
+export default Projects;
