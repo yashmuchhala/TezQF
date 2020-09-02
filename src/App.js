@@ -17,6 +17,7 @@ import Sponsor from "./containers/rounds/Sponsor";
 import Disputes from "./containers/governance/Disputes";
 import Executive from "./containers/governance/Executive";
 import ExecutiveVoting from "./containers/governance/ExecutiveVoting";
+import DisputeVoting from "./containers/governance/DisputeVoting";
 
 const App = () => {
   return (
@@ -42,6 +43,12 @@ const App = () => {
             exact
             path="/governance/executive/:id"
             component={ExecutiveVoting}
+          />
+          {/* NOTE: Replace with appropraite parameters once the contract is integrated */}
+          <Route
+            exact
+            path="/governance/disputes/:roundId/:id"
+            component={DisputeVoting}
           />
           <Route exact path="/governance/executive" component={Executive} />
           <Route exact path="/governance/disputes" component={Disputes} />

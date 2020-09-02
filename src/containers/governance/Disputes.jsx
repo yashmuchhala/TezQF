@@ -7,7 +7,8 @@ import ArchivedDispute from "../../components/governance/ArchivedDispute";
 import { disputes } from "../../data/disputes";
 
 const Disputes = () => {
-  const { activeDisputes, archivedDisputes } = disputes;
+  const activeDisputes = disputes[disputes.length - 1];
+  const archivedDisputes = disputes.slice(0, -1);
 
   return (
     <div>
@@ -35,8 +36,14 @@ const Disputes = () => {
       <br />
 
       {/* Active Disputes */}
-      {activeDisputes.map((dispute) => (
-        <ActiveDispute key={dispute.entryId} dispute={dispute} />
+
+      {/* Remove roundId after contract contract integration */}
+      {activeDisputes.disputes.map((dispute) => (
+        <ActiveDispute
+          roundId={activeDisputes.roundId}
+          key={dispute.entryId}
+          dispute={dispute}
+        />
       ))}
 
       <hr className="my-0" />
@@ -70,7 +77,11 @@ const Disputes = () => {
                   <p className="text-center mb-0">No disputes to show.</p>
                 ) : (
                   round.disputes.map((dispute) => (
-                    <ArchivedDispute key={dispute.entryId} dispute={dispute} />
+                    <ArchivedDispute
+                      roundId={round.roundId}
+                      key={dispute.entryId}
+                      dispute={dispute}
+                    />
                   ))
                 )}
               </div>

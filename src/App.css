@@ -1,7 +1,9 @@
 .btn:focus,
-.btn:active {
+.btn:active,
+.btn:hover {
   outline: none !important;
   box-shadow: none;
+  text-decoration: none !important;
 }
 
 .details-table tr {

@@ -3,44 +3,46 @@ import { useParams } from "react-router-dom";
 import Moment from "react-moment";
 
 //Dummy data
-import { executive } from "../../data/executive";
+import { disputes } from "../../data/disputes";
 
-const ExecutiveVoting = () => {
-  const { id } = useParams();
+const DisputeVoting = () => {
+  const { roundId, id } = useParams();
 
-  //Retrieve Proposal Object (Replace with contract retrieval)
-  const proposal = executive[id - 1];
+  //Retrieve Dispute Object (Replace with contract retrieval)
+  const dispute = disputes[roundId - 1].disputes.filter(
+    (dispute) => dispute.entryId === parseInt(id)
+  )[0];
 
   //Check for resolved status and generate the relevant button
   const getVotingButton = () => {
-    if (proposal.resolved === 0) {
+    if (dispute.resolved === 0) {
       return (
         <>
           <button className="btn btn-outline-success btn-block">Vote</button>
           <p className="mt-1 text-center text-secondary">
-            {proposal.votesYes} votes in support.
+            {dispute.votesYes} votes in support.
           </p>
         </>
       );
-    } else if (proposal.resolved === 1) {
+    } else if (dispute.resolved === 1) {
       return (
         <>
-          <button disabled className="btn btn-success btn-block">
-            Accepted
+          <button disabled className="btn btn-danger btn-block">
+            Entry Disqualified
           </button>
           <p className="mt-1 text-center text-secondary">
-            {proposal.votesYes} votes in support.
+            {dispute.votesYes} votes in support.
           </p>
         </>
       );
     } else {
       return (
         <>
-          <button disabled className="btn btn-danger btn-block">
-            Rejected
+          <button disabled className="btn btn-success btn-block">
+            Dispute Rejected
           </button>
           <p className="mt-1 text-center text-secondary">
-            {proposal.votesNo} votes against.
+            {dispute.votesNo} votes against.
           </p>
         </>
       );
@@ -49,12 +51,12 @@ const ExecutiveVoting = () => {
 
   return (
     <div className="row">
-      {/* Proposal Details */}
+      {/* dispute Details */}
       <div className="col-md-8">
         <div className="card">
           <div className="card-body">
             <h2 className="card-title">
-              Proposal to conduct funding round {proposal.id}
+              Dispute Entry #{dispute.entryId}: {dispute.title}
             </h2>
             <h4>Description</h4>
             <p className="text-grey">
@@ -73,31 +75,8 @@ const ExecutiveVoting = () => {
               nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo
               voluptas nulla pariatur
             </p>
-            <table>
-              <thead>
-                <tr>
-                  <td>
-                    <h4>Start</h4>
-                  </td>
-                  <td className="px-4">
-                    <h4>End</h4>
-                  </td>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>
-                    <Moment format="DD/MM/YYYY">{proposal.start}</Moment>
-                  </td>
-                  <td className="px-4">
-                    <Moment format="DD/MM/YYYY">{proposal.end}</Moment>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-            <br />
-            <h4>Categories</h4>
-            <p>{proposal.categories}</p>
+            <h4>Relevants Links</h4>
+            <a href={dispute.link}>{dispute.link}</a>
             <br />
           </div>
         </div>
@@ -112,21 +91,21 @@ const ExecutiveVoting = () => {
             <table className="w-100 mb-3 details-table">
               <tbody>
                 <tr>
-                  <td className="text-grey">Creator</td>
+                  <td className="text-grey">Disputer</td>
                   {/* Link to tzStats */}
-                  <td>{proposal.creator.slice(0, 10)}...</td>
+                  <td>{dispute.disputer.slice(0, 10)}...</td>
                 </tr>
                 <tr>
                   <td className="text-grey">Created at</td>
                   <td>
-                    <Moment format="DD/MM/YYYY">{proposal.created}</Moment>
+                    <Moment format="DD/MM/YYYY">{dispute.created}</Moment>
                   </td>
                 </tr>
-                {proposal.resolved === 0 ? (
+                {dispute.resolved === 0 ? (
                   <tr>
                     <td className="text-grey">Ends in</td>
                     <td>
-                      <Moment format="DD/MM/YYYY">{proposal.expiry}</Moment>
+                      <Moment format="DD/MM/YYYY">{dispute.expiry}</Moment>
                     </td>
                   </tr>
                 ) : (
@@ -140,15 +119,15 @@ const ExecutiveVoting = () => {
               <tbody>
                 <tr>
                   <td className="text-grey">Total Votes</td>
-                  <td>{proposal.votes}</td>
+                  <td>{dispute.votes}</td>
                 </tr>
                 <tr>
                   <td className="text-grey">Yes Votes</td>
-                  <td>{proposal.votesYes}</td>
+                  <td>{dispute.votesYes}</td>
                 </tr>
                 <tr>
                   <td className="text-grey">No Votes</td>
-                  <td>{proposal.votesNo}</td>
+                  <td>{dispute.votesNo}</td>
                 </tr>
               </tbody>
             </table>
@@ -159,4 +138,4 @@ const ExecutiveVoting = () => {
   );
 };
 
-export default ExecutiveVoting;
+export default DisputeVoting;

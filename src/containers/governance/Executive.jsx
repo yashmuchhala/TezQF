@@ -55,9 +55,14 @@ const Executive = () => {
               </p>
             </div>
             <div className="col-sm-3">
-              <button className="btn btn-outline-success btn-block">
-                Vote for Proposal
-              </button>
+              <Link
+                to={`/governance/executive/${activeProposal.id}`}
+                style={{ textDecoration: "none" }}
+              >
+                <button className="btn btn-outline-success btn-block">
+                  Vote for Proposal
+                </button>
+              </Link>
               <p className="mb-0 mt-1 text-center text-secondary">
                 {activeProposal.votesYes} votes in support.
               </p>

@@ -1,6 +1,8 @@
 import React from "react";
+import PropTypes from "prop-types";
+import { Link } from "react-router-dom";
 
-const ArchivedDispute = ({ dispute }) => {
+const ArchivedDispute = ({ roundId, dispute }) => {
   return (
     <div className="mb-3 card">
       <div className="card-body">
@@ -11,9 +13,12 @@ const ArchivedDispute = ({ dispute }) => {
               {dispute.description.length > 100
                 ? dispute.description.substring(0, 100) + ".."
                 : dispute.description}{" "}
-              <a href="!#" className="text-blue">
+              <Link
+                to={`/governance/disputes/${roundId}/${dispute.entryId}`}
+                className="text-blue"
+              >
                 Read more.
-              </a>
+              </Link>
             </p>
           </div>
           <div className="col-sm-3">
@@ -41,6 +46,11 @@ const ArchivedDispute = ({ dispute }) => {
       </div>
     </div>
   );
+};
+
+ArchivedDispute.propTypes = {
+  roundId: PropTypes.number.isRequired,
+  dispute: PropTypes.object.isRequired,
 };
 
 export default ArchivedDispute;
