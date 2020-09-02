@@ -4,12 +4,12 @@ import Moment from "react-moment";
 
 const ArchivedProposal = ({ proposal }) => {
   return (
-    <div className="card">
+    <div className="mb-3 card">
       <div className="card-body">
         <div className="align-items-center row">
           <div className="col-sm-9">
-            <h5 class="card-title">{`Proposal to conduct funding round ${proposal.id}`}</h5>
-            <p class="card-text">
+            <h5 className="card-title">{`Proposal to conduct funding round ${proposal.id}`}</h5>
+            <p className="card-text">
               {`Round ${proposal.id} to be held from `}
               <Moment format="DD-MM-YYYY">{proposal.start}</Moment> {" to "}
               <Moment format="DD-MM-YYYY">{proposal.end}</Moment>

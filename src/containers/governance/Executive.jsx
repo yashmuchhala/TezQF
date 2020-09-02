@@ -1,9 +1,9 @@
 import React from "react";
 import Moment from "react-moment";
+import ArchivedProposal from "../../components/governance/ArchivedProposal";
 
 //Dummy data
 import { executive } from "../../data/executive";
-import ArchivedProposal from "../../components/governance/ArchivedProposal";
 
 const Executive = () => {
   const { activeProposal, archivedProposals } = executive;
@@ -15,8 +15,8 @@ const Executive = () => {
         <div className="card-body">
           <div className="align-items-center row">
             <div className="col-sm-9">
-              <h5 class="card-title">Round Proposal</h5>
-              <p class="card-text">
+              <h5 className="card-title">Round Proposal</h5>
+              <p className="card-text">
                 Create a proposal for a funding round. You must be a holder of
                 at least 2000 DAO tokens.
               </p>
@@ -37,8 +37,8 @@ const Executive = () => {
         <div className="card-body">
           <div className="align-items-center row">
             <div className="col-sm-9">
-              <h5 class="card-title">{`Proposal to conduct funding round ${activeProposal.id}`}</h5>
-              <p class="card-text">
+              <h5 className="card-title">{`Proposal to conduct funding round ${activeProposal.id}`}</h5>
+              <p className="card-text">
                 {`Round ${activeProposal.id} to be held from `}
                 <Moment format="DD-MM-YYYY">{activeProposal.start}</Moment>{" "}
                 {" to "}
@@ -64,11 +64,8 @@ const Executive = () => {
       <hr className="my-4" />
 
       {/* Archived Proposal */}
-      {archivedProposals.map((proposal) => (
-        <>
-          <ArchivedProposal proposal={proposal} />
-          <br />
-        </>
+      {archivedProposals.map((proposal, index) => (
+        <ArchivedProposal key={index} proposal={proposal} />
       ))}
     </div>
   );
