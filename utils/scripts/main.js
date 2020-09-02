@@ -2,6 +2,7 @@ var fs = require("fs");
 const compileContract = require("./compile");
 const deployContract = require("./deploy");
 const config = require("../../contractsConfig.json");
+const setupContracts = require("./setupContracts");
 const admin = require(`../keystore/${config.keyName}`);
 
 require.extensions[".tz"] = function (module, filename) {
@@ -81,7 +82,15 @@ async function main() {
       JSON.stringify(configFile, null, 2),
       () => {}
     );
-    console.log("Updated config file [COMPLETE]");
+    console.log("Updated config file");
+    console.log("Setting contract addresses in dependant contracts");
+    await setupContracts(
+      daoContract.address,
+      tokenContract.address,
+      crowdSaleContract.address,
+      roundManagerContract.address
+    );
+    console.log("COMPLETE");
   } catch (error) {
     if (!error.response) {
       console.log("Error:", error);

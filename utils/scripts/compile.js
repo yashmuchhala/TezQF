@@ -1,6 +1,5 @@
 const exec = require("child_process").exec;
 const config = require("../../contractsConfig.json");
-const admin = require(`../keystore/${config.keyName}`);
 
 async function compileContract(filename, className, params) {
   return new Promise((resolve, reject) => {
