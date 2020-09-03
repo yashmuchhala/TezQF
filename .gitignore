@@ -12,6 +12,7 @@
 /contracts/build
 
 # production
+__pycache__/
 /build
 
 # misc

@@ -5,7 +5,7 @@ A Quadratic Funding scheme governed by a Decentralized Autonomous Organization b
 ## Dependencies
 
 - Unix/Linux
-- Nodejs == 12.8
+- Nodejs >= 12.0
 - Python 3
 
 ## Steps to build
