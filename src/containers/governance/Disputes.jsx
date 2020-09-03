@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 import ActiveDispute from "../../components/governance/ActiveDispute";
 import ArchivedDispute from "../../components/governance/ArchivedDispute";
@@ -25,9 +26,14 @@ const Disputes = () => {
               </p>
             </div>
             <div className="col-sm-3">
-              <button className="btn btn-outline-primary btn-block">
-                Setup
-              </button>
+              <Link
+                to="/governance/disputes/new"
+                style={{ textDecoration: "none" }}
+              >
+                <button className="btn btn-outline-primary btn-block">
+                  Setup
+                </button>
+              </Link>
             </div>
           </div>
         </div>
@@ -46,7 +52,7 @@ const Disputes = () => {
         />
       ))}
 
-      <hr className="my-0" />
+      <hr className="mb-3" />
 
       {/* Archived Disputes */}
       <div id="accordian">

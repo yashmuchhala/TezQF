@@ -24,9 +24,14 @@ const Executive = () => {
               </p>
             </div>
             <div className="col-sm-3">
-              <button className="btn btn-outline-primary btn-block">
-                Setup
-              </button>
+              <Link
+                to="/governance/executive/new"
+                style={{ textDecoration: "none" }}
+              >
+                <button className="btn btn-outline-primary btn-block">
+                  Setup
+                </button>
+              </Link>
             </div>
           </div>
         </div>
