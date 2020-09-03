@@ -1,7 +1,7 @@
 var fs = require("fs");
 const { Tezos } = require("@taquito/taquito");
 const config = require("../../contractsConfig.json");
-const { importKey, InMemorySigner } = require("@taquito/signer");
+const { InMemorySigner } = require("@taquito/signer");
 
 require.extensions[".tz"] = function (module, filename) {
   module.exports = fs.readFileSync(filename, "utf8");
