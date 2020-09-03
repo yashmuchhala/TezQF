@@ -11,7 +11,7 @@
 </head>
 <body class="article toc2 toc-left">
 <div id="header">
-<h1><span class="image"><img src="../logo-transp.png" alt="Logo" width="50"></span> Reference Manual - SmartPy.io</h1>
+<h1><span class="image"><img src="static/img/logo-only.svg" alt="Logo" width="50"></span> Reference Manual - SmartPy.io</h1>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
@@ -2303,9 +2303,28 @@ See reference <a href="index.html?template=FA2.py" target="_blank" rel="noopener
 <pre class="CodeRay highlight"><code data-lang="python">  scenario += c1
   <span class="comment"># This is identical to doing</span>
   scenario.register(c1, show = <span class="predefined-constant">True</span>)
+
   <span class="comment"># To only register the smart contract but not show it</span>
   scenario.register(c1)</code></pre>
 </div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_contract_methods">Contract Methods</h4>
+<div class="paragraph">
+<p>Additionaly to entry points, contracts have two additional methods that can be called once, before origination.</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>c.set_storage(expression)</code></dt>
+<dd>
+<p>set the storage of a contract with no initial storage.</p>
+</dd>
+<dt class="hdlist1"><code>c.set_initial_balance(expression)</code></dt>
+<dd>
+<p>set the initial balance of a contract.</p>
+</dd>
+</dl>
 </div>
 </div>
 <div class="sect3">
@@ -2333,7 +2352,7 @@ See <a href="#_cryptography_in_test_scenarios">Cryptography in Test Scenarios</a
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="python">  scenario += c1.myEntryPoint(<span class="integer">12</span>)
-  scenario += c1.myEntryPoint(...).run(sender = ..., source = ..., amount = ..., now = ..., level = ..., valid = ..., chain_id = ...)
+  scenario += c1.myEntryPoint(...).run(sender = ..., source = ..., amount = ..., now = ..., level = ..., valid = ..., show = ..., chain_id = ...)
   <span class="comment"># To only execute a call to an entry point but not show it</span>
   scenario.register(c1.myEntryPoint(<span class="integer">12</span>))</code></pre>
 </div>
@@ -2362,6 +2381,10 @@ See <a href="#_cryptography_in_test_scenarios">Cryptography in Test Scenarios</a
 <dt class="hdlist1"><code>level</code></dt>
 <dd>
 <p>the level of the transaction. Example: <code>1234</code>. It populates <code>sp.level</code>.</p>
+</dd>
+<dt class="hdlist1"><code>show</code></dt>
+<dd>
+<p>show or hide the transaction. <code>True</code> by default.</p>
 </dd>
 <dt class="hdlist1"><code>valid</code></dt>
 <dd>

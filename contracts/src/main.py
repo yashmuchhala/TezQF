@@ -1238,7 +1238,7 @@ class RoundManager(sp.Contract):
         self.init(
             daoContractAddress = _daoContractAddress, 
             isRoundActive = False, 
-            currentRound = sp.nat(-1), 
+            currentRound = sp.nat(1), 
             rounds = sp.big_map(
                 tkey = sp.TNat, 
                 tvalue = sp.TRecord(
@@ -1253,7 +1253,7 @@ class RoundManager(sp.Contract):
                         )
                     ), 
                     entryId = sp.TNat,
-                    entries = sp.TBigMap(
+                    entries = sp.TMap(
                         sp.TNat,
                         sp.TRecord(
                             description = sp.TString, 
@@ -1338,10 +1338,10 @@ class RoundManager(sp.Contract):
             name=params.name,
             totalSponsorship=params.totalSponsorship,
             sponsors=params.sponsors,
-            entries=sp.big_map(),
+            entries=sp.map(),
             totalContribution=sp.mutez(0),
-            totalSubsidyPower=sp.nat(0),
-            entryId=sp.nat(-1),
+            totalSubsidyPower=sp.nat(1),
+            entryId=sp.nat(1),
         )
         self.data.isRoundActive = True
         
@@ -1383,7 +1383,7 @@ class RoundManager(sp.Contract):
             disqualified=False,
             contributions=sp.list(),
             totalContribution = sp.tez(0),
-            subsidyPower = sp.nat(0),
+            subsidyPower = sp.nat(1),
             sponsorshipWon = sp.tez(0)
         )
         
@@ -1598,9 +1598,6 @@ class RoundManager(sp.Contract):
                 sponsorshipRemaining.value -= self.data.rounds[self.data.currentRound].entries[i].sponsorshipWon
             
         self.data.isRoundActive = False
-        
-        # Return the change to DAO
-        #sp.send(self.data.daoContractAddress, sponsorshipRemaining.value)    
         
 
 if "templates" not in __name__:
