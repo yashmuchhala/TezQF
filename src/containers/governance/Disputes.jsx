@@ -52,7 +52,7 @@ const Disputes = () => {
         />
       ))}
 
-      <hr className="mb-3" />
+      <hr className="my-4" />
 
       {/* Archived Disputes */}
       <div id="accordian">

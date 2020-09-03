@@ -1,6 +1,7 @@
 import React from "react";
-
 import { Link } from "react-router-dom";
+
+import WalletStatus from "./WalletStatus";
 
 const RoundsNavbar = (props) => {
   return (
@@ -10,14 +11,7 @@ const RoundsNavbar = (props) => {
           <a className="navbar-brand" href="/">
             TezQF <span className="lead">Rounds</span>
           </a>
-          <div
-            style={{
-              size: "5",
-              color: props.wallet.status === "connected" ? "green" : "red",
-            }}
-          >
-            {props.wallet.status}
-          </div>
+
           <div className="collapse navbar-collapse">
             <ul className="navbar-nav ml-auto">
               <li className="nav-item">
@@ -47,9 +41,7 @@ const RoundsNavbar = (props) => {
               </li>
 
               <li className="nav-item">
-                <Link to="#" className="nav-link">
-                  {props.wallet.account}
-                </Link>
+                <WalletStatus wallet={props.wallet} />
               </li>
             </ul>
           </div>
