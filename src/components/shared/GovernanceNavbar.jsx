@@ -1,39 +1,30 @@
-import React from 'react';
+import React from "react";
+import { Link } from "react-router-dom";
 
-import { Link } from 'react-router-dom';
+import WalletStatus from "./WalletStatus";
 
 const GovernanceNavbar = (props) => {
   return (
     <div>
-      <nav className='navbar navbar-expand bg-light mb-4'>
-        <div className='container'>
-          <a className='navbar-brand' href='/'>
-            TezQF <span className='lead'>Governance</span>
+      <nav className="navbar navbar-expand bg-light mb-4">
+        <div className="container">
+          <a className="navbar-brand" href="/">
+            TezQF <span className="lead">Governance</span>
           </a>
-          <div
-            style={{
-              size: '5',
-              color: props.wallet.status === 'connected' ? 'green' : 'red',
-            }}
-          >
-            {props.wallet.status}
-          </div>
-          <div className='collapse navbar-collapse'>
-            <ul className='navbar-nav ml-auto'>
-              <li className='nav-item'>
-                <Link to='/governance/disputes' className='nav-link'>
+          <div className="collapse navbar-collapse">
+            <ul className="navbar-nav ml-auto">
+              <li className="nav-item">
+                <Link to="/governance/disputes" className="nav-link">
                   Disputes
                 </Link>
               </li>
-              <li className='nav-item'>
-                <Link to='/governance/executive' className='nav-link'>
+              <li className="nav-item">
+                <Link to="/governance/executive" className="nav-link">
                   Executive
                 </Link>
               </li>
-              <li className='nav-item'>
-                <Link to='#' className='nav-link'>
-                  {props.wallet.account}
-                </Link>
+              <li className="nav-item">
+                <WalletStatus wallet={props.wallet} />
               </li>
             </ul>
           </div>

@@ -16,6 +16,10 @@ import Sponsor from "./containers/rounds/Sponsor";
 //Governance
 import Disputes from "./containers/governance/Disputes";
 import Executive from "./containers/governance/Executive";
+import ExecutiveVoting from "./containers/governance/ExecutiveVoting";
+import DisputeVoting from "./containers/governance/DisputeVoting";
+import RoundProposal from "./containers/governance/RoundProposal";
+import DisputeProposal from "./containers/governance/DisputeProposal";
 
 const App = () => {
   return (
@@ -37,6 +41,27 @@ const App = () => {
           <Route path="/rounds/archive" component={Archive} />
           <Route path="/rounds/profile" component={Profile} />
           {/* Governance Routes */}
+          <Route
+            exact
+            path="/governance/executive/new"
+            component={RoundProposal}
+          />
+          <Route
+            exact
+            path="/governance/executive/:id"
+            component={ExecutiveVoting}
+          />
+          {/* NOTE: Replace with appropraite parameters once the contract is integrated */}
+          <Route
+            exact
+            path="/governance/disputes/new"
+            component={DisputeProposal}
+          />
+          <Route
+            exact
+            path="/governance/disputes/:roundId/:id"
+            component={DisputeVoting}
+          />
           <Route exact path="/governance/executive" component={Executive} />
           <Route exact path="/governance/disputes" component={Disputes} />
         </Switch>
