@@ -1,6 +1,22 @@
-class TokenContract {
+class TokenContractABI {
   constructor(tezos, address) {
     this.contract = tezos.wallet.at(address);
+  }
+
+  // Returns a BigMap
+  async getBalances() {
+    const storage = await this.contract.storage();
+    return storage.balances;
+  }
+
+  async getTotalSuppy() {
+    const storage = await this.contract.storage();
+    return storage.totalSupply;
+  }
+
+  async getPaused() {
+    const storage = await this.contract.storage();
+    return storage.paused;
   }
 
   async transfer(from, to, value) {
@@ -16,4 +32,4 @@ class TokenContract {
   // Others are admin only entry points
 }
 
-export default TokenContract;
+export default TokenContractABI;

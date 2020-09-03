@@ -1,11 +1,11 @@
-import DAOContract from "./DAOContract";
-import TokenContract from "./TokenContract";
-import CrowdSaleContract from "./CrowdSaleContract";
-import RoundManagerContract from "./RoundManagerContract";
+import DAOContractABI from "./DAOContract";
+import TokenContractABI from "./TokenContract";
+import CrowdSaleContractABI from "./CrowdSaleContract";
+import RoundManagerContractABI from "./RoundManagerContract";
 
 export default {
-  DAOContract,
-  TokenContract,
-  CrowdSaleContract,
-  RoundManagerContract,
+  DAOContractABI,
+  TokenContractABI,
+  CrowdSaleContractABI,
+  RoundManagerContractABI,
 };

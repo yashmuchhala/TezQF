@@ -1,4 +1,4 @@
-class RoundManagerContract {
+class RoundManagerContractABI {
   constructor(tezos, address) {
     this.contract = tezos.wallet.at(address);
   }
@@ -27,4 +27,4 @@ class RoundManagerContract {
   }
 }
 
-export default RoundManagerContract;
+export default RoundManagerContractABI;

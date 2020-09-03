@@ -1,6 +1,21 @@
-class DAOContract {
+class DAOContractABI {
   constructor(tezos, address) {
     this.contract = tezos.wallet.at(address);
+  }
+
+  async getNewRoundProposalData() {
+    const storage = await this.contract.storage();
+    return {
+      newRoundProposals: storage.newRoundProposals,
+      newRoundProposalId: storage.newRoundProposalId,
+      newRoundProposalActive: storage.newRoundProposalActive,
+      currentOnGoingRoundProposalId: storage.currentOnGoingRoundProposalId,
+    };
+  }
+
+  async getDisputes() {
+    const storage = await this.contract.storage();
+    return storage.disputes.valueMap;
   }
 
   async proposeNewRound(name, startTime, endTime, expiry) {
@@ -57,4 +72,4 @@ class DAOContract {
   }
 }
 
-export default DAOContract;
+export default DAOContractABI;
