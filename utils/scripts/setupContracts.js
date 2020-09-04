@@ -10,10 +10,11 @@ async function setupContracts(
 ) {
   const keystore = require(`../keystore/${config.keyName}`);
   Tezos.setProvider({ rpc: config.deployConfig.node });
-  Tezos.setProvider({ signer: new InMemorySigner(keystore.privateKey, "tif") });
+  Tezos.setProvider({
+    signer: new InMemorySigner(keystore.privateKey, keystore.seed),
+  });
   const daoContract = await Tezos.contract.at(daoContractAddress);
   const crowdSaleContract = await Tezos.contract.at(crowdSaleContractAddress);
-
   const daoContractSetTokenOp = await daoContract.methods
     .setTokenContract(tokenContractAddress)
     .send();
@@ -25,7 +26,7 @@ async function setupContracts(
   const daoContractSetRoundManagerOp = await daoContract.methods
     .setRoundManagerContract(roundManagerContractAddress)
     .send();
-  await daoContractSetRoundManagerOp.confirmatio();
+  await daoContractSetRoundManagerOp.confirmation();
   console.log("Dao Contract Set RM Contract DONE", daoContractSetTokenOp.hash);
 
   const crowdSaleContractSetTokenOp = await crowdSaleContract.methods

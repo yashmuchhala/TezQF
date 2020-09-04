@@ -27,21 +27,7 @@ async function main() {
     await compileContract(
       "main",
       "CrowdSale",
-      `(sp.address('${admin.publicKeyHash}'), 100000, sp.address('${daoContractAddress}'))`
-    );
-
-    console.log("Compiling QuadToken Contract");
-    await compileContract(
-      "main",
-      "QuadToken",
-      `(sp.address('${admin.publicKeyHash}'), sp.address('${daoContractAddress}'))`
-    );
-
-    console.log("Compiling RM Contract");
-    await compileContract(
-      "main",
-      "RoundManager",
-      `(sp.address('${daoContractAddress}'))`
+      `(sp.address('${admin.publicKeyHash}'), 1000000, sp.address('${daoContractAddress}'))`
     );
 
     // CrowdSale deployment
@@ -52,6 +38,20 @@ async function main() {
       "admin"
     );
     console.log("Deployed CrowdSale Contract at:", crowdSaleContract.address);
+
+    console.log("Compiling QuadToken Contract");
+    await compileContract(
+      "main",
+      "QuadToken",
+      `(sp.address('${crowdSaleContract.address}'), sp.address('${daoContractAddress}'))`
+    );
+
+    console.log("Compiling RM Contract");
+    await compileContract(
+      "main",
+      "RoundManager",
+      `(sp.address('${daoContractAddress}'))`
+    );
 
     // QuadToken deployment
     console.log("Deploying QuadToken Contract");

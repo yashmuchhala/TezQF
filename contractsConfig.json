@@ -16,8 +16,8 @@
   "interactionConfig": {
     "node": "https://carthagenet.smartpy.io"
   },
-  "daoContractAddress": "KT1VoVTCSs4pB6S7iRZ67WPie7XGT7Kfm6ty",
-  "crowdSaleContractAddress": "KT1MSPqKUMCaAdAVmANGDW6CZqKzSujDmUyd",
-  "tokenContractAddress": "KT1FzMnC1cNx4AJb1FXjvU7mq6LhZRDCPwwQ",
-  "roundManagerContractAddress": "KT1KUDFK1zPNVbWWZEVNkz3TVMrxMcWzb3Ri"
+  "daoContractAddress": "KT1XT5METUtseU3eYHJqQkKDicL9JKFT45oy",
+  "crowdSaleContractAddress": "KT1Btsddu86NQtfq6q4GabYusYbmi7spxghV",
+  "tokenContractAddress": "KT1DUk3efCQGfy5iaEXNPyuF9qQ8Mf7mmGkP",
+  "roundManagerContractAddress": "KT1R6pWSAAw9S4JU7bthThyjNUyVfpHd1Ge3"
 }

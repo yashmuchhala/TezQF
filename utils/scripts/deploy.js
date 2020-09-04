@@ -10,7 +10,9 @@ require.extensions[".tz"] = function (module, filename) {
 async function deployContract(filename, className, keyName) {
   const keystore = require(`../keystore/${keyName}`);
   Tezos.setProvider({ rpc: config.deployConfig.node });
-  Tezos.setProvider({ signer: new InMemorySigner(keystore.privateKey, "tif") });
+  Tezos.setProvider({
+    signer: new InMemorySigner(keystore.privateKey, keystore.seed),
+  });
   const contractCode = require(`../../${
     config.buildDirectory + filename + "/" + className
   }/${filename}_compiled.json`);
