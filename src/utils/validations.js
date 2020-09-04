@@ -21,3 +21,8 @@ export const projectEntryValidations = {
 export const proposalVaidations = {
   description: validDescription,
 };
+
+export const disputeValidations = {
+  reason: validTitle,
+  description: validDescription,
+};

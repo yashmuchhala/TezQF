@@ -19,15 +19,15 @@ const RoundProposal = () => {
     if (!start || !end || start < new Date() || end <= start) {
       setDatesError(true);
       return;
-    }
+    } else setDatesError(false);
     if (!categories) {
       setCategoriesError(true);
       return;
-    }
+    } else setCategoriesError(false);
     if (!validations.description(description)) {
       setDescriptionError(true);
       return;
-    }
+    } else setDescriptionError(false);
 
     setDatesError(false);
     setCategoriesError(false);
