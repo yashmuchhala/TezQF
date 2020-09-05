@@ -1,6 +1,6 @@
 class RoundManagerContractABI {
-  constructor(tezos, address) {
-    this.contract = tezos.wallet.at(address);
+  constructor(contract) {
+    this.contract = contract;
   }
   async getRounds() {
     const storage = await this.contract.storage();

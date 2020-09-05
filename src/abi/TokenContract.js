@@ -1,6 +1,6 @@
 class TokenContractABI {
-  constructor(tezos, address) {
-    this.contract = tezos.wallet.at(address);
+  constructor(contract) {
+    this.contract = contract;
   }
 
   // Returns a BigMap

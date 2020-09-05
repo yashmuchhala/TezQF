@@ -1,6 +1,6 @@
 class CrowdSaleContractABI {
-  constructor(tezos, address) {
-    this.contract = tezos.wallet.at(address);
+  constructor(contract) {
+    this.contract = contract;
   }
 
   async getPrice() {
