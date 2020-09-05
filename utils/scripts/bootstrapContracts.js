@@ -45,12 +45,12 @@ async function bootstrapContracts() {
   //   await op2.confirmation();
   try {
     Tezos.setProvider({
-      signer: new InMemorySigner(john.privateKey, john.seed),
+      signer: new InMemorySigner(alice.privateKey, john.seed),
     });
 
     const op3 = await crowdSaleContract.methods
       .buyTokens(100)
-      .send({ amount: 100, mutez: false, gasLimit: 1040000 });
+      .send({ amount: 100000000, mutez: true });
     await op3.confirmation();
   } catch (error) {
     console.log(error);

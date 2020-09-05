@@ -15,19 +15,6 @@ async function setupContracts(
   });
   const daoContract = await Tezos.contract.at(daoContractAddress);
   const crowdSaleContract = await Tezos.contract.at(crowdSaleContractAddress);
-  const daoContractSetTokenOp = await daoContract.methods
-    .setTokenContract(tokenContractAddress)
-    .send();
-  await daoContractSetTokenOp.confirmation();
-  console.log(
-    "Dao Contract Set Token Contract DONE:",
-    daoContractSetTokenOp.hash
-  );
-  const daoContractSetRoundManagerOp = await daoContract.methods
-    .setRoundManagerContract(roundManagerContractAddress)
-    .send();
-  await daoContractSetRoundManagerOp.confirmation();
-  console.log("Dao Contract Set RM Contract DONE", daoContractSetTokenOp.hash);
 
   const crowdSaleContractSetTokenOp = await crowdSaleContract.methods
     .setTokenContract(tokenContractAddress)
@@ -35,7 +22,16 @@ async function setupContracts(
   await crowdSaleContractSetTokenOp.confirmation();
   console.log(
     "CrowdSale Contract Set Token Contract DONE",
-    daoContractSetTokenOp.hash
+    crowdSaleContractSetTokenOp.hash
+  );
+
+  const daoContractSetRoundManagerOp = await daoContract.methods
+    .setRoundManagerContract(roundManagerContractAddress)
+    .send();
+  await daoContractSetRoundManagerOp.confirmation();
+  console.log(
+    "Dao Contract Set RM Contract DONE",
+    daoContractSetRoundManagerOp.hash
   );
 }
 

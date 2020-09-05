@@ -12,22 +12,11 @@ require.extensions[".tz"] = function (module, filename) {
 async function main() {
   // Compile and deploy DAO Contract
   try {
-    console.log("Compiling DAO Contract");
-    await compileContract(
-      "main",
-      "DAO",
-      `(sp.address('${admin.publicKeyHash}'))`
-    );
-    console.log("Deploying DAO Contract");
-    const daoContract = await deployContract("main", "DAO", "admin");
-    const daoContractAddress = daoContract.address;
-    console.log("Deployed DAO Contract at:", daoContractAddress);
-
     console.log("Compiling CrowdSale Contract");
     await compileContract(
       "main",
       "CrowdSale",
-      `(sp.address('${admin.publicKeyHash}'), 1000000, sp.address('${daoContractAddress}'))`
+      `(sp.address('${admin.publicKeyHash}'), 1000000, sp.address('${admin.publicKeyHash}'), 3000)`
     );
 
     // CrowdSale deployment
@@ -43,8 +32,23 @@ async function main() {
     await compileContract(
       "main",
       "QuadToken",
-      `(sp.address('${crowdSaleContract.address}'), sp.address('${daoContractAddress}'))`
+      `(sp.address('${crowdSaleContract.address}'))`
     );
+    // QuadToken deployment
+    console.log("Deploying QuadToken Contract");
+    const tokenContract = await deployContract("main", "QuadToken", "admin");
+    console.log("Deployed QuadToken Contract at:", tokenContract.address);
+
+    console.log("Compiling DAO Contract");
+    await compileContract(
+      "main",
+      "DAO",
+      `(sp.address('${admin.publicKeyHash}'), sp.address('${tokenContract.address}'))`
+    );
+    console.log("Deploying DAO Contract");
+    const daoContract = await deployContract("main", "DAO", "admin");
+    const daoContractAddress = daoContract.address;
+    console.log("Deployed DAO Contract at:", daoContractAddress);
 
     console.log("Compiling RM Contract");
     await compileContract(
@@ -52,11 +56,6 @@ async function main() {
       "RoundManager",
       `(sp.address('${daoContractAddress}'))`
     );
-
-    // QuadToken deployment
-    console.log("Deploying QuadToken Contract");
-    const tokenContract = await deployContract("main", "QuadToken", "admin");
-    console.log("Deployed QuadToken Contract at:", tokenContract.address);
 
     // RM deployment
     console.log("Deploying RM contract");
