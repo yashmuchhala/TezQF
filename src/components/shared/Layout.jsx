@@ -4,7 +4,9 @@ import { ThanosWallet } from "@thanos-wallet/dapp";
 
 import GovernanceNavbar from "./GovernanceNavbar";
 
-import { UPDATE_TEZOS } from "../../redux/ActionTypes";
+import { UPDATE_TEZOS, SET_CONTRACTS } from "../../redux/ActionTypes";
+import ABIs from "../../abi/index";
+
 import Navbar from "./Navbar";
 
 const Layout = (props) => {
@@ -22,8 +24,41 @@ const Layout = (props) => {
         await wallet.connect("carthagenet");
         const tezos = wallet.toTezos();
         const accountPkh = await tezos.wallet.pkh();
+
+        const [
+          daoContract,
+          crowdSaleContract,
+          tokenContract,
+          roundManagerContract,
+        ] = await Promise.all([
+          tezos.wallet.at("KT1W7r8Up9E83DhKTsZgHDX3kbGkiU57iHT5"),
+          tezos.wallet.at("KT1Ks4uZcoiKykVieJBuaW9XgmFaYgthBJ9s"),
+          tezos.wallet.at("KT1VdfPGgHYBSfgCWhAagQKcPpTWRqs5oDvK"),
+          tezos.wallet.at("KT1Dv4PX87fWkW1eaYpQkfyzeeuWVNzb4rWF"),
+        ]);
+
+        const daoContractObject = new ABIs.DAOContractABI(daoContract);
+        const crowdSaleContractObject = new ABIs.CrowdSaleContractABI(
+          crowdSaleContract
+        );
+        const tokenContractObject = new ABIs.TokenContractABI(tokenContract);
+        const roundManagerContractObject = new ABIs.TokenContractABI(
+          roundManagerContract
+        );
+
         setWallet({ status: "connected", account: accountPkh });
         dispatch({ type: UPDATE_TEZOS, payload: { tezos } });
+        dispatch({
+          type: SET_CONTRACTS,
+          payload: {
+            contracts: {
+              dao: daoContractObject,
+              crowdSale: crowdSaleContractObject,
+              token: tokenContractObject,
+              roundManager: roundManagerContractObject,
+            },
+          },
+        });
       }
     };
     configureWallet();

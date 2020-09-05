@@ -1,5 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { useSelector } from "react-redux";
 import Layout from "./components/shared/Layout";
 
 //Rounds
@@ -21,6 +22,8 @@ import RoundProposal from "./containers/governance/RoundProposal";
 import DisputeProposal from "./containers/governance/DisputeProposal";
 
 const App = () => {
+  const contracts = useSelector((state) => state.contract.contracts);
+  console.log(contracts);
   return (
     <Router>
       <Layout>

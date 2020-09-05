@@ -1,9 +1,9 @@
-import { UPDATE_TEZOS } from "../ActionTypes";
+import { UPDATE_TEZOS, SET_CONTRACTS } from "../ActionTypes";
 
 export const contract = (
   state = {
     tezos: null,
-    contract: null,
+    contracts: {},
   },
   action
 ) => {
@@ -12,6 +12,12 @@ export const contract = (
       return {
         ...state,
         tezos: action.payload.tezos,
+      };
+    }
+    case SET_CONTRACTS: {
+      return {
+        ...state,
+        contracts: action.payload.contracts,
       };
     }
     default:
