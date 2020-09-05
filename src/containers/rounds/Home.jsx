@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-const RoundsHome = () => {
+const Home = () => {
   return (
     <div>
       <h1 className="font-weight-light mb-3">QuadDAO Rounds</h1>
@@ -13,7 +13,12 @@ const RoundsHome = () => {
       <Link to="/rounds/enter">
         <button className="btn btn-success mr-3">Enter Round</button>
       </Link>
-      <button className="btn btn-primary">Know More</button>
+      <button className="btn btn-primary mr-3">Know More</button>
+      <button className="btn btn-secondary" href="/governance/executive">
+        <a href="/governance/executive" style={{ color: "white" }}>
+          Governance
+        </a>
+      </button>
       <hr />
       <h4 className="text-center mt-5">
         Funding Round 5 is here! We have 15 sponsors bringing in $25000 to the
@@ -24,4 +29,4 @@ const RoundsHome = () => {
   );
 };
 
-export default RoundsHome;
+export default Home;

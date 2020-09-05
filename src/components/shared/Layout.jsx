@@ -2,26 +2,12 @@ import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { ThanosWallet } from "@thanos-wallet/dapp";
 
-import RoundsNavbar from "./RoundsNavbar";
 import GovernanceNavbar from "./GovernanceNavbar";
 
 import { UPDATE_TEZOS } from "../../redux/ActionTypes";
 import Navbar from "./Navbar";
 
-import config from "../../../contractsConfig.json";
-import {
-  crowdSaleContractABI,
-  tokenContractABI,
-  daoContractABI,
-  roundManagerContractABI,
-} from "../../abi";
-
 const Layout = (props) => {
-  const [crowdSaleContract, setCrowdSaleContract] = useState(null);
-  const [tokenContract, setTokenContract] = useState(null);
-  const [daoContract, setDAOContract] = useState(null);
-  const [roundManagerContract, setRoundManagerContract] = useState(null);
-
   const [wallet, setWallet] = useState({
     status: "not connected",
     account: "",
@@ -37,9 +23,6 @@ const Layout = (props) => {
         const tezos = wallet.toTezos();
         const accountPkh = await tezos.wallet.pkh();
         setWallet({ status: "connected", account: accountPkh });
-        setCrowdSaleContract(
-          crowdSaleContractABI(tezos, config.crowdSaleContractAddress)
-        );
         dispatch({ type: UPDATE_TEZOS, payload: { tezos } });
       }
     };
@@ -57,7 +40,7 @@ const Layout = (props) => {
       return url.match(regEx) ? (
         <GovernanceNavbar wallet={wallet} />
       ) : (
-        <RoundsNavbar wallet={wallet} />
+        <Navbar wallet={wallet} />
       );
     }
   };
