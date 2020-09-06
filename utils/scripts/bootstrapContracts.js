@@ -23,26 +23,26 @@ async function bootstrapContracts() {
   );
 
   // Crowdsale test
-  //   Tezos.setProvider({
-  //     signer: new InMemorySigner(alice.privateKey, alice.seed),
-  //   });
-  //   try {
-  //     const op1 = await crowdSaleContract.methods
-  //       .buyTokens(10)
-  //       .send({ amount: 10, mutez: false });
-  //     await op1.confirmation();
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
+  Tezos.setProvider({
+    signer: new InMemorySigner(alice.privateKey, alice.seed),
+  });
+  try {
+    const op1 = await crowdSaleContract.methods
+      .buyTokens(10)
+      .send({ amount: 10, mutez: false });
+    await op1.confirmation();
+  } catch (error) {
+    console.log(error);
+  }
 
-  //   Tezos.setProvider({
-  //     signer: new InMemorySigner(bob.privateKey, bob.seed),
-  //   });
+  Tezos.setProvider({
+    signer: new InMemorySigner(bob.privateKey, bob.seed),
+  });
 
-  //   const op2 = await crowdSaleContract.methods
-  //     .buyTokens(10)
-  //     .send({ amount: 10, mutez: false });
-  //   await op2.confirmation();
+  const op2 = await crowdSaleContract.methods
+    .buyTokens(10)
+    .send({ amount: 10, mutez: false });
+  await op2.confirmation();
   try {
     Tezos.setProvider({
       signer: new InMemorySigner(alice.privateKey, john.seed),
@@ -59,20 +59,20 @@ async function bootstrapContracts() {
   const tokenStorage = await tokenContract.storage();
   console.log("Token balances:", tokenStorage.balances);
 
-  //   Tezos.setProvider({
-  //     signer: new InMemorySigner(alice.privateKey, alice.seed),
-  //   });
-  //   const startTime = new Date("September 30, 2020 01:00:00");
-  //   const endTime = new Date("October 30, 2020 00:00:00");
-  //   const expiry = new Date("September 10, 2020 00:00:00");
+  Tezos.setProvider({
+    signer: new InMemorySigner(alice.privateKey, alice.seed),
+  });
+  const startTime = new Date("September 30, 2020 01:00:00");
+  const endTime = new Date("October 30, 2020 00:00:00");
+  const expiry = new Date("September 10, 2020 00:00:00");
 
-  //   const op4 = await daoContract.methods.proposeNewRound(
-  //     "Premier Round of TezQF",
-  //     startTime.getTime(),
-  //     endTime.getTime(),
-  //     expiry.getTime()
-  //   );
-  //   await op4.confirmation();
+  const op4 = await daoContract.methods.proposeNewRound(
+    "Premier Round of TezQF",
+    startTime.getTime(),
+    endTime.getTime(),
+    expiry.getTime()
+  );
+  await op4.confirmation();
 }
 
 (async () => {

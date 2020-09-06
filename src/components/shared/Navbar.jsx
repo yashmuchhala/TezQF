@@ -1,16 +1,17 @@
 import React from "react";
 import { Link } from "react-router-dom";
-
+import { useSelector } from "react-redux";
 import WalletStatus from "./WalletStatus";
 
-const Navbar = (props) => {
+const Navbar = () => {
+  const wallet = useSelector((state) => state.credentials.wallet);
   return (
     <div>
       <nav className="navbar navbar-expand bg-light mb-4">
         <div className="container">
-          <a className="navbar-brand" href="/">
+          <Link className="navbar-brand" to="/">
             TezQF <span className="lead">Rounds</span>
-          </a>
+          </Link>
 
           <div className="collapse navbar-collapse">
             <ul className="navbar-nav ml-auto">
@@ -35,7 +36,7 @@ const Navbar = (props) => {
                 </Link>
               </li>
               <li className="nav-item">
-                <WalletStatus wallet={props.wallet} />
+                <WalletStatus wallet={wallet} />
               </li>
             </ul>
           </div>

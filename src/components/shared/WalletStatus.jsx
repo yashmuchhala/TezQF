@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 const WalletStatus = ({ wallet }) => {
-  return wallet.status === "connected" ? (
+  return wallet.isConnected ? (
     <Link
       to="#"
       className="nav-link font-weight-bold text-primary"

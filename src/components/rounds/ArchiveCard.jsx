@@ -4,15 +4,15 @@ import { Link } from "react-router-dom";
 const ArchiveCard = ({ details }) => {
   return (
     <div className="col-4 mb-4">
-      <div class="card">
+      <div className="card">
         <img
-          class="card-img-top"
+          className="card-img-top"
           src={details.image}
           alt="Project Background"
         />
-        <div class="card-body">
-          <h5 class="card-title">{details.title}</h5>
-          <p class="card-text">{details.description}</p>
+        <div className="card-body">
+          <h5 className="card-title">{details.title}</h5>
+          <p className="card-text">{details.description}</p>
 
           {/* Show contribution and CLR match only if not disqualified */}
           {details.disqualified ? (
@@ -35,7 +35,7 @@ const ArchiveCard = ({ details }) => {
             </div>
           )}
           <Link to={`/rounds/archive/${details.id}`}>
-            <button class="btn btn-primary btn-block">View</button>
+            <button className="btn btn-primary btn-block">View</button>
           </Link>
         </div>
       </div>

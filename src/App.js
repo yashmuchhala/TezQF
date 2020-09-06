@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
-import { useSelector } from "react-redux";
 import Layout from "./components/shared/Layout";
+import { useDispatch } from "react-redux";
+import { ThanosWallet } from "@thanos-wallet/dapp";
 
 //Rounds
 import Archive from "./containers/rounds/archive/Archive";
@@ -20,14 +21,86 @@ import ExecutiveVoting from "./containers/governance/ExecutiveVoting";
 import DisputeVoting from "./containers/governance/DisputeVoting";
 import RoundProposal from "./containers/governance/RoundProposal";
 import DisputeProposal from "./containers/governance/DisputeProposal";
+import GovernanceHome from "./containers/governance/Home";
 
+import {
+  getRoundStatusAction,
+  getRoundsDataAction,
+} from "./redux/actions/round";
+
+import {
+  getNewRoundProposalsDataAction,
+  getDisputesDataAction,
+} from "./redux/actions/governance";
+import {
+  UPDATE_TEZOS,
+  SET_CONTRACTS,
+  GET_WALLET_DATA,
+} from "./redux/ActionTypes";
+import ABIs from "./abi/index";
+import CrowdSale from "./containers/CrowdSale";
 const App = () => {
-  const contracts = useSelector((state) => state.contract.contracts);
-  console.log(contracts);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const configureWallet = async () => {
+      if (await ThanosWallet.isAvailable()) {
+        const w = new ThanosWallet("TezQF");
+        await w.connect("carthagenet");
+        const tezos = w.toTezos();
+        const accountPkh = await tezos.wallet.pkh();
+
+        const [
+          daoContract,
+          crowdSaleContract,
+          tokenContract,
+          roundManagerContract,
+        ] = await Promise.all([
+          tezos.wallet.at("KT1W7r8Up9E83DhKTsZgHDX3kbGkiU57iHT5"),
+          tezos.wallet.at("KT1Ks4uZcoiKykVieJBuaW9XgmFaYgthBJ9s"),
+          tezos.wallet.at("KT1VdfPGgHYBSfgCWhAagQKcPpTWRqs5oDvK"),
+          tezos.wallet.at("KT1Dv4PX87fWkW1eaYpQkfyzeeuWVNzb4rWF"),
+        ]);
+
+        const daoContractObject = new ABIs.DAOContractABI(daoContract);
+        const crowdSaleContractObject = new ABIs.CrowdSaleContractABI(
+          crowdSaleContract
+        );
+        const tokenContractObject = new ABIs.TokenContractABI(tokenContract);
+        const roundManagerContractObject = new ABIs.RoundManagerContractABI(
+          roundManagerContract
+        );
+
+        dispatch({
+          type: GET_WALLET_DATA,
+          payload: { isConnected: true, account: accountPkh },
+        });
+        dispatch({ type: UPDATE_TEZOS, payload: { tezos } });
+        dispatch({
+          type: SET_CONTRACTS,
+          payload: {
+            contracts: {
+              dao: daoContractObject,
+              crowdSale: crowdSaleContractObject,
+              token: tokenContractObject,
+              roundManager: roundManagerContractObject,
+            },
+          },
+        });
+        dispatch(await getRoundStatusAction(roundManagerContractObject));
+        dispatch(await getRoundsDataAction(roundManagerContractObject));
+        dispatch(await getNewRoundProposalsDataAction(daoContractObject));
+        dispatch(await getDisputesDataAction(daoContractObject));
+      }
+    };
+    configureWallet();
+  }, [dispatch]);
   return (
     <Router>
       <Layout>
         <Switch>
+          {/* Crowdsale Route*/}
+          <Route path="/crowdsale" exact component={CrowdSale} />
           {/* Rounds Routes */}
           <Route path="/" exact component={Home} />
           <Route exact path="/contribute/:id" component={ProjectProfile} />
@@ -61,6 +134,7 @@ const App = () => {
           />
           <Route exact path="/governance/executive" component={Executive} />
           <Route exact path="/governance/disputes" component={Disputes} />
+          <Route exec path="/governance" component={GovernanceHome} />
         </Switch>
       </Layout>
     </Router>

@@ -1,11 +1,35 @@
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
 
 const RoundProposal = () => {
-  const [start, setStart] = useState(new Date());
-  const [end, setEnd] = useState(new Date());
+  const [name, setName] = useState("");
+  const [start, setStart] = useState(new Date().toISOString().split("T")[0]);
+  const [end, setEnd] = useState(new Date().toISOString().split("T")[0]);
   const [categories, setCategories] = useState("");
   const [description, setDescription] = useState("");
+  const daoContract = useSelector((state) => state.contract.contracts.dao);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isCompleted, setIsCompleted] = useState(false);
 
+  const onSubmit = async () => {
+    setIsCompleted(false);
+    setIsLoading(true);
+    const now = Date.now();
+    console.log("Now:", now);
+    const success = await daoContract.proposeNewRound(
+      // testing values only
+      name,
+      now + 30 * 60000,
+      now + 60 * 60000,
+      now + 15 * 60000
+    );
+
+    if (success) {
+      console.log("success");
+      setIsCompleted(true);
+    }
+    setIsLoading(false);
+  };
   return (
     <div className="container w-75 mb-5">
       <h1>Setup New Funding Round Proposal</h1>
@@ -16,6 +40,14 @@ const RoundProposal = () => {
       </p>
       <br />
       <form>
+        <label className="font-weight-bold mb-0">Round Name</label>
+        <input
+          type="text"
+          className="form-control mb-3"
+          placeholder="Mega Funding Round September"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
         <div className="row no-gutters">
           <div className="col mr-2">
             <label className="font-weight-bold mb-0">Start Date</label>
@@ -38,7 +70,6 @@ const RoundProposal = () => {
             />
           </div>
         </div>
-
         <label className="font-weight-bold mb-0">Entry Categories</label>
         <input
           type="text"
@@ -47,7 +78,6 @@ const RoundProposal = () => {
           value={categories}
           onChange={(e) => setCategories(e.target.value)}
         />
-
         <label className="font-weight-bold mb-0">Description</label>
         <textarea
           type="text"
@@ -57,10 +87,19 @@ const RoundProposal = () => {
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         />
-
-        <button className="btn btn-lg btn-outline-primary font-weight-bold">
-          Confirm Proposal
-        </button>
+        {isLoading ? (
+          "Loading"
+        ) : (
+          <>
+            <button
+              className="btn btn-lg btn-outline-primary font-weight-bold"
+              onClick={onSubmit}
+            >
+              Confirm Proposal
+            </button>{" "}
+            <h1>{isCompleted ? "Success!" : ""}</h1>
+          </>
+        )}
       </form>
     </div>
   );

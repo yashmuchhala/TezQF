@@ -6,7 +6,7 @@ import { dummyProjects } from "../../../data/dummyProjects";
 
 const Projects = () => {
   const renderProjects = dummyProjects.map((details) => (
-    <ProjectCard details={details} />
+    <ProjectCard details={details} key={details.id} />
   ));
 
   return (

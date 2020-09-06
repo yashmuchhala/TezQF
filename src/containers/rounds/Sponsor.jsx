@@ -1,6 +1,21 @@
-import React from "react";
-
+import React, { useState } from "react";
+import { useSelector } from "react-redux";
 const Sponsor = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [isCompleted, setIsCompleted] = useState(false);
+  const [name, setName] = useState("");
+  const [amount, setAmount] = useState(0);
+  const daoContract = useSelector((state) => state.contract.contracts.dao);
+
+  const onSubmit = async () => {
+    setIsCompleted(false);
+    setIsLoading(true);
+    const success = await daoContract.donateToRound(name, amount * 100000);
+    if (success) {
+      setIsCompleted(true);
+    }
+    setIsLoading(false);
+  };
   return (
     <div className="container d-flex align-items-center flex-column mb-5">
       {/* Header */}
@@ -26,19 +41,33 @@ const Sponsor = () => {
             className="form-control w-100 mb-3"
             placeholder="Name"
             aria-label="Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
           />
 
-          <label className="font-weight-bold mb-0">Amount</label>
+          <label className="font-weight-bold mb-0">Amount (in XTZ)</label>
           <input
             type="text"
             className="form-control w-100 mb-3"
             placeholder="Amount (in XTZ)"
             aria-label="Amount"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
           />
+          {isLoading ? (
+            "Loading"
+          ) : (
+            <>
+              <button
+                className="btn btn-primary btn-block font-weight-bold"
+                onClick={onSubmit}
+              >
+                CONFIRM
+              </button>
 
-          <button className="btn btn-primary btn-block font-weight-bold">
-            CONFIRM
-          </button>
+              <h1>{isCompleted ? "Success!" : ""}</h1>
+            </>
+          )}
         </div>
       </div>
     </div>

@@ -5,13 +5,20 @@ class CrowdSaleContractABI {
 
   async getPrice() {
     const storage = await this.contract.storage();
-    return storage.price;
+    return storage.price.c[0];
   }
+
+  async getTotalSupply() {
+    const storage = await this.contract.storage();
+    return storage.totalSupply.c[0];
+  }
+
   async buyTokens(value, mutezAmount) {
     const op = await this.contract.methods
       .buyTokens(value)
       .send({ amount: mutezAmount, mutez: true });
-    return op.confirmation();
+    const result = await op.confirmation();
+    return result?.completed;
   }
 }
 

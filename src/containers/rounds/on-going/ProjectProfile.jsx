@@ -10,7 +10,7 @@ const ProjectProfile = () => {
 
   const renderContributors = dummyProjects[id - 1].contributors?.map(
     (contribution) => (
-      <li className="list-group-item row d-flex">
+      <li className="list-group-item row d-flex" key={contribution.address}>
         <span className="col-8">{contribution.address}</span>
         <span className="col-2">{contribution.amount}</span>
         <span className="col-2">$60</span>
@@ -35,10 +35,10 @@ const ProjectProfile = () => {
         <div className="col-4">
           <h1 className="font-weight-light">{dummyProjects[id - 1].title}</h1>
           <h3 className="font-weight-light">{dummyProjects[id - 1].pitch}</h3>
-          <ul class="list-group list-group-flush">
-            <li class="list-group-item">{dummyProjects[id - 1].website}</li>
-            <li class="list-group-item">{dummyProjects[id - 1].github}</li>
-            <li class="list-group-item">{dummyProjects[id - 1].address}</li>
+          <ul className="list-group list-group-flush">
+            <li className="list-group-item">{dummyProjects[id - 1].website}</li>
+            <li className="list-group-item">{dummyProjects[id - 1].github}</li>
+            <li className="list-group-item">{dummyProjects[id - 1].address}</li>
           </ul>
         </div>
         {/* Project funding */}
