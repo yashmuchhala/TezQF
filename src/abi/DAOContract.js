@@ -18,9 +18,12 @@ class DAOContractABI {
   }
 
   async getDisputesData() {
-    // const storage = await this.contract.storage();
-    // TODO: Set a disputeCount to retrieve from BigMap or convert to Map
-    return {};
+    const storage = await this.contract.storage();
+    const disputes = [];
+    for (var i = 1; i <= storage.lastAcceptedRound; i++) {
+      disputes.push(await storage.disputes.get(i.toString()));
+    }
+    return disputes;
   }
 
   async proposeNewRound(description, startTime, endTime) {
@@ -66,7 +69,7 @@ class DAOContractABI {
   }
 
   async settleRound() {
-    const op = await this.contract.methods.settleRound().send();
+    const op = await this.contract.methods.settleRound([["unit"]]).send();
 
     const result = await op.confirmation();
     return result?.confirmed;

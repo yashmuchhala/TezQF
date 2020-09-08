@@ -9,7 +9,7 @@ export const governance = (
     newRoundProposalId: 0,
     newRoundProposalActive: false,
     currentOnGoingRoundProposalId: -1,
-    disputes: {},
+    disputes: [],
   },
   action
 ) => {
