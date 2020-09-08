@@ -18,13 +18,30 @@ const ExecutiveVoting = () => {
   );
 
   if (!proposal) {
-    return <p className="text-center">Loading...</p>;
+    return (
+      <div className="text-center text-primary">
+        <div className="spinner-border" />
+      </div>
+    );
   }
 
   const onExecute = async () => {
     try {
       setLoading(true);
       await daoContract.executeNewRoundProposal();
+      window.location.reload();
+    } catch (err) {
+      console.log(err);
+      alert(err);
+    }
+
+    setLoading(false);
+  };
+
+  const onList = async () => {
+    try {
+      setLoading(true);
+      await daoContract.listNewRound();
       window.location.reload();
     } catch (err) {
       console.log(err);
@@ -66,13 +83,27 @@ const ExecutiveVoting = () => {
         </>
       );
     } else if (proposal.resolved.toNumber() === 1) {
-      return (
+      return proposal.listed ? (
         <>
           <button disabled className="btn btn-success btn-block">
             Accepted
           </button>
           <p className="mt-1 text-center text-secondary">
             {proposal.votesYes.toNumber()} votes in support.
+          </p>
+        </>
+      ) : (
+        <>
+          <button
+            onClick={onList}
+            className="btn btn-outline-success btn-block"
+          >
+            {loading && <div className="spinner-border spinner-border-sm" />}
+            {loading ? " Processing Transaction" : "List Round"}
+          </button>
+          <p className="mt-1 text-center text-black">
+            {proposal.totalFunds.toNumber() / 1000000} tz in sponsorship till
+            now.
           </p>
         </>
       );

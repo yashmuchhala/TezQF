@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 
@@ -8,9 +8,10 @@ import NoActiveRound from "../../components/rounds/NoActiveRound";
 const Home = () => {
   const isRoundActive = useSelector((state) => state.round.isRoundActive);
   const rounds = useSelector((state) => state.round.rounds);
-  useEffect(() => {
-    console.log(rounds);
-  }, [isRoundActive, rounds]);
+
+  const currentRound = isRoundActive ? rounds[rounds.length - 1] : null;
+
+  console.log(currentRound);
   return (
     <div>
       <h1 className="font-weight-light mb-3">
@@ -27,7 +28,15 @@ const Home = () => {
         <button className="btn btn-secondary">Governance</button>
       </a>
       <hr />
-      {isRoundActive ? <RoundActive /> : <NoActiveRound />}
+      {currentRound ? (
+        <RoundActive
+          name={currentRound.name}
+          sponsors={currentRound.sponsors.size}
+          funds={currentRound.totalSponsorship.toNumber()}
+        />
+      ) : (
+        <NoActiveRound />
+      )}
     </div>
   );
 };

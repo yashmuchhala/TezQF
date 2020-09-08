@@ -17,6 +17,14 @@ const Executive = () => {
     ? newRoundProposals.slice(0, -1)
     : newRoundProposals;
 
+  if (newRoundProposals.length === 0) {
+    return (
+      <div className="text-center text-primary">
+        <div className="spinner-border" />
+      </div>
+    );
+  }
+
   return (
     <div>
       {/* Setup Panel */}

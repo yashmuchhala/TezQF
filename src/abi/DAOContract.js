@@ -60,7 +60,7 @@ class DAOContractABI {
   }
 
   async listNewRound() {
-    const op = await this.contract.methods.listNewRound().send();
+    const op = await this.contract.methods.listNewRound([["unit"]]).send();
 
     const result = await op.confirmation();
     return result?.confirmed;

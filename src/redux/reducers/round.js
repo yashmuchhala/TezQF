@@ -4,7 +4,7 @@ export const round = (
   state = {
     isRoundActive: true,
     currentRound: -1,
-    rounds: {},
+    rounds: [],
   },
   action
 ) => {

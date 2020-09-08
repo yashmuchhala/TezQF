@@ -4,9 +4,9 @@ class RoundManagerContractABI {
   }
   async getRoundsData() {
     const storage = await this.contract.storage();
-    const rounds = {};
-    for (var i = 0; i < storage.currentRound; i++) {
-      rounds[i] = await storage.rounds.get(i);
+    const rounds = [];
+    for (var i = 0; i <= storage.currentRound; i++) {
+      rounds.push(await storage.rounds.get(i.toString()));
     }
     console.log("RM ABI:getRoundsData():rounds:", rounds);
     return {
