@@ -2,26 +2,52 @@ import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 
-const RoundProposal = ({ instance }) => {
+import { proposalVaidations as validations } from "../../utils/validations";
+
+const ipfs = require("nano-ipfs-store").at("https://ipfs.infura.io:5001");
+
+const RoundProposal = () => {
   const [name, setName] = useState("");
   const [start, setStart] = useState(new Date().toISOString().split("T")[0]);
   const [end, setEnd] = useState(new Date().toISOString().split("T")[0]);
   const [categories, setCategories] = useState("");
   const [description, setDescription] = useState("");
+  const [datesError, setDatesError] = useState(false);
+  const [categoriesError, setCategoriesError] = useState(false);
+  const [descriptionError, setDescriptionError] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const daoContract = useSelector((state) => state.contract.contracts.dao);
 
   const history = useHistory();
 
-  /*
-    Changes to be made:
-    - name parameter is the number for the current round and should be auto generated based on the last listed round id (retrieve it from the round contract)
-    - change name to IPFS hash
-  */
-
-  const onSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!start || !end || start < new Date() || end <= start) {
+      setDatesError(true);
+      return;
+    } else setDatesError(false);
+    if (!categories) {
+      setCategoriesError(true);
+      return;
+    } else setCategoriesError(false);
+    if (!validations.description(description)) {
+      setDescriptionError(true);
+      return;
+    } else setDescriptionError(false);
+
+    setDatesError(false);
+    setCategoriesError(false);
+    setDescriptionError(false);
+
+    const ipfsObject = {
+      name,
+      description,
+      categories: categories.split(","),
+    };
+
+    const cid = await ipfs.add(JSON.stringify(ipfsObject));
 
     setLoading(true);
 
@@ -29,7 +55,7 @@ const RoundProposal = ({ instance }) => {
       const startTimestamp = new Date(start).getTime() / 1000;
       const endTimestamp = new Date(end).getTime() / 1000;
 
-      await daoContract.proposeNewRound(name, startTimestamp, endTimestamp);
+      await daoContract.proposeNewRound(cid, startTimestamp, endTimestamp);
 
       history.push("/governance/executive");
     } catch (err) {
@@ -48,7 +74,7 @@ const RoundProposal = ({ instance }) => {
         transaction.
       </p>
       <br />
-      <form>
+      <form onSubmit={handleSubmit}>
         <label className="font-weight-bold mb-0">Round Name</label>
         <input
           type="text"
@@ -59,49 +85,77 @@ const RoundProposal = ({ instance }) => {
         />
         <div className="row no-gutters">
           <div className="col mr-2">
-            <label className="font-weight-bold mb-0">Start Date</label>
+            <label className="font-weight-bold mb-0">
+              Start Date<sup className="text-danger">*</sup>
+            </label>
             <input
               type="date"
-              className="form-control mb-3"
+              className={`form-control ${
+                datesError ? "border-danger mb-0" : "mb-3"
+              }`}
               placeholder="Start Date"
               value={start}
               onChange={(e) => setStart(e.target.value)}
             />
+            {datesError ? (
+              <div className={`text-danger mb-3`}>Please enter valid dates</div>
+            ) : null}
           </div>
           <div className="col ml-2">
-            <label className="font-weight-bold mb-0">End Date</label>
+            <label className="font-weight-bold mb-0">
+              End Date<sup className="text-danger">*</sup>
+            </label>
             <input
               type="date"
-              className="form-control mb-3"
+              className={`form-control ${
+                datesError ? "border-danger mb-0" : "mb-3"
+              }`}
               placeholder="End Date"
               value={end}
               onChange={(e) => setEnd(e.target.value)}
             />
           </div>
         </div>
-        <label className="font-weight-bold mb-0">Entry Categories</label>
+
+        <label className="font-weight-bold mb-0">
+          Entry Categories<sup className="text-danger">*</sup>
+        </label>
         <input
           type="text"
-          className="form-control mb-3"
-          placeholder="Categories"
+          className={`form-control ${
+            categoriesError ? "border-danger mb-0" : "mb-3"
+          }`}
+          placeholder="Enter comma separated categories"
           value={categories}
           onChange={(e) => setCategories(e.target.value)}
         />
-        <label className="font-weight-bold mb-0">Description</label>
+        {categoriesError ? (
+          <div className={`text-danger mb-3`}>
+            Please enter at least one category
+          </div>
+        ) : null}
+
+        <label className="font-weight-bold mb-0">
+          Description<sup className="text-danger">*</sup>
+        </label>
         <textarea
           type="text"
-          className="form-control mb-3"
+          className={`form-control ${
+            descriptionError ? "border-danger mb-0" : "mb-3"
+          }`}
           placeholder="Enter a short description for the proposed funding round..."
           rows={10}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         />
-        <button
-          className="btn btn-lg btn-outline-primary font-weight-bold"
-          onClick={onSubmit}
-        >
-          {loading && <div className="spinner-border" />}
-          {!loading ? "Confirm Proposal" : " Processing"}
+        {descriptionError ? (
+          <div className={`text-danger mb-3`}>
+            Please enter 1-500 characters
+          </div>
+        ) : null}
+
+        <button className="btn btn-lg btn-outline-primary font-weight-bold">
+          Confirm Proposal
         </button>
       </form>
     </div>
