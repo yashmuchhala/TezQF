@@ -32,9 +32,6 @@ async function main() {
     const tokenContract = await deploy("main", "QuadToken", "admin");
     console.log("Deployed QuadToken Contract at:", tokenContract.address);
 
-    config.crowdSaleContract = crowdSaleContract.address;
-    config.tokenContract = tokenContract.address;
-
     console.log("\n--ICO Contracts Deployed--");
 
     //Update Config

@@ -39,6 +39,7 @@ import {
 } from "./redux/ActionTypes";
 import ABIs from "./abi/index";
 import CrowdSale from "./containers/CrowdSale";
+
 const App = () => {
   const dispatch = useDispatch();
 
@@ -56,10 +57,10 @@ const App = () => {
           tokenContract,
           roundManagerContract,
         ] = await Promise.all([
-          tezos.wallet.at("KT1WwPkjbsYd3H4L8ysg9cmc1woFn1z2a2zt"),
-          tezos.wallet.at("KT1WdC1ZvLABzJUGYBGTVQHXtgw87zVb2A8z"),
-          tezos.wallet.at("KT1TcU2fBknZTAe83kffQu5E24ZhDK2rNDSj"),
-          tezos.wallet.at("KT1SAmdLauRvJVrHmeELA7wrrs3QPJR4WJQQ"),
+          tezos.wallet.at("KT1MDJcxTHeFMqLksZyZKvbAnXnqeYzP2fBj"),
+          tezos.wallet.at("KT1NcBP4ytLyydi1RfM2KJLJwXKwNk9SS49A"),
+          tezos.wallet.at("KT1Vstt4D3RXfJxTEHEcr9ShzA8tyvREiEyq"),
+          tezos.wallet.at("KT1NQCY6ZwwTwEmoLhiNM12LykdEsC55eDA1"),
         ]);
 
         const daoContractObject = new ABIs.DAOContractABI(daoContract);
