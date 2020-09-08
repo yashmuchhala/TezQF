@@ -23,10 +23,9 @@ class DAOContractABI {
     return {};
   }
 
-  async proposeNewRound(name, startTime, endTime) {
-    // TODO: startTime, endTime, expiry in what format ???
+  async proposeNewRound(description, startTime, endTime) {
     const op = await this.contract.methods
-      .proposeNewRound(endTime, name, startTime)
+      .proposeNewRound(description, endTime, startTime)
       .send();
     const result = await op.confirmation();
     console.log(result);

@@ -1,23 +1,33 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Moment from "react-moment";
 import ExecutiveVotingModal from "../../components/governance/ExecutiveVotingModal";
 
 import { useSelector } from "react-redux";
-import { useState } from "react";
+
+const ipfs = require("nano-ipfs-store").at("https://ipfs.infura.io:5001");
 
 const ExecutiveVoting = () => {
   const { id } = useParams();
 
   const [loading, setLoading] = useState(false);
+  const [ipfsContent, setIpfsContent] = useState({});
 
   const account = useSelector((state) => state.credentials.wallet.account);
   const daoContract = useSelector((state) => state.contract.contracts.dao);
-  let proposal = useSelector(
+  const proposal = useSelector(
     (state) => state.governance.newRoundProposals[id - 1]
   );
 
-  if (!proposal) {
+  useEffect(() => {
+    const getContent = async () => {
+      setIpfsContent(JSON.parse(await ipfs.cat(proposal.description)));
+    };
+
+    if (proposal) getContent();
+  }, [proposal]);
+
+  if (!proposal || Object.keys(ipfsContent).length === 0) {
     return (
       <div className="text-center text-primary">
         <div className="spinner-border" />
@@ -128,25 +138,10 @@ const ExecutiveVoting = () => {
         <div className="card">
           <div className="card-body">
             <h2 className="card-title">
-              Proposal to conduct funding round {proposal.name}
+              Proposal to conduct funding round {proposal.id.toNumber()}
             </h2>
             <h4>Description</h4>
-            <p className="text-grey">
-              Sed ut perspiciatis unde omnis iste natus error sit voluptatem
-              accusantium doloremque laudantium, totam rem aperiam, eaque ipsa
-              quae ab illo inventore veritatis et quasi architecto beatae vitae
-              dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit
-              aspernatur aut odit aut fugit, sed quia consequuntur magni dolores
-              eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam
-              est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci
-              velit, sed quia non numquam eius modi tempora incidunt ut labore
-              et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima
-              veniam, quis nostrum exercitationem ullam corporis suscipit
-              laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem
-              vel eum iure reprehenderit qui in ea voluptate velit esse quam
-              nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo
-              voluptas nulla pariatur
-            </p>
+            <p className="text-grey">{ipfsContent.description}</p>
             <table>
               <thead>
                 <tr>
@@ -171,7 +166,7 @@ const ExecutiveVoting = () => {
             </table>
             <br />
             <h4>Categories</h4>
-            <p>Lorem Ipsum</p>
+            <p>{ipfsContent.categories.join(", ")}</p>
             <br />
           </div>
         </div>
@@ -227,7 +222,7 @@ const ExecutiveVoting = () => {
       </div>
 
       {/* Voting Modal */}
-      <ExecutiveVotingModal name={proposal.name.toString()} />
+      <ExecutiveVotingModal id={proposal.id.toNumber()} />
     </div>
   );
 };

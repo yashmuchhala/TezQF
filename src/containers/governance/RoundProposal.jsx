@@ -7,7 +7,6 @@ import { proposalVaidations as validations } from "../../utils/validations";
 const ipfs = require("nano-ipfs-store").at("https://ipfs.infura.io:5001");
 
 const RoundProposal = () => {
-  const [name, setName] = useState("");
   const [start, setStart] = useState(new Date().toISOString().split("T")[0]);
   const [end, setEnd] = useState(new Date().toISOString().split("T")[0]);
   const [categories, setCategories] = useState("");
@@ -18,7 +17,10 @@ const RoundProposal = () => {
   const [loading, setLoading] = useState(false);
 
   const daoContract = useSelector((state) => state.contract.contracts.dao);
-
+  console.log(daoContract);
+  /*
+    TODO: Replace with a page load call
+  */
   const history = useHistory();
 
   const handleSubmit = async (e) => {
@@ -42,12 +44,11 @@ const RoundProposal = () => {
     setDescriptionError(false);
 
     const ipfsObject = {
-      name,
       description,
       categories: categories.split(","),
     };
 
-    const cid = await ipfs.add(JSON.stringify(ipfsObject));
+    const desc = await ipfs.add(JSON.stringify(ipfsObject));
 
     setLoading(true);
 
@@ -55,7 +56,7 @@ const RoundProposal = () => {
       const startTimestamp = new Date(start).getTime() / 1000;
       const endTimestamp = new Date(end).getTime() / 1000;
 
-      await daoContract.proposeNewRound(cid, startTimestamp, endTimestamp);
+      await daoContract.proposeNewRound(desc, startTimestamp, endTimestamp);
 
       history.push("/governance/executive");
     } catch (err) {
@@ -75,14 +76,6 @@ const RoundProposal = () => {
       </p>
       <br />
       <form onSubmit={handleSubmit}>
-        <label className="font-weight-bold mb-0">Round Name</label>
-        <input
-          type="text"
-          className="form-control mb-3"
-          placeholder="Mega Funding Round September"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
         <div className="row no-gutters">
           <div className="col mr-2">
             <label className="font-weight-bold mb-0">
@@ -155,7 +148,8 @@ const RoundProposal = () => {
         ) : null}
 
         <button className="btn btn-lg btn-outline-primary font-weight-bold">
-          Confirm Proposal
+          {loading && <div className="spinner-border" />}
+          {loading ? " Processing Transaction" : "Confirm Proposal"}
         </button>
       </form>
     </div>

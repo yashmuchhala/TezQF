@@ -17,13 +17,9 @@ const Executive = () => {
     ? newRoundProposals.slice(0, -1)
     : newRoundProposals;
 
-  if (newRoundProposals.length === 0) {
-    return (
-      <div className="text-center text-primary">
-        <div className="spinner-border" />
-      </div>
-    );
-  }
+  /*
+    TODO: Add a loader for proposal loading
+  */
 
   return (
     <div>
@@ -60,7 +56,7 @@ const Executive = () => {
       {/* Active Proposal */}
       {activeProposal !== null ? (
         <ActiveProposal
-          name={activeProposal.name}
+          id={activeProposal.id.toNumber()}
           start={activeProposal.start.toString()}
           end={activeProposal.end.toString()}
           votesYes={activeProposal.votesYes.toNumber()}
@@ -78,7 +74,7 @@ const Executive = () => {
         archivedProposals.map((proposal, index) => (
           <ArchivedProposal
             key={index}
-            name={proposal.name}
+            id={proposal.id}
             start={proposal.start.toString()}
             end={proposal.end.toString()}
             votesYes={proposal.votesYes.toNumber()}

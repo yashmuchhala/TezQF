@@ -2,26 +2,19 @@ import React from "react";
 import Moment from "react-moment";
 import { Link } from "react-router-dom";
 
-const ArchivedProposal = ({
-  name,
-  resolved,
-  start,
-  end,
-  votesYes,
-  votesNo,
-}) => {
+const ArchivedProposal = ({ id, resolved, start, end, votesYes, votesNo }) => {
   return (
     <div className="mb-3 card">
       <div className="card-body">
         <div className="align-items-center row">
           <div className="col-sm-9">
-            <h5 className="card-title">{`Proposal to conduct funding round ${name}`}</h5>
+            <h5 className="card-title">{`Proposal to conduct funding round ${id}`}</h5>
             <p className="card-text">
-              {`Round ${name} to be held from `}
+              {`Round ${id} to be held from `}
               <Moment format="DD-MM-YYYY">{start}</Moment> {" to "}
               <Moment format="DD-MM-YYYY">{end}</Moment>
               {". "}
-              <Link to={`/governance/executive/${name}`} className="text-blue">
+              <Link to={`/governance/executive/${id}`} className="text-blue">
                 Read more.
               </Link>
             </p>
