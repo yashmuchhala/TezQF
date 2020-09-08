@@ -1,44 +1,65 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
+import { useSelector } from "react-redux";
 
-const ExecutiveVotingModal = ({ proposal }) => {
-  const [weight, setWeight] = useState();
+const ExecutiveVotingModal = ({ name }) => {
+  const [weight, setWeight] = useState(0);
   const [inFavor, setFavor] = useState(true);
+  const [loading, setLoading] = useState(false);
+
+  const daoContract = useSelector((state) => state.contract.contracts.dao);
+
+  const onVote = async () => {
+    if (weight === 0) {
+      alert("You must vote using at least 1 token!");
+    } else {
+      try {
+        setLoading(true);
+        await daoContract.voteForNewRoundProposal(inFavor, weight);
+        window.location.reload();
+      } catch (err) {
+        console.log(err);
+        alert(err);
+      }
+    }
+
+    setLoading(false);
+  };
 
   return (
     <div
-      class="modal fade"
+      className="modal fade"
       id="executive-voting-model"
-      tabindex="-1"
+      tabIndex="-1"
       role="dialog"
       aria-labelledby="executive-voting-modelLabel"
       aria-hidden="true"
     >
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="executive-voting-modelLabel">
+      <div className="modal-dialog" role="document">
+        <div className="modal-content">
+          <div className="modal-header">
+            <h5 className="modal-title" id="executive-voting-modelLabel">
               Voting Confirmation
             </h5>
             <button
               type="button"
-              class="close"
+              className="close"
               data-dismiss="modal"
               aria-label="Close"
             >
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
-          <div class="modal-body">
+          <div className="modal-body">
             By confirming, you will be choosing to vote for/against{" "}
-            <strong>Proposal to conduct funding round {proposal.id}</strong>, by
+            <strong>Proposal to conduct funding round {name}</strong>, by
             depositing your tokens, which shall be returned after proposal
             execution.
             <div className="row align-items-center no-gutters my-2">
               <div className="col-8">
                 <input
                   type="number"
-                  class="form-control"
+                  className="form-control"
                   value={weight}
                   name="weight"
                   placeholder="Voting weight..."
@@ -59,9 +80,16 @@ const ExecutiveVotingModal = ({ proposal }) => {
               </div>
             </div>
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-block btn-primary">
-              Confirm Vote using Tokens
+          <div className="modal-footer">
+            <button
+              onClick={onVote}
+              type="button"
+              className="btn btn-block btn-primary"
+            >
+              {loading && <div className="spinner-border spinner-border-sm" />}
+              {loading
+                ? " Processing Transaction"
+                : "Confirm Vote using Tokens"}
             </button>
           </div>
         </div>
@@ -71,7 +99,7 @@ const ExecutiveVotingModal = ({ proposal }) => {
 };
 
 ExecutiveVotingModal.propTypes = {
-  proposal: PropTypes.object.isRequired,
+  name: PropTypes.string.isRequired,
 };
 
 export default ExecutiveVotingModal;

@@ -5,9 +5,9 @@ class DAOContractABI {
 
   async getNewRoundProposalsData() {
     const storage = await this.contract.storage();
-    const newRoundProposals = {};
-    for (var i = 0; i < storage.newRoundProposalId; i++) {
-      newRoundProposals[i] = await storage.newRoundProposals.get(i + 1);
+    const newRoundProposals = [];
+    for (var i = 1; i <= storage.newRoundProposalId; i++) {
+      newRoundProposals.push(await storage.newRoundProposals.get(i.toString()));
     }
     return {
       newRoundProposals: newRoundProposals,
@@ -23,17 +23,13 @@ class DAOContractABI {
     return {};
   }
 
-  async proposeNewRound(name, startTime, endTime, expiry) {
+  async proposeNewRound(name, startTime, endTime) {
     // TODO: startTime, endTime, expiry in what format ???
     const op = await this.contract.methods
-      .proposeNewRound(
-        name,
-        Math.round(startTime / 1000),
-        Math.round(endTime / 1000),
-        Math.round(expiry / 1000)
-      )
+      .proposeNewRound(endTime, name, startTime)
       .send();
     const result = await op.confirmation();
+    console.log(result);
     return result?.confirmed;
   }
 
@@ -46,7 +42,9 @@ class DAOContractABI {
   }
 
   async executeNewRoundProposal() {
-    const op = await this.contract.methods.executeNewRoundProposal().send();
+    const op = await this.contract.methods
+      .executeNewRoundProposal([["unit"]])
+      .send();
 
     const result = await op.confirmation();
     return result?.confirmed;

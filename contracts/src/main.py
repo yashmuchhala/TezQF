@@ -662,8 +662,7 @@ class DAO(sp.Contract):
             proposal.resolved = 1
         sp.else:
             proposal.resolved = -1
-        
-        self.data.newRoundProposalActive = False
+            self.data.newRoundProposalActive = False
     
     
     @sp.entry_point

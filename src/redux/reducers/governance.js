@@ -5,7 +5,7 @@ import {
 
 export const governance = (
   state = {
-    newRoundProposals: {},
+    newRoundProposals: [],
     newRoundProposalId: 0,
     newRoundProposalActive: false,
     currentOnGoingRoundProposalId: -1,

@@ -3,40 +3,76 @@ import { useParams } from "react-router-dom";
 import Moment from "react-moment";
 import ExecutiveVotingModal from "../../components/governance/ExecutiveVotingModal";
 
-//Dummy data
-import { executive } from "../../data/executive";
+import { useSelector } from "react-redux";
+import { useState } from "react";
 
 const ExecutiveVoting = () => {
   const { id } = useParams();
 
-  //Retrieve Proposal Object (Replace with contract retrieval)
-  const proposal = executive[id - 1];
+  const [loading, setLoading] = useState(false);
+
+  const account = useSelector((state) => state.credentials.wallet.account);
+  const daoContract = useSelector((state) => state.contract.contracts.dao);
+  let proposal = useSelector(
+    (state) => state.governance.newRoundProposals[id - 1]
+  );
+
+  if (!proposal) {
+    return <p className="text-center">Loading...</p>;
+  }
+
+  const onExecute = async () => {
+    try {
+      setLoading(true);
+      await daoContract.executeNewRoundProposal();
+      window.location.reload();
+    } catch (err) {
+      console.log(err);
+      alert(err);
+    }
+
+    setLoading(false);
+  };
 
   //Check for resolved status and generate the relevant button
   const getVotingButton = () => {
-    if (proposal.resolved === 0) {
-      return (
+    if (proposal.resolved.toNumber() === 0) {
+      return Date.now() > new Date(proposal.expiry) ? (
+        <>
+          <button
+            onClick={onExecute}
+            className="btn btn-outline-primary btn-block"
+          >
+            {loading && <div className="spinner-border spinner-border-sm" />}
+            {loading ? " Processing Transaction" : "Execute Proposal"}
+          </button>
+          <p className="mt-1 text-center text-secondary">
+            {proposal.votesYes.toNumber()} votes in support.
+          </p>
+        </>
+      ) : (
         <>
           <button
             data-toggle="modal"
             data-target="#executive-voting-model"
             className="btn btn-outline-success btn-block"
+            disabled={proposal.voters.has(account)}
           >
-            Vote
+            {proposal.voters.has(account) ? "You have already voted" : "Vote"}
           </button>
           <p className="mt-1 text-center text-secondary">
-            {proposal.votesYes} votes in support.
+            {proposal.votesYes.toNumber()} votes in support.
           </p>
         </>
       );
-    } else if (proposal.resolved === 1) {
+    } else if (proposal.resolved.toNumber() === 1) {
       return (
         <>
           <button disabled className="btn btn-success btn-block">
             Accepted
           </button>
           <p className="mt-1 text-center text-secondary">
-            {proposal.votesYes} votes in support.
+            {proposal.votesYes.toNumber()} votes in support.
           </p>
         </>
       );
@@ -47,7 +83,7 @@ const ExecutiveVoting = () => {
             Rejected
           </button>
           <p className="mt-1 text-center text-secondary">
-            {proposal.votesNo} votes against.
+            {proposal.votesNo.toNumber()} votes against.
           </p>
         </>
       );
@@ -61,7 +97,7 @@ const ExecutiveVoting = () => {
         <div className="card">
           <div className="card-body">
             <h2 className="card-title">
-              Proposal to conduct funding round {proposal.id}
+              Proposal to conduct funding round {proposal.name}
             </h2>
             <h4>Description</h4>
             <p className="text-grey">
@@ -104,7 +140,7 @@ const ExecutiveVoting = () => {
             </table>
             <br />
             <h4>Categories</h4>
-            <p>{proposal.categories}</p>
+            <p>Lorem Ipsum</p>
             <br />
           </div>
         </div>
@@ -129,7 +165,7 @@ const ExecutiveVoting = () => {
                     <Moment format="DD/MM/YYYY">{proposal.created}</Moment>
                   </td>
                 </tr>
-                {proposal.resolved === 0 ? (
+                {proposal.resolved.toNumber() === 0 ? (
                   <tr>
                     <td className="text-grey">Ends in</td>
                     <td>
@@ -146,16 +182,12 @@ const ExecutiveVoting = () => {
             <table className="w-100 mb-3 details-table">
               <tbody>
                 <tr>
-                  <td className="text-grey">Total Votes</td>
-                  <td>{proposal.votes}</td>
-                </tr>
-                <tr>
                   <td className="text-grey">Yes Votes</td>
-                  <td>{proposal.votesYes}</td>
+                  <td>{proposal.votesYes.toNumber()}</td>
                 </tr>
                 <tr>
                   <td className="text-grey">No Votes</td>
-                  <td>{proposal.votesNo}</td>
+                  <td>{proposal.votesNo.toNumber()}</td>
                 </tr>
               </tbody>
             </table>
@@ -164,7 +196,7 @@ const ExecutiveVoting = () => {
       </div>
 
       {/* Voting Modal */}
-      <ExecutiveVotingModal proposal={proposal} />
+      <ExecutiveVotingModal name={proposal.name.toString()} />
     </div>
   );
 };

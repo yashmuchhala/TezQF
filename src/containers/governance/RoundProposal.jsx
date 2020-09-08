@@ -1,35 +1,44 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
+import { useHistory } from "react-router-dom";
 
-const RoundProposal = () => {
+const RoundProposal = ({ instance }) => {
   const [name, setName] = useState("");
   const [start, setStart] = useState(new Date().toISOString().split("T")[0]);
   const [end, setEnd] = useState(new Date().toISOString().split("T")[0]);
   const [categories, setCategories] = useState("");
   const [description, setDescription] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const daoContract = useSelector((state) => state.contract.contracts.dao);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isCompleted, setIsCompleted] = useState(false);
 
-  const onSubmit = async () => {
-    setIsCompleted(false);
-    setIsLoading(true);
-    const now = Date.now();
-    console.log("Now:", now);
-    const success = await daoContract.proposeNewRound(
-      // testing values only
-      name,
-      now + 30 * 60000,
-      now + 60 * 60000,
-      now + 15 * 60000
-    );
+  const history = useHistory();
 
-    if (success) {
-      console.log("success");
-      setIsCompleted(true);
+  /*
+    Changes to be made:
+    - name parameter is the number for the current round and should be auto generated based on the last listed round id (retrieve it from the round contract)
+    - change name to IPFS hash
+  */
+
+  const onSubmit = async (e) => {
+    e.preventDefault();
+
+    setLoading(true);
+
+    try {
+      const startTimestamp = new Date(start).getTime() / 1000;
+      const endTimestamp = new Date(end).getTime() / 1000;
+
+      await daoContract.proposeNewRound(name, startTimestamp, endTimestamp);
+
+      history.push("/governance/executive");
+    } catch (err) {
+      alert(err);
     }
-    setIsLoading(false);
+
+    setLoading(false);
   };
+
   return (
     <div className="container w-75 mb-5">
       <h1>Setup New Funding Round Proposal</h1>
@@ -87,19 +96,13 @@ const RoundProposal = () => {
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         />
-        {isLoading ? (
-          "Loading"
-        ) : (
-          <>
-            <button
-              className="btn btn-lg btn-outline-primary font-weight-bold"
-              onClick={onSubmit}
-            >
-              Confirm Proposal
-            </button>{" "}
-            <h1>{isCompleted ? "Success!" : ""}</h1>
-          </>
-        )}
+        <button
+          className="btn btn-lg btn-outline-primary font-weight-bold"
+          onClick={onSubmit}
+        >
+          {loading && <div className="spinner-border" />}
+          {!loading ? "Confirm Proposal" : " Processing"}
+        </button>
       </form>
     </div>
   );

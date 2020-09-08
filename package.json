@@ -23,7 +23,8 @@
   "scripts": {
     "compile-dev": "node ./utils/scripts/compile.js",
     "deploy-dev": "node ./utils/scripts/deploy.js",
-    "deploy": "node ./utils/scripts/main.js",
+    "deploy-main": "node ./utils/scripts/main.js",
+    "deploy-ico": "node ./utils/scripts/ico_deploy.js",
     "test-contracts": "node ./utils/scripts/test.js",
     "test-contracts-verbose": "node ./utils/scripts/test.js --verbose",
     "start": "react-scripts start",

@@ -56,10 +56,10 @@ const App = () => {
           tokenContract,
           roundManagerContract,
         ] = await Promise.all([
-          tezos.wallet.at("KT1W7r8Up9E83DhKTsZgHDX3kbGkiU57iHT5"),
-          tezos.wallet.at("KT1Ks4uZcoiKykVieJBuaW9XgmFaYgthBJ9s"),
-          tezos.wallet.at("KT1VdfPGgHYBSfgCWhAagQKcPpTWRqs5oDvK"),
-          tezos.wallet.at("KT1Dv4PX87fWkW1eaYpQkfyzeeuWVNzb4rWF"),
+          tezos.wallet.at("KT1WwPkjbsYd3H4L8ysg9cmc1woFn1z2a2zt"),
+          tezos.wallet.at("KT1WdC1ZvLABzJUGYBGTVQHXtgw87zVb2A8z"),
+          tezos.wallet.at("KT1TcU2fBknZTAe83kffQu5E24ZhDK2rNDSj"),
+          tezos.wallet.at("KT1SAmdLauRvJVrHmeELA7wrrs3QPJR4WJQQ"),
         ]);
 
         const daoContractObject = new ABIs.DAOContractABI(daoContract);
@@ -95,6 +95,7 @@ const App = () => {
     };
     configureWallet();
   }, [dispatch]);
+
   return (
     <Router>
       <Layout>
