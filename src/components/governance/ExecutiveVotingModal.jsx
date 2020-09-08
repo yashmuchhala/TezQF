@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
 
-const ExecutiveVotingModal = ({ name }) => {
+const ExecutiveVotingModal = ({ id }) => {
   const [weight, setWeight] = useState(0);
   const [inFavor, setFavor] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -52,7 +51,7 @@ const ExecutiveVotingModal = ({ name }) => {
           </div>
           <div className="modal-body">
             By confirming, you will be choosing to vote for/against{" "}
-            <strong>Proposal to conduct funding round {name}</strong>, by
+            <strong>Proposal to conduct funding round {id}</strong>, by
             depositing your tokens, which shall be returned after proposal
             execution.
             <div className="row align-items-center no-gutters my-2">
@@ -96,10 +95,6 @@ const ExecutiveVotingModal = ({ name }) => {
       </div>
     </div>
   );
-};
-
-ExecutiveVotingModal.propTypes = {
-  name: PropTypes.string.isRequired,
 };
 
 export default ExecutiveVotingModal;

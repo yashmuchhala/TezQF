@@ -182,8 +182,13 @@ const ExecutiveVoting = () => {
               <tbody>
                 <tr>
                   <td className="text-grey">Creator</td>
-                  {/* Link to tzStats */}
-                  <td>{proposal.creator.slice(0, 10)}...</td>
+                  <td>
+                    <a
+                      href={`https://carthagenet.tzstats.com/${proposal.creator}`}
+                    >
+                      {proposal.creator.slice(0, 7)}...
+                    </a>
+                  </td>
                 </tr>
                 <tr>
                   <td className="text-grey">Created at</td>
@@ -207,6 +212,10 @@ const ExecutiveVoting = () => {
             <h4>Voting Stats</h4>
             <table className="w-100 mb-3 details-table">
               <tbody>
+                <tr>
+                  <td className="text-grey">Unique Voters</td>
+                  <td>{proposal.voters.size}</td>
+                </tr>
                 <tr>
                   <td className="text-grey">Yes Votes</td>
                   <td>{proposal.votesYes.toNumber()}</td>
