@@ -11,7 +11,6 @@ const Home = () => {
 
   const currentRound = isRoundActive ? rounds[rounds.length - 1] : null;
 
-  console.log(currentRound);
   return (
     <div>
       <h1 className="font-weight-light mb-3">

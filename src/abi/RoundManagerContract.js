@@ -6,8 +6,11 @@ class RoundManagerContractABI {
     const storage = await this.contract.storage();
     const rounds = [];
     for (var i = 1; i <= storage.currentRound; i++) {
-      rounds.push(await storage.rounds.get(i.toString()));
+      rounds.push(storage.rounds.get(i.toString()));
     }
+
+    await Promise.all(rounds);
+
     return {
       rounds: rounds,
       isRoundActive: storage.isRoundActive,
