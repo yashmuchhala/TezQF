@@ -1,15 +1,27 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 import ActiveDispute from "../../components/governance/ActiveDispute";
 import ArchivedDispute from "../../components/governance/ArchivedDispute";
 
-//Dummy data
-import { disputes } from "../../data/disputes";
+const ipfs = require("nano-ipfs-store").at("https://ipfs.infura.io:5001");
 
 const Disputes = () => {
-  const activeDisputes = disputes[disputes.length - 1];
-  const archivedDisputes = disputes.slice(0, -1);
+  const [activeDisputes, setActiveDisputes] = useState(null);
+  const [archivedDisputes, setArchivedDisputes] = useState([]);
+
+  const { disputes } = useSelector((state) => state.governance);
+  const { isRoundActive, currentRound } = useSelector((state) => state.round);
+
+  useEffect(() => {
+    if (disputes) {
+      if (isRoundActive) {
+        setActiveDisputes(disputes[disputes.length - 1]);
+      }
+      setArchivedDisputes(isRoundActive ? disputes.slice(0, -1) : disputes);
+    }
+  }, [disputes, isRoundActive]);
 
   return (
     <div>
@@ -44,51 +56,72 @@ const Disputes = () => {
       {/* Active Disputes */}
 
       {/* Remove roundId after contract contract integration */}
-      {activeDisputes.disputes.map((dispute) => (
-        <ActiveDispute
-          roundId={activeDisputes.roundId}
-          key={dispute.entryId}
-          dispute={dispute}
-        />
-      ))}
+      {activeDisputes &&
+        activeDisputes.forEach(async (dispute, id) => {
+          const ipfsContent = JSON.parse(await ipfs.cat(dispute.description));
+
+          return (
+            <ActiveDispute
+              roundId={currentRound}
+              entryId={id}
+              key={id}
+              reason={ipfsContent.reason}
+              description={ipfsContent.description}
+              votesYes={dispute.votesYes.toNumber()}
+              votesNo={dispute.votesNo.toNumber()}
+              resolved={dispute.resolved.toNumber()}
+            />
+          );
+        })}
 
       <hr className="my-4" />
 
       {/* Archived Disputes */}
       <div id="accordian">
-        {archivedDisputes.map((round) => (
-          <div key={round.roundId} className="card">
-            <div className="card-header" id={`heading${round.roundId}`}>
+        {archivedDisputes.map((disputes, index) => (
+          <div key={index} className="card">
+            <div className="card-header" id={`heading${index}`}>
               {/* <h1 className="mb-0"> */}
               <button
                 className="d-flex align-items-center justify-content-between btn btn-block collapsed"
                 data-toggle="collapse"
-                data-target={`#collapse${round.roundId}`}
+                data-target={`#collapse${index}`}
                 aria-expanded="true"
-                aria-controls={`collapse${round.roundId}`}
+                aria-controls={`collapse${index}`}
               >
-                <span style={accordionHeaderStyle}>Round {round.roundId}</span>
+                <span style={accordionHeaderStyle}>Round {index + 1}</span>
               </button>
               {/* </h1> */}
             </div>
 
             <div
-              id={`collapse${round.roundId}`}
+              id={`collapse${index}`}
               className="collapse"
-              aria-labelledby={`heading${round.roundId}`}
+              aria-labelledby={`heading${index}`}
               data-parent="#accordion"
             >
               <div className="card-body">
-                {round.disputes.length === 0 ? (
+                {disputes.size === 0 ? (
                   <p className="text-center mb-0">No disputes to show.</p>
                 ) : (
-                  round.disputes.map((dispute) => (
-                    <ArchivedDispute
-                      roundId={round.roundId}
-                      key={dispute.entryId}
-                      dispute={dispute}
-                    />
-                  ))
+                  disputes.forEach(async (dispute, id) => {
+                    const ipfsContent = JSON.parse(
+                      await ipfs.cat(dispute.description)
+                    );
+
+                    return (
+                      <ArchivedDispute
+                        roundId={currentRound}
+                        entryId={id}
+                        key={id}
+                        reason={ipfsContent.reason}
+                        description={ipfsContent.description}
+                        votesYes={dispute.votesYes.toNumber()}
+                        votesNo={dispute.votesNo.toNumber()}
+                        resolved={dispute.resolved.toNumber()}
+                      />
+                    );
+                  })
                 )}
               </div>
             </div>

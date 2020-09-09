@@ -1,20 +1,27 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import PropTypes from "prop-types";
 
-const ActiveDispute = ({ roundId, dispute }) => {
+const ActiveDispute = ({
+  roundId,
+  votesNo,
+  votesYes,
+  resolved,
+  reason,
+  description,
+  entryId,
+}) => {
   return (
     <div className="mb-3 card">
       <div className="card-body">
         <div className="align-items-center row">
           <div className="col-sm-9">
-            <h5 className="card-title">{`Dispute Entry #${dispute.entryId}: ${dispute.title}`}</h5>
+            <h5 className="card-title">{`Dispute Entry #${entryId}: ${reason}`}</h5>
             <p className="card-text">
-              {dispute.description.length > 100
-                ? dispute.description.substring(0, 100) + ".."
-                : dispute.description}{" "}
+              {description.length > 100
+                ? description.substring(0, 100) + ".."
+                : description}{" "}
               <Link
-                to={`/governance/disputes/${roundId}/${dispute.entryId}`}
+                to={`/governance/disputes/${roundId}/${entryId}`}
                 className="text-blue"
               >
                 Read more.
@@ -22,27 +29,45 @@ const ActiveDispute = ({ roundId, dispute }) => {
             </p>
           </div>
           <div className="col-sm-3">
-            <Link
-              to={`/governance/disputes/${roundId}/${dispute.entryId}`}
-              style={{ textDecoration: "none" }}
-            >
-              <button className="btn btn-outline-success btn-block">
-                Vote for Dispute
-              </button>
-            </Link>
-            <p className="mb-0 mt-1 text-center text-secondary">
-              {dispute.votesYes} votes in support.
-            </p>
+            {resolved === 0 && (
+              <>
+                <Link
+                  to={`/governance/disputes/${roundId}/${entryId}`}
+                  style={{ textDecoration: "none" }}
+                >
+                  <button className="btn btn-outline-success btn-block">
+                    Vote for Dispute
+                  </button>
+                </Link>
+                <p className="mb-0 mt-1 text-center text-secondary">
+                  {votesYes} votes in support.
+                </p>
+              </>
+            )}
+            {resolved !== 0 && resolved === 1 ? (
+              <>
+                <button disabled className="btn btn-danger btn-block">
+                  Entry Disqualified
+                </button>
+                <p className="mb-0 mt-1 text-center text-secondary">
+                  {votesYes} votes in support.
+                </p>
+              </>
+            ) : (
+              <>
+                <button disabled className="btn btn-success btn-block">
+                  Dispute Rejected
+                </button>
+                <p className="mb-0 mt-1 text-center text-secondary">
+                  {votesNo} votes against.
+                </p>
+              </>
+            )}
           </div>
         </div>
       </div>
     </div>
   );
-};
-
-ActiveDispute.propTypes = {
-  roundId: PropTypes.number.isRequired,
-  dispute: PropTypes.object.isRequired,
 };
 
 export default ActiveDispute;

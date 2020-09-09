@@ -1,20 +1,27 @@
 import React from "react";
-import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 
-const ArchivedDispute = ({ roundId, dispute }) => {
+const ArchivedDispute = ({
+  roundId,
+  votesNo,
+  votesYes,
+  resolved,
+  reason,
+  description,
+  entryId,
+}) => {
   return (
     <div className="mb-3 card">
       <div className="card-body">
         <div className="align-items-center row">
           <div className="col-sm-9">
-            <h5 className="card-title">{`Dispute Entry #${dispute.entryId}: ${dispute.title}`}</h5>
+            <h5 className="card-title">{`Dispute Entry #${entryId}: ${reason}`}</h5>
             <p className="card-text">
-              {dispute.description.length > 100
-                ? dispute.description.substring(0, 100) + ".."
-                : dispute.description}{" "}
+              {description.length > 100
+                ? description.substring(0, 100) + ".."
+                : description}{" "}
               <Link
-                to={`/governance/disputes/${roundId}/${dispute.entryId}`}
+                to={`/governance/disputes/${roundId}/${entryId}`}
                 className="text-blue"
               >
                 Read more.
@@ -22,13 +29,13 @@ const ArchivedDispute = ({ roundId, dispute }) => {
             </p>
           </div>
           <div className="col-sm-3">
-            {dispute.resolved === 1 ? (
+            {resolved === 1 ? (
               <>
                 <button disabled className="btn btn-danger btn-block">
                   Entry Disqualified
                 </button>
                 <p className="mb-0 mt-1 text-center text-secondary">
-                  {dispute.votesYes} votes in support.
+                  {votesYes} votes in support.
                 </p>
               </>
             ) : (
@@ -37,7 +44,7 @@ const ArchivedDispute = ({ roundId, dispute }) => {
                   Dispute Rejected
                 </button>
                 <p className="mb-0 mt-1 text-center text-secondary">
-                  {dispute.votesNo} votes against.
+                  {votesNo} votes against.
                 </p>
               </>
             )}
@@ -46,11 +53,6 @@ const ArchivedDispute = ({ roundId, dispute }) => {
       </div>
     </div>
   );
-};
-
-ArchivedDispute.propTypes = {
-  roundId: PropTypes.number.isRequired,
-  dispute: PropTypes.object.isRequired,
 };
 
 export default ArchivedDispute;
