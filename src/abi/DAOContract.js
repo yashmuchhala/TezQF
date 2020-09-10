@@ -62,7 +62,9 @@ class DAOContractABI {
   }
 
   async listNewRound() {
-    const op = await this.contract.methods.listNewRound([["unit"]]).send();
+    const op = await this.contract.methods
+      .listNewRound([["unit"]])
+      .send({ gasLimit: 1040000 });
 
     const result = await op.confirmation();
     return result?.confirmed;

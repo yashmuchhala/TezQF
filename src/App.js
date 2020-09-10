@@ -57,12 +57,12 @@ const App = () => {
           tokenContract,
           roundManagerContract,
         ] = await Promise.all([
-          tezos.wallet.at("KT1MDJcxTHeFMqLksZyZKvbAnXnqeYzP2fBj"),
-          tezos.wallet.at("KT1NcBP4ytLyydi1RfM2KJLJwXKwNk9SS49A"),
-          tezos.wallet.at("KT1Vstt4D3RXfJxTEHEcr9ShzA8tyvREiEyq"),
-          tezos.wallet.at("KT1NQCY6ZwwTwEmoLhiNM12LykdEsC55eDA1"),
+          tezos.wallet.at(process.env.REACT_APP_DAO_CONTRACT_ADDRESS),
+          tezos.wallet.at(process.env.REACT_APP_CROWDSALE_CONTRACT_ADDRESS),
+          tezos.wallet.at(process.env.REACT_APP_TOKEN_CONTRACT_ADDRESS),
+          tezos.wallet.at(process.env.REACT_APP_ROUND_MANAGER_CONTRACT_ADDRESS),
         ]);
-
+        console.log(process.env.REACT_APP_TOKEN_CONTRACT_ADDRESS);
         const daoContractObject = new ABIs.DAOContractABI(daoContract);
         const crowdSaleContractObject = new ABIs.CrowdSaleContractABI(
           crowdSaleContract

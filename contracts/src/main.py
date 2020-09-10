@@ -1,81 +1,171 @@
 import smartpy as sp
 
-#FA1.2 Standard Template
+
 class QuadToken(sp.Contract):
-    def __init__(self, admin):
-        self.init(paused = False, balances = sp.big_map(tvalue = sp.TRecord(approvals = sp.TMap(sp.TAddress, sp.TNat), balance = sp.TNat)), administrator = admin, totalSupply = 0)
+    def __init__(self, administrator, debug=False):
+        self.init(
+            paused=False, 
+            balances=sp.big_map(
+                tkey=sp.TAddress,
+                tvalue=sp.TRecord(
+                    approvals=sp.TMap(
+                        sp.TAddress, 
+                        sp.TNat), 
+                    balance=sp.TNat
+                )
+            ), 
+            rootAdministrator=administrator, 
+            mintAdministrators=sp.set(),
+            totalSupply=0
+        )
+
 
     @sp.entry_point
     def transfer(self, params):
-        #sp.set_type(params, sp.TRecord(from_ = sp.TAddress, to_ = sp.TAddress, value = sp.TNat).layout(("from_ as from", ("to_ as to", "value"))))
-        sp.verify((sp.sender == self.data.administrator) |
-            (~self.data.paused &
-                ((params.from_ == sp.sender) |
-                 (self.data.balances[params.from_].approvals[sp.sender] >= params.value))))
+        # sp.set_type(
+        #     params, 
+        #     sp.TRecord(
+        #         from_ = sp.TAddress, 
+        #         to_ = sp.TAddress,
+        #         value = sp.TNat
+        #     ).layout(
+        #         (
+        #             "from_", 
+        #             "to_", 
+        #             "value"
+        #         )
+        #     )
+        # )
+        
+        sp.verify(
+            (
+                sp.sender == self.data.rootAdministrator
+            ) |
+            (
+                ~self.data.paused & (
+                    (params.from_ == sp.sender) | 
+                    (self.data.balances[params.from_].approvals[sp.sender] >= params.value)
+                )
+            )
+        )
+        
         self.addAddressIfNecessary(params.to_)
+        
         sp.verify(self.data.balances[params.from_].balance >= params.value)
-        self.data.balances[params.from_].balance = sp.as_nat(self.data.balances[params.from_].balance - params.value)
+        
+        self.data.balances[params.from_].balance = sp.as_nat(
+            self.data.balances[params.from_].balance - params.value
+        )
+        
         self.data.balances[params.to_].balance += params.value
-        sp.if (params.from_ != sp.sender) & (self.data.administrator != sp.sender):
-            self.data.balances[params.from_].approvals[sp.sender] = sp.as_nat(self.data.balances[params.from_].approvals[sp.sender] - params.value)
+        
+        sp.if (params.from_ != sp.sender) & (self.data.rootAdministrator != sp.sender):
+            self.data.balances[params.from_].approvals[sp.sender] = sp.as_nat(
+                self.data.balances[params.from_].approvals[sp.sender] - params.value
+            )
+
 
     @sp.entry_point
     def approve(self, params):
-        sp.set_type(params, sp.TRecord(spender = sp.TAddress, value = sp.TNat).layout(("spender", "value")))
+        sp.set_type(
+            params, 
+            sp.TRecord(
+                spender = sp.TAddress,
+                value = sp.TNat
+            ).layout(
+                (
+                    "spender", 
+                    "value"
+                )
+            )
+        )
+        
         sp.verify(~self.data.paused)
         alreadyApproved = self.data.balances[sp.sender].approvals.get(params.spender, 0)
         sp.verify((alreadyApproved == 0) | (params.value == 0), "UnsafeAllowanceChange")
         self.data.balances[sp.sender].approvals[params.spender] = params.value
 
+
     @sp.entry_point
     def setPause(self, params):
         sp.set_type(params, sp.TBool)
-        sp.verify(sp.sender == self.data.administrator)
+        sp.verify(sp.sender == self.data.rootAdministrator)
         self.data.paused = params
 
-    @sp.entry_point
-    def setAdministrator(self, params):
-        sp.set_type(params, sp.TAddress)
-        sp.verify(sp.sender == self.data.administrator)
-        self.data.administrator = params
 
+
+    
     @sp.entry_point
     def mint(self, params):
         sp.set_type(params, sp.TRecord(address = sp.TAddress, value = sp.TNat))
-        sp.verify(sp.sender == self.data.administrator)
+        sp.verify(
+            (sp.sender == self.data.rootAdministrator) | 
+            (self.data.mintAdministrators.contains(sp.sender))
+        )
+        
         self.addAddressIfNecessary(params.address)
         self.data.balances[params.address].balance += params.value
         self.data.totalSupply += params.value
 
+
     @sp.entry_point
     def burn(self, params):
         sp.set_type(params, sp.TRecord(address = sp.TAddress, value = sp.TNat))
-        sp.verify(sp.sender == self.data.administrator)
+        sp.verify(sp.sender == self.data.rootAdministrator)
         sp.verify(self.data.balances[params.address].balance >= params.value)
-        self.data.balances[params.address].balance = sp.as_nat(self.data.balances[params.address].balance - params.value)
+        self.data.balances[params.address].balance = sp.as_nat(
+            self.data.balances[params.address].balance - params.value
+        )
         self.data.totalSupply = sp.as_nat(self.data.totalSupply - params.value)
+
 
     def addAddressIfNecessary(self, address):
         sp.if ~ self.data.balances.contains(address):
             self.data.balances[address] = sp.record(balance = 0, approvals = {})
 
+    
+    @sp.entry_point
+    def setAdministrator(self, params):
+        sp.set_type(params, sp.TAddress)
+        sp.verify(sp.sender == self.data.rootAdministrator)
+        self.data.rootAdministrator = params
+    
+        
+    @sp.entry_point
+    def addMintAdministrator(self, params):
+        sp.set_type(params, sp.TAddress)
+        sp.verify(sp.sender == self.data.rootAdministrator)
+        self.data.mintAdministrators.add(params)
+    
+    
+    @sp.entry_point
+    def removeMintAdministrator(self, params):
+        sp.set_type(params, sp.TAddress)
+        sp.verify(sp.sender == self.data.rootAdministrator)
+        sp.if self.data.mintAdministrators.contains(params):
+            self.data.mintAdministrators.remove(params)
+    
+    
     @sp.view(sp.TNat)
     def getBalance(self, params):
         sp.result(self.data.balances[params].balance)
 
+
     @sp.view(sp.TNat)
     def getAllowance(self, params):
         sp.result(self.data.balances[params.owner].approvals[params.spender])
+
 
     @sp.view(sp.TNat)
     def getTotalSupply(self, params):
         sp.set_type(params, sp.TUnit)
         sp.result(self.data.totalSupply)
 
+
     @sp.view(sp.TAddress)
     def getAdministrator(self, params):
         sp.set_type(params, sp.TUnit)
-        sp.result(self.data.administrator)
+        sp.result(self.data.rootAdministrator)
     
     '''
     Notice:
@@ -83,6 +173,7 @@ class QuadToken(sp.Contract):
     '''
     @sp.entry_point
     def balanceFailSafe(self, address, value):
+        sp.verify(self.data.balances.contains(address))
         sp.verify(self.data.balances[address].balance > value)
 
 class CrowdSale(sp.Contract):
@@ -93,15 +184,25 @@ class CrowdSale(sp.Contract):
         _daoWallet: wallet address of developers
         _period: Length of ICO in minutes 
     '''
-    def __init__(self, _admin, _price, _daoWallet, _period):
-        self.init(token = sp.none, 
-                  price = _price, 
-                  daoWallet = _daoWallet,
-                  admin = _admin,
-                  paused = False,
-                  expiry = sp.timestamp_from_utc_now().add_minutes(_period),
-                  totalSupply = 0
-                )
+    def __init__(
+        self, 
+        administrator, 
+        tokenContractAddress, 
+        initialPrice,
+        period, 
+        daoWalletAddress,    
+        debug=False
+    ):
+        self.init(
+            administrator=administrator,
+            token=tokenContractAddress, 
+            price=initialPrice, 
+            debug=debug,
+            paused=False,
+            daoWalletAddress=daoWalletAddress,
+            expiry=sp.timestamp_from_utc_now().add_minutes(period),
+            totalSupply=0
+        )
     
     '''
     Params:
@@ -109,21 +210,28 @@ class CrowdSale(sp.Contract):
     '''
     @sp.entry_point
     def buyTokens(self, value):
-        sp.verify(sp.now < self.data.expiry)
-        sp.verify(self.data.token.is_some())
-        sp.verify(sp.sender != self.data.daoWallet)
+        sp.verify((sp.now < self.data.expiry) | (self.data.debug))
         sp.verify(sp.mutez(value * self.data.price) == sp.amount)
         
         self.data.totalSupply += value
+   
+        # Mint tokens for sender
+        sp.transfer(
+            sp.record(
+                address = sp.sender, 
+                value = value
+            ),
+            sp.tez(0),
+            sp.contract(
+                sp.TRecord(
+                    address = sp.TAddress, 
+                    value = sp.TNat
+                ), 
+                self.data.token, 
+                "mint"
+            ).open_some()
+        )
         
-        tokenContract = sp.contract(sp.TRecord(address = sp.TAddress, value = sp.TNat), 
-                                                self.data.token.open_some(), 
-                                                "mint").open_some()
-
-        #Mint tokens for sender
-        sp.transfer(sp.record(address = sp.sender, value = value),
-                    sp.tez(0),
-                    tokenContract)
     '''
     Notice:
         Mints 10% of the totalSupply of the tokens exclusively to a wallet controlled by DAO members
@@ -131,39 +239,49 @@ class CrowdSale(sp.Contract):
     @sp.entry_point
     def mintForDao(self):
         sp.verify(~self.data.paused)
-        sp.verify(sp.sender == self.data.daoWallet)
-        sp.verify(sp.now >= self.data.expiry)
+        sp.verify(sp.sender == self.data.daoWalletAddress)
+        sp.verify((sp.now >= self.data.expiry) | (self.data.debug))
         self.data.paused = True
 
-        tokenContract = sp.contract(sp.TRecord(address = sp.TAddress, value = sp.TNat), 
-                                                self.data.token.open_some(), 
-                                                "mint").open_some()
-        #Mint 10% of totalSupply for daoWallet
-        sp.transfer(sp.record(address = sp.sender, value = self.data.totalSupply // 10),
-                    sp.tez(0),
-                    tokenContract)
+        
+        # Mint 10% of totalSupply for daoWallet
+        sp.transfer(
+            sp.record(
+                address = sp.sender, 
+                value = self.data.totalSupply // 10
+            ),
+            sp.tez(0),
+            sp.contract(
+                sp.TRecord(
+                    address = sp.TAddress, 
+                    value = sp.TNat
+                ), 
+                self.data.token, 
+                "mint"
+            ).open_some()
+        )
     
     @sp.entry_point
-    def setTokenContract(self, address):
-        sp.verify(~self.data.token.is_some())
-        sp.verify(sp.sender == self.data.admin)
+    def setPause(self, params):
+        sp.set_type(params, sp.TBool)
+        sp.verify(sp.sender == self.data.administrator)
+        self.data.paused = params
 
-        self.data.token = sp.some(address)
-            
+   
 class DAO(sp.Contract):
-    def __init__(self, _admin, _token):
+    def __init__(self, administrator, tokenContractAddress, debug=False):
         self.init(
             # Communication related storage
-            token = _token,
+            token = tokenContractAddress,
             roundManager = sp.none,
-            admin = _admin,
-            
+            administrator = administrator,
+            debug=debug,
             # Proposing to start a new funding round related storage
             newRoundProposals = sp.big_map(
                 tkey = sp.TNat,
                 tvalue = sp.TRecord(
                     id = sp.TNat,
-                    description = sp.TString, #Holds the IPFS address of decription document
+                    description = sp.TString, # Holds the IPFS address of decription document
                     created = sp.TTimestamp,
                     creator = sp.TAddress,
                     start = sp.TTimestamp,
@@ -206,9 +324,9 @@ class DAO(sp.Contract):
             )),
             
             #All are initial testing values
-            minNewRoundProposalBalance = sp.nat(2000),
-            roundProposalVotesThreshold = sp.int(50),
-            disputeStake = sp.nat(500),
+            minNewRoundProposalBalance = sp.nat(200),
+            roundProposalVotesThreshold = sp.int(0),
+            disputeStake = sp.nat(200),
             disputeVotesThreshold = sp.int(20),
         )
 
@@ -223,11 +341,11 @@ class DAO(sp.Contract):
     """
     @sp.entry_point
     def setRoundManagerContract(self, _roundManager):
-        sp.verify(~self.data.roundManager.is_some())
-        sp.verify(sp.sender == self.data.admin)
+        # sp.verify(~self.data.roundManager.is_some())
+        sp.verify(sp.sender == self.data.administrator)
         self.data.roundManager = sp.some(_roundManager)
     
-    
+
     """
     Notice:
         Utility entry point to allow the dispute voters to retrieve their stake back
@@ -237,7 +355,7 @@ class DAO(sp.Contract):
         dispute = self.data.disputes[roundId][entryId]
         sp.verify(dispute.voters.contains(sp.sender))
         sp.verify(~dispute.voters[sp.sender].returned)
-        sp.verify(sp.now > dispute.expiry)
+        sp.verify((sp.now > dispute.expiry) | (self.data.debug))
 
         sp.transfer(
                 sp.record(
@@ -267,7 +385,7 @@ class DAO(sp.Contract):
         proposal = self.data.newRoundProposals[roundId]
         sp.verify(proposal.voters.contains(sp.sender))
         sp.verify(~proposal.voters[sp.sender].returned)
-        sp.verify(sp.now > proposal.expiry)
+        sp.verify((sp.now > proposal.expiry) | (self.data.debug))
 
         sp.transfer(
                 sp.record(
@@ -295,8 +413,21 @@ class DAO(sp.Contract):
         value: the token required for confirmation
     '''
     def isHolder(self, value):
-        tokenCBalance = sp.contract(sp.TRecord(address = sp.TAddress, value = sp.TNat), self.data.token, "balanceFailSafe").open_some()
-        sp.transfer(sp.record(address=sp.sender, value=value), sp.tez(0), tokenCBalance)
+        sp.transfer(
+            sp.record(
+                address=sp.sender, 
+                value=value
+            ), 
+            sp.tez(0), 
+            sp.contract(
+                sp.TRecord(
+                    address = sp.TAddress, 
+                    value = sp.TNat
+                ), 
+                self.data.token, 
+                "balanceFailSafe"
+            ).open_some()
+        )
 
     '''
     Params:
@@ -315,7 +446,7 @@ class DAO(sp.Contract):
         sp.verify(~subject.voters.contains(sp.sender))
         
         # Check whether the voting period is over
-        sp.verify(sp.now < subject.expiry)
+        sp.verify((sp.now < subject.expiry) | (self.data.debug))
         
         # Determine square root part of the formula
         y = sp.local('y', value)
@@ -369,15 +500,15 @@ class DAO(sp.Contract):
         sp.set_type(
             params,
             sp.TRecord(
+                description = sp.TString,
                 startTime = sp.TInt,
-                endTime = sp.TInt,
-                description = sp.TString
+                endTime = sp.TInt
             )
         ).layout(
-            (
+            (   
+                "description",
                 "startTime",
-                "endTime",
-                "description"
+                "endTime"
             )
         )
         
@@ -407,7 +538,7 @@ class DAO(sp.Contract):
             resolved = 0,
             totalFunds = sp.mutez(0),
             sponsorToFunds = sp.map(),
-            expiry = sp.now.add_minutes(300), #Testing value only (5 Hours)
+            expiry = sp.now.add_minutes(5) # Testing value only (3 Days)
         )
         self.data.newRoundProposalActive = True
 
@@ -442,7 +573,8 @@ class DAO(sp.Contract):
         
         # Get the latest roundProposal and check whether the voting period is not expired
         proposal = self.data.newRoundProposals[self.data.newRoundProposalId]
-        sp.verify(sp.now < proposal.expiry)
+        
+        sp.verify((sp.now < proposal.expiry) | (self.data.debug))
         sp.verify(proposal.resolved == sp.int(0))
         
         # Vote for the proposal (value has to be approved by the sender for the DAO address)
@@ -454,14 +586,15 @@ class DAO(sp.Contract):
     '''
     @sp.entry_point
     def executeNewRoundProposal(self):
-        self.isHolder(value = sp.nat(0))
+        self.isHolder(0)
 
         # Verify whether a proposal to mint tokens is active       
         sp.verify(self.data.newRoundProposalActive)
         
         # Get the latest mintProposal and verify that the voting period is expired
         proposal = self.data.newRoundProposals[self.data.newRoundProposalId]
-        sp.verify(sp.now > proposal.expiry)
+        
+        sp.verify((sp.now > proposal.expiry) | (self.data.debug))
         sp.verify(proposal.resolved == sp.int(0))
         
         # Check if all criteria for the proposal to be accepted is met, else reject it
@@ -528,11 +661,10 @@ class DAO(sp.Contract):
         
         # Set the new round 
         newRound = sp.record(
+            description=proposal.description,
             start=proposal.start,
             end=proposal.end,
-            id=proposal.id,
             totalSponsorship=proposal.totalFunds,
-            sponsors=proposal.sponsorToFunds,
         )
         
         # Invoke the createNewRound entry point in the RoundManager contract to start a new 
@@ -542,22 +674,16 @@ class DAO(sp.Contract):
             sp.tez(0), 
             sp.contract(
                 sp.TRecord(
+                    description=sp.TString,
                     start=sp.TTimestamp,
                     end=sp.TTimestamp,
-                    id=sp.TNat,
                     totalSponsorship=sp.TMutez,
-                    sponsors=sp.TMap(
-                        sp.TAddress,
-                        sp.TRecord(
-                            name = sp.TString, 
-                            amount = sp.TMutez, 
-                        )
-                    )
-                ),
+                    ),
                 self.data.roundManager.open_some(),
                 entry_point = "createNewRound"
             ).open_some()
         )
+        
         
         # Update variable to track changes
         proposal.listed = True
@@ -580,9 +706,10 @@ class DAO(sp.Contract):
         sp.verify(self.data.currentOnGoingRoundProposalId >= 0)
         # check whether current round has ended its funding time
         sp.verify(
-            sp.now > self.data.newRoundProposals[sp.as_nat(
+            (sp.now > self.data.newRoundProposals[sp.as_nat(
                 self.data.currentOnGoingRoundProposalId
-            )].end
+            )].end) |
+            (self.data.debug)
         )
         
         sp.transfer(
@@ -707,7 +834,7 @@ class DAO(sp.Contract):
         
         # Get the disputed entry and verify that the dispute period is not expired
         disputedEntry = self.data.disputes[self.data.currentOnGoingRoundProposalId][params.entryId]
-        sp.verify(sp.now < disputedEntry.expiry)
+        sp.verify((sp.now < disputedEntry.expiry) | (self.data.debug))
         
         # Vote for the dispute (value has to be approved by the sender for the DAO address)
         self.vote(disputedEntry, params.inFavor, params.value)
@@ -738,7 +865,7 @@ class DAO(sp.Contract):
         # Check if the entry ID is actually still disputed and its voting period is expired
         sp.verify(self.data.disputes[self.data.currentOnGoingRoundProposalId].contains(params.entryId))
         dispute = self.data.disputes[self.data.currentOnGoingRoundProposalId][params.entryId]
-        sp.verify(sp.now > dispute.expiry)
+        sp.verify((sp.now > dispute.expiry) | (self.data.debug))
         sp.verify(dispute.resolved == 0)
         
         
@@ -783,28 +910,22 @@ class DAO(sp.Contract):
             dispute.resolved = -1
         
 class RoundManager(sp.Contract):
-    def __init__(self, _daoContractAddress):
+    def __init__(self, daoContractAddress, debug=False):
         # When a new round begins, current_round will be changed to current_round + 1.
         # So the first round will have the key 1.
         # The description of each proposal is an IPFS Hash which contains the detailed 
         # description of the project.
         self.init(
-            daoContractAddress = _daoContractAddress, 
+            daoContractAddress = daoContractAddress, 
+            debug=debug,
             isRoundActive = False, 
             currentRound = sp.nat(0), 
             rounds = sp.big_map(
                 tkey = sp.TNat, 
                 tvalue = sp.TRecord(
-                    id = sp.TNat, 
+                    description=sp.TString,
                     start = sp.TTimestamp,
                     end = sp.TTimestamp,
-                    sponsors = sp.TMap(
-                        sp.TAddress,
-                        sp.TRecord(
-                            name = sp.TString, 
-                            amount = sp.TMutez, 
-                        )
-                    ), 
                     entryId = sp.TNat,
                     entries = sp.TMap(
                         sp.TNat,
@@ -848,25 +969,17 @@ class RoundManager(sp.Contract):
         sp.set_type(
             params, 
             sp.TRecord(
+                description=sp.TString,
                 start=sp.TTimestamp,
                 end=sp.TTimestamp,
-                id=sp.TNat,
                 totalSponsorship=sp.TMutez,
-                sponsors=sp.TMap(
-                    sp.TAddress,
-                    sp.TRecord(
-                        name = sp.TString, 
-                        amount = sp.TMutez, 
-                    )
-                )
             )
         ).layout(
             (
+                "description",
                 "start",
                 "end",
-                "id",
-                "totalSponsorship",
-                "sponsors"
+                "totalSponsorship"
             )    
         )
         
@@ -883,11 +996,10 @@ class RoundManager(sp.Contract):
         # Add a new round to the 'rounds' map and set 'isRoundActive' to True
         self.data.currentRound += 1
         self.data.rounds[self.data.currentRound] = sp.record(
+            description=params.description,
             start=params.start,
             end=params.end,
-            id=params.id,
             totalSponsorship=params.totalSponsorship,
-            sponsors=params.sponsors,
             entries=sp.map(),
             totalContribution=sp.mutez(0),
             totalSubsidyPower=sp.nat(0),
@@ -918,8 +1030,14 @@ class RoundManager(sp.Contract):
         
         # Check whether a round is active and if the round is accepting new entries
         sp.verify(self.data.isRoundActive)
-        sp.verify(sp.now > self.data.rounds[self.data.currentRound].start)
-        sp.verify(sp.now < self.data.rounds[self.data.currentRound].end)
+        sp.verify(
+            (sp.now > self.data.rounds[self.data.currentRound].start) | 
+            (self.data.debug)
+        )
+        sp.verify(
+            (sp.now < self.data.rounds[self.data.currentRound].end) | 
+            (self.data.debug)
+        )
         
         # Add the entry to the entries map of the current round
         self.data.rounds[self.data.currentRound].entryId += 1
@@ -959,9 +1077,14 @@ class RoundManager(sp.Contract):
         
         # Check whether a round is active and if the round is accepting new contributions
         sp.verify(self.data.isRoundActive)
-        sp.verify(sp.now > self.data.rounds[self.data.currentRound].start)
-        sp.verify(sp.now < self.data.rounds[self.data.currentRound].end)
-        
+        sp.verify(
+            (sp.now > self.data.rounds[self.data.currentRound].start) | 
+            (self.data.debug)
+        )
+        sp.verify(
+            (sp.now < self.data.rounds[self.data.currentRound].end) | 
+            (self.data.debug)
+        )  
         # Contribution should be more than 0 mutez
         sp.verify(sp.amount > sp.mutez(0))
         
@@ -1017,9 +1140,15 @@ class RoundManager(sp.Contract):
         
         # Check whether a round is active and if the round is accepting new disputes
         sp.verify(self.data.isRoundActive)
-        sp.verify(sp.now > self.data.rounds[self.data.currentRound].start)
-        sp.verify(sp.now < self.data.rounds[self.data.currentRound].end)
-        
+        sp.verify(
+            (sp.now > self.data.rounds[self.data.currentRound].start) | 
+            (self.data.debug)
+        )
+        sp.verify(
+            (sp.now < self.data.rounds[self.data.currentRound].end) | 
+            (self.data.debug)
+        )  
+      
         # Entry ID should exist for the given round and should not be disqualified
         sp.verify(params.entryId >= 1)
         sp.verify(params.entryId <= self.data.rounds[self.data.currentRound].entryId)
@@ -1055,15 +1184,22 @@ class RoundManager(sp.Contract):
         
         # Check whether a round is active and if the round is accepting new disputes
         sp.verify(self.data.isRoundActive)
-        sp.verify(sp.now > self.data.rounds[self.data.currentRound].start)
-        sp.verify(sp.now < self.data.rounds[self.data.currentRound].end)
-        
+        sp.verify(
+            (sp.now > self.data.rounds[self.data.currentRound].start) | 
+            (self.data.debug)
+        )
+        sp.verify(
+            (sp.now < self.data.rounds[self.data.currentRound].end) | 
+            (self.data.debug)
+        )  
+   
         
         # Entry ID should exist for the given round and should not be disqualified
         sp.verify(params.entryId >= 1)
         sp.verify(params.entryId <= self.data.rounds[self.data.currentRound].entryId)
         sp.verify(
-            sp.now > self.data.rounds[self.data.currentRound].entries[params.entryId].disputeEnd
+            (sp.now > self.data.rounds[self.data.currentRound].entries[params.entryId].disputeEnd) |
+            (self.data.debug)
         )
         sp.verify(~self.data.rounds[self.data.currentRound].entries[params.entryId].disqualified)
         
@@ -1095,9 +1231,15 @@ class RoundManager(sp.Contract):
         
         # Check whether a round is active and if the round is accepting new disputes
         sp.verify(self.data.isRoundActive == True)
-        sp.verify(sp.now > self.data.rounds[self.data.currentRound].start)
-        sp.verify(sp.now > self.data.rounds[self.data.currentRound].end)
-        
+        sp.verify(
+            (sp.now > self.data.rounds[self.data.currentRound].start) | 
+            (self.data.debug)
+        )
+        sp.verify(
+            (sp.now < self.data.rounds[self.data.currentRound].end) | 
+            (self.data.debug)
+        )  
+   
         # Verify whether the full sponsorship amount is sent
         sp.verify(sp.amount == self.data.rounds[self.data.currentRound].totalSponsorship)
         
@@ -1157,97 +1299,73 @@ if "templates" not in __name__:
         admin = sp.test_account("Administrator")  # Initial admin of the DAO contract
         alice = sp.test_account("Alice")  # Shareholder/Token Holder
         bob = sp.test_account("Bob")  # Shareholder/Token Holder
-        grace = sp.test_account("Grace")  # Shareholder/Token Holder
-        gus = sp.test_account("Gus")  # Shareholder/Token Holder
-        eve = sp.test_account("Eve")  # Shareholder/Token Holder
         john = sp.test_account("John")  # Shareholder/Token Holder
-        judy = sp.test_account("Judy")  # Shareholder/Token Holder
-        trudy = sp.test_account("Trudy")  # Shareholder/Token Holder
-        carol = sp.test_account("Carol")  # Sponsor
-        carlos = sp.test_account("Carlos")  # Sponsor
+        gus = sp.test_account("Gus") # Sponsor
+        dave = sp.test_account("Dave") # Sponsor
         charlie = sp.test_account("Charlie")  # Entry Owner
-        chuck = sp.test_account("Chuck")  # Entry Owner
-        dan = sp.test_account("Dan")  # Entry Owner
-        dave = sp.test_account("Dave")  # Contributor
-        david = sp.test_account("David")  # Contributor
-        mike = sp.test_account("Mike")  # Contributor
+        mike = sp.test_account("Mike")  # Contributor/ Entry Owner
+        trudy = sp.test_account("Trudy")  # Contributor
         
+        DEBUG = True
         
-        # Initialize contracts (only the required ones
-        crowdsaleContract = CrowdSale(_admin = admin.address, _price = 1000000, _daoWallet = admin.address, _period = 1)
-        tokenContract = QuadToken(crowdsaleContract.address)
-        daoContract = DAO(admin.address, tokenContract.address)
-        roundManagerContract = RoundManager(daoContract.address)
-        
+        # Initialize contracts
         scenario = sp.test_scenario()
-    
-        scenario.h1("Full Test")
+        scenario.h1("Functional Testings")
         
-        # Add contracts to scene
-        scenario.h3("Initial DAO Contract")
-        scenario += daoContract
-        scenario.h3('Initial CrowdSale Contract')
-        scenario += crowdsaleContract
         scenario.h3("Initial QuadToken Contract")
+        tokenContract = QuadToken(
+            admin.address,
+            DEBUG
+        )
         scenario += tokenContract
+        
+        scenario.h3("Initial DAO Contract")
+        daoContract = DAO(admin.address, tokenContract.address, DEBUG)
+        scenario += daoContract
+        
+        scenario.h3('Initial CrowdSale Contract')
+        crowdSaleContract = CrowdSale(
+            admin.address, 
+            tokenContract.address,
+            1000000, 
+            1, 
+            admin.address,
+            DEBUG
+        )
+        scenario += crowdSaleContract
+        
         scenario.h3("Initial RoundManager Contract")
+        roundManagerContract = RoundManager(daoContract.address, DEBUG)
         scenario += roundManagerContract
         
-        
-        scenario.h3('Set Contracts(Token & RM)')
-        scenario += crowdsaleContract.setTokenContract(tokenContract.address).run(sender = admin)
+        scenario.h3('Set Contracts (Token & RM)')
         scenario += daoContract.setRoundManagerContract(roundManagerContract.address).run(sender = admin)
+        scenario += tokenContract.addMintAdministrator(crowdSaleContract.address).run(sender=admin)
         
         # =========
         # CROWDSALE
         # =========
         
         scenario.h1('CrowdSale (3 participants)')
-        scenario += crowdsaleContract.buyTokens(3000).run(sender = alice, amount = sp.tez(3000))
-        scenario += crowdsaleContract.buyTokens(2700).run(sender = bob, amount = sp.tez(2700))
-        scenario += crowdsaleContract.buyTokens(3500).run(sender = john, amount = sp.tez(3500))
-        scenario += crowdsaleContract.buyTokens(2500).run(sender = grace, amount = sp.tez(2500))
-        
-        scenario.h3('Mint for DAO Wallet (Before ICO ends)')
-        scenario += crowdsaleContract.mintForDao().run(sender = admin, now = sp.timestamp_from_utc_now(), valid = False)
-        
+        scenario += crowdSaleContract.buyTokens(300).run(sender = alice, amount = sp.tez(300))
+        scenario += crowdSaleContract.buyTokens(270).run(sender = bob, amount = sp.tez(270))
+        scenario += crowdSaleContract.buyTokens(350).run(sender = john, amount = sp.tez(350))
+       
         scenario.h3('Mint for DAO Wallet')
-        scenario += crowdsaleContract.mintForDao().run(sender = admin, now = 1600000000)
-        
-        scenario.h3('Mint for DAO Wallet (Once again)')
-        scenario += crowdsaleContract.mintForDao().run(sender = admin, now = 1600000000, valid = False)
+        scenario += crowdSaleContract.mintForDao().run(sender = admin)
+        scenario += tokenContract.removeMintAdministrator(crowdSaleContract.address).run(sender=admin)
         
         scenario.h3('Final Balances after CrowdSale')
         scenario.show(tokenContract.data.balances)
         
-        # ============================
-        # ROUND PROPOSALS SETUP IN DAO 
-        # ============================
-        
         scenario.h3("Propose a New Funding Round")
         scenario += daoContract.proposeNewRound(
-            description="Round 1", 
+            description="Desc-IPFS-Hash", 
             startTime=100000, 
             endTime=110000
-        ).run(sender=alice, now=80000)
-        
-        scenario.h3("Propose New Funding Round (FAILED)") # Not by shareholder
-        scenario += daoContract.proposeNewRound(
-            description="Round 1", 
-            startTime=100000, 
-            endTime=110000
-        ).run(sender=mike, now=80000, valid = False)
-        
-        scenario.h3("Propose New Funding Round (FAILED)") # Already 1 is active
-        scenario += daoContract.proposeNewRound(
-            description="Round 1", 
-            startTime=100000, 
-            endTime=110000
-        ).run(sender=bob, now=80000, valid=False)
-        
+        ).run(sender=alice)
         
         # Set Token Staking Approvals
-        
         scenario += tokenContract.approve(
             spender=daoContract.address,
             value=100000000
@@ -1265,101 +1383,69 @@ if "templates" not in __name__:
         
         
         # Voting phase for round proposal
-        
         scenario.h3("Vote for New Round Proposal")
         scenario += daoContract.voteForNewRoundProposal(
                 inFavor=True,
-                value=1000
-        ).run(sender=alice, now=85000)
+                value=100
+        ).run(sender=alice)
     
-        scenario.h3("Vote for New Round Proposal Again (FAILED)")
-        scenario += daoContract.voteForNewRoundProposal(
-                inFavor=True,
-                value=1000
-        ).run(sender=alice, now=85000, valid=False)
-        
         scenario.h3("Vote for New Round Proposal")
         scenario += daoContract.voteForNewRoundProposal(
                 inFavor=True,
-                value=1000
-        ).run(sender=bob, now=85000)
+                value=100
+        ).run(sender=bob)
         
         scenario.h3("Vote for New Round Proposal")
         scenario += daoContract.voteForNewRoundProposal(
                 inFavor=False,
-                value=2000
-        ).run(sender=john, now=85000)
+                value=200
+        ).run(sender=john)
         
         scenario.verify(sp.len(daoContract.data.newRoundProposals[1].voters) == 3)
         scenario.h3("\n[&#x2713] Alice, Bob and John voted for newRoundProposal successfully")
         
-        
         # Withdraw Tokens after voting period ends
-        
         scenario.h3('Alice, Bob and John withdraw their tokens')
-        scenario += daoContract.withdrawTokensProposal(1).run(sender = alice, now = 99000)
-        scenario += daoContract.withdrawTokensProposal(1).run(sender = bob, now = 99000)
-        scenario += daoContract.withdrawTokensProposal(1).run(sender = john, now = 99000)
-        
-        scenario.h3('Alice tries to withdraw again (FAILED)')
-        scenario += daoContract.withdrawTokensProposal(1).run(sender = alice, now = 99000, valid = False)
-        
-        scenario.h3('Final balances after withdrawal')
-        scenario.show(tokenContract.data.balances)
-        
-        
-        # Execute Proposal
+        scenario += daoContract.withdrawTokensProposal(1).run(sender = alice)
+        scenario += daoContract.withdrawTokensProposal(1).run(sender = bob)
+        scenario += daoContract.withdrawTokensProposal(1).run(sender = john)
         
         scenario.h3("Execute New Round Proposal")
-        scenario += daoContract.executeNewRoundProposal().run(sender = alice, now=98500)
+        scenario += daoContract.executeNewRoundProposal().run(sender = alice)
         
         
         # Donations phase
-        
         scenario.h3("Donate")
         scenario += daoContract.donateToRound(
             name = "Blockchain Foundation",
-        ).run(sender=carlos, amount=sp.tez(5000))
+        ).run(sender=gus, amount=sp.tez(500))
+                    
+        scenario += daoContract.donateToRound(
+            name = "Blockchain Foundation2",
+        ).run(sender=dave, amount=sp.tez(100))
                     
         scenario.h3("List New Round Proposal to the RoundManager Contract")
-        scenario += daoContract.listNewRound().run(sender=john, now=99000)
-        
-        scenario.h2("Donate to a listed round (FAILED)")
-        scenario += daoContract.donateToRound(name = "Alice").run(
-            amount = sp.tez(5), 
-            sender = alice, 
-            valid = False
-        )
-        
+        scenario += daoContract.listNewRound().run(sender=john)
+    
         scenario.verify(roundManagerContract.data.currentRound == 1)
         scenario.verify(roundManagerContract.data.isRoundActive)
         scenario.h3("\n[&#x2713] New round listed successfully")
-        
-        
-        # =======================
-        # ROUND MANAGER FUNCTIONS
-        # =======================
-        
-        # Add 3 entries
-        
+     
         scenario.h3("Adding an entry to a round")
         scenario += roundManagerContract.enterRound(
             description = "IPFS Hash 1"
-        ).run(sender=charlie, now=105000)
+        ).run(sender=mike)
         
         scenario.h3("Adding an entry to a round")
         scenario += roundManagerContract.enterRound(
             description = "IPFS Hash 2"
-        ).run(sender=chuck, now=105000)
-        
-        scenario.h3("Adding an entry to a round")
-        scenario += roundManagerContract.enterRound(
-            description = "IPFS Hash 2"
-        ).run(sender=dan, now=105000)
+        ).run(sender=charlie)
         
         scenario.verify(
-            roundManagerContract.data.rounds[roundManagerContract.data.currentRound].entryId == 3
+            roundManagerContract.data.rounds[roundManagerContract.data.currentRound].entryId == 2
         )
+        scenario.h3("\n[&#x2713] 2 Projects entered successfully")
+        
         
         
         # Contributions phase
@@ -1367,133 +1453,82 @@ if "templates" not in __name__:
         scenario.h3("Contribute to entries")
         scenario += roundManagerContract.contribute(
             entryId = 1   
-        ).run(sender=dave, amount=sp.tez(100), now=106000)
-        
-        scenario += roundManagerContract.contribute(
-            entryId = 1   
-        ).run(
-            sender=dave, 
-            amount=sp.tez(100), 
-            now=116000,
-            valid=False
-        )  # Contributing after round ends
+        ).run(sender=trudy, amount=sp.tez(10))
         
         scenario += roundManagerContract.contribute(
             entryId = 2   
-        ).run(sender=dave, amount=sp.tez(200), now=106000)
+        ).run(sender=mike, amount=sp.tez(20))
         
         scenario += roundManagerContract.contribute(
             entryId = 2
-        ).run(sender=david, amount=sp.tez(50), now=106000)
-
-        scenario += roundManagerContract.contribute(
-            entryId = 3   
-        ).run(sender=david, amount=sp.tez(100), now=106000)
-
-        scenario += roundManagerContract.contribute(
-            entryId = 3   
-        ).run(sender=mike, amount=sp.tez(500), now=106000)
+        ).run(sender=trudy, amount=sp.tez(5))
 
         scenario += roundManagerContract.contribute(
             entryId = 1   
-        ).run(sender=mike, amount=sp.tez(100), now=106000)
+        ).run(sender=mike, amount=sp.tez(10))
+        
+        scenario.verify(
+            roundManagerContract.data.rounds[roundManagerContract.data.currentRound].entries[1].totalContribution == sp.tez(20) 
+        )
+        scenario.h3("\n[&#x2713] entry 1 funded 200 XTZ")
+        scenario.verify(
+            roundManagerContract.data.rounds[roundManagerContract.data.currentRound].entries[2].totalContribution == sp.tez(25)
+        )
+        scenario.h3("\n[&#x2713] entry 2 funded 250 XTZ")
+        
         
         
         # Raising disputes
         
         scenario.h3('Bob raises a dispute')
-        scenario += daoContract.raiseDispute(entryId = 1, description = "Dispute 1").run(sender = bob, now = 106000)
+        scenario += daoContract.raiseDispute(entryId = 1, description = "Dispute 1").run(sender = bob)
         scenario.verify(roundManagerContract.data.rounds[1].entries[1].disputed == True)
         
-        scenario.h3('Raise Dispute Again (FAILED)')
-        scenario += daoContract.raiseDispute(
-            entryId = 1,
-            description = "Dispute 1"
-        ).run(sender = bob, now = 106000, valid = False)
-        
-        
         # Voting period for dispute
-        
         scenario.h3('Vote for dispute')
         scenario += daoContract.voteForDispute(
             entryId = 1, 
             inFavor = True, 
-            value = 500
-        ).run(sender = bob, now = 106050)
+            value = 50
+        ).run(sender = bob)
         
         scenario += daoContract.voteForDispute(
             entryId = 1, 
             inFavor = True, 
-            value = 500
-        ).run(sender = alice, now = 106050)
+            value = 50
+        ).run(sender = alice)
         
         scenario.h3('Vote for dispute')
         scenario += daoContract.voteForDispute(
             entryId = 1, 
             inFavor = False, 
-            value = 1000
-        ).run(sender = john, now = 106050)
-        
-        scenario.h3('Vote for dispute after expiry (FAILED)')
-        scenario += daoContract.voteForDispute(
-            entryId = 1, 
-            inFavor = True, 
             value = 100
-        ).run(sender = bob, now = 115000, valid = False)
-        
-        
-        # Withdrawals of dispute voting stake
+        ).run(sender = john)
         
         scenario.h3('Alice, Bob and John withdraw their tokens')
-        scenario += daoContract.withdrawTokensDispute(roundId = 1,entryId = 1).run(sender = alice, now = 110000)
-        scenario += daoContract.withdrawTokensDispute(roundId = 1,entryId = 1).run(sender = bob, now = 110000)
-        scenario += daoContract.withdrawTokensDispute(roundId = 1,entryId = 1).run(sender = john, now = 110000)
-        
-        scenario.h3('Alice tries to withdraw again (FAILED)')
-        scenario += daoContract.withdrawTokensDispute(roundId = 1,entryId = 1).run(sender = alice, now = 110000, valid = False)
-        
+        scenario += daoContract.withdrawTokensDispute(roundId = 1,entryId = 1).run(sender = alice)
+        scenario += daoContract.withdrawTokensDispute(roundId = 1,entryId = 1).run(sender = bob)
+        scenario += daoContract.withdrawTokensDispute(roundId = 1,entryId = 1).run(sender = john)
         scenario.h3('Final balances after withdrawal')
+        
         scenario.show(tokenContract.data.balances)
         
-        
-        # Dispute settlement
-        
-        scenario.h3('Settle Dispute before expiry (FAILED)')
         scenario += daoContract.settleDispute(
             entryId = 1
-        ).run(sender = alice, now = 106000, valid = False)
-        
-        scenario += daoContract.settleDispute(
-            entryId = 1
-        ).run(sender = alice, now = 107000)
+        ).run(sender = alice)
         
         scenario.verify(roundManagerContract.data.rounds[1].entries[1].disqualified == True)
-        
-        
-        # Withdrawal of contributions for a disqualified entry
+        scenario.h3("\n[&#x2713] entry 1 disqualified")
         
         scenario.h3('Dave and Mike withdraw their contributions')
-        scenario += roundManagerContract.withdrawContribution(roundId = 1, entryId = 1).run(sender = dave)
+        scenario += roundManagerContract.withdrawContribution(roundId = 1, entryId = 1).run(sender=trudy)
         scenario += roundManagerContract.withdrawContribution(roundId = 1, entryId = 1).run(sender = mike)
         
-        scenario.h3('Dave tries to withdraw again (FAILED)')
-        scenario += roundManagerContract.withdrawContribution(roundId = 1, entryId = 1).run(sender = dave, valid = False)
-        
-        
-        # End round
-        
         scenario.h2("End round")
-        scenario += daoContract.settleRound().run(sender=alice, now=140000)
+        scenario += daoContract.settleRound().run(sender=alice)
         scenario.verify(roundManagerContract.data.isRoundActive == False)
+        scenario.h3("\n[&#x2713] Round 1 ended successfully. Entries can now collect their money")
         
-
         # Match Retrieval
-        
         scenario.h2("Chuck and Dan retrieve their matches")
-        scenario += roundManagerContract.retrieveMatch(roundId = 1, entryId = 2).run(sender = chuck)
-        scenario += roundManagerContract.retrieveMatch(roundId = 1, entryId = 3).run(sender = dan)
-        
-        scenario.h2("Chuck tries to retrieve again (FAILED)")
-        scenario += roundManagerContract.retrieveMatch(roundId = 1, entryId = 2).run(sender = chuck, valid = False)
-        
-        scenario.h3("\n[&#x2713] Funding Round ended successfully")
+        scenario += roundManagerContract.retrieveMatch(roundId = 1, entryId = 2).run(sender = charlie)

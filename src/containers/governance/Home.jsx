@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 
-const ADMIN_PKH = "KT1W7r8Up9E83DhKTsZgHDX3kbGkiU57iHT5";
+const ADMIN_PKH = process.env.REACT_APP_ADMIN_PKH;
 function Home() {
   const [numberOfTokens, setNumberOfTokens] = useState(0);
   const [accountTokenBalance, setAccountTokenBalance] = useState(0);

@@ -13,11 +13,11 @@ const Sponsor = () => {
 
   //MUST UNCOMMENT LATER ON
 
-  // const proposal = newRoundProposalActive
-  //   ? newRoundProposals[newRoundProposals.length - 1]
-  //   : null;
+  const proposal = newRoundProposalActive
+    ? newRoundProposals[newRoundProposals.length - 1]
+    : null;
 
-  const proposal = newRoundProposals[newRoundProposals.length - 1];
+  // const proposal = newRoundProposals[newRoundProposals.length - 1];
 
   const onSubmit = async () => {
     setIsCompleted(false);

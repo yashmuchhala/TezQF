@@ -130,7 +130,7 @@ const ExecutiveVoting = () => {
       );
     }
   };
-
+  console.log("Sponsors:", proposal.sponsorToFunds.valueMap);
   return (
     <div className="row">
       {/* Proposal Details */}
