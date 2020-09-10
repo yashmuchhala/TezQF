@@ -4,12 +4,12 @@ class RoundManagerContractABI {
   }
   async getRoundsData() {
     const storage = await this.contract.storage();
-    const rounds = [];
+    let rounds = [];
     for (var i = 1; i <= storage.currentRound; i++) {
       rounds.push(storage.rounds.get(i.toString()));
     }
 
-    await Promise.all(rounds);
+    rounds = await Promise.all(rounds);
 
     return {
       rounds: rounds,
