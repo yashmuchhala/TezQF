@@ -1,12 +1,29 @@
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 import { dummyProjects } from "../../../data/dummyProjects";
 
 const ProjectProfile = () => {
+  const roundManagerContract = useSelector(
+    (state) => state.contract.contracts.roundManager
+  );
+  const [isLoading, setIsLoading] = useState(false);
+  const [amount, setAmount] = useState();
   const { id } = useParams();
   // State to maintain active tab
   const [activeTab, setActiveTab] = useState(0);
+
+  const handleSubmit = async () => {
+    try {
+      setIsLoading(true);
+      await roundManagerContract.contribute(id, amount);
+    } catch (err) {
+      alert(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const renderContributors = dummyProjects[id - 1].contributors?.map(
     (contribution) => (
@@ -51,7 +68,24 @@ const ProjectProfile = () => {
                 {dummyProjects[id - 1].amount} tz
               </h1>
               <p>Received from a total of 180 contributors</p>
-              <button className="btn btn-primary btn-block">Contribute</button>
+              <input
+                type="text"
+                className="form-control w-100 mb-3"
+                placeholder="Enter amount in mutez"
+                aria-label="Amount"
+                name="amount"
+                value={amount}
+                onChange={({ target: { value } }) => setAmount(value)}
+              />
+              <button
+                className="btn btn-primary btn-block"
+                onClick={handleSubmit}
+              >
+                {isLoading && (
+                  <div className="spinner-border spinner-border-sm" />
+                )}
+                {isLoading ? " Processing Transaction" : "Contribute"}
+              </button>
               <p className="align-self-end">! Dispute</p>
             </>
           )}
