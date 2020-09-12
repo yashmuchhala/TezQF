@@ -2,7 +2,8 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
 import App from "./App";
-import "bootswatch/dist/litera/bootstrap.min.css";
+import "bootswatch/dist/lumen/bootstrap.min.css";
+import "./index.css";
 import "./App.css";
 
 import { ConfigureStore } from "./redux/configureStore";

@@ -8,7 +8,10 @@ const GovernanceNavbar = () => {
 
   return (
     <div>
-      <nav className="navbar navbar-expand bg-light mb-4">
+      <nav
+        className="navbar navbar-expand fixed-top bg-light mb-4"
+        style={{ borderWidth: "1px" }}
+      >
         <div className="container">
           <Link className="navbar-brand" to="/governance">
             TezQF <span className="lead">Governance</span>

@@ -1,6 +1,7 @@
 import React from "react";
 import GovernanceNavbar from "./GovernanceNavbar";
 import Navbar from "./Navbar";
+import Footer from "./Footer";
 
 const Layout = (props) => {
   //Check if the url is of the governance page or rounds page and return the navbar accordingly.
@@ -19,7 +20,10 @@ const Layout = (props) => {
   return (
     <div>
       {getNav()}
-      <div className="container">{props.children}</div>
+      <div className="container" style={{ paddingTop: "72px" }}>
+        {props.children}
+      </div>
+      <Footer />
     </div>
   );
 };

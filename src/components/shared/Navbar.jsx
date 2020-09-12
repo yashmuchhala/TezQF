@@ -7,7 +7,10 @@ const Navbar = () => {
   const wallet = useSelector((state) => state.credentials.wallet);
   return (
     <div>
-      <nav className="navbar navbar-expand bg-light mb-4">
+      <nav
+        className="navbar navbar-expand fixed-top bg-light mb-4"
+        style={{ borderWidth: "1px" }}
+      >
         <div className="container">
           <Link className="navbar-brand" to="/">
             TezQF <span className="lead">Rounds</span>

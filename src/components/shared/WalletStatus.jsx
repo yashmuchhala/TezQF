@@ -8,7 +8,10 @@ const WalletStatus = ({ wallet }) => {
       className="nav-link font-weight-bold text-primary"
       style={{ pointerEvents: "none" }}
     >
-      &#176; {wallet.account}
+      &#176;{" "}
+      {wallet.account.substring(0, 7) +
+        "..." +
+        wallet.account.substring(32, 36)}
     </Link>
   ) : (
     <Link

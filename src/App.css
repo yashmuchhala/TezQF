@@ -12,3 +12,14 @@
 .details-table td {
   padding: 10px;
 }
+
+.navbar-brand {
+  font-size: 28px;
+}
+.navbar-brand .lead {
+  font-size: 24px;
+}
+
+.nav-link {
+  font-size: 18px;
+}
