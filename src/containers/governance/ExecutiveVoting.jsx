@@ -29,8 +29,10 @@ const ExecutiveVoting = () => {
 
   if (!proposal || Object.keys(ipfsContent).length === 0) {
     return (
-      <div className="text-center text-primary">
-        <div className="spinner-border" />
+      <div className="text-center text-primary" style={{ padding: "256px" }}>
+        <div className="spinner-grow spinner-grow-sm text-info" />
+        <div className="spinner-grow spinner-grow-sm text-info ml-2 mr-2" />
+        <div className="spinner-grow spinner-grow-sm text-info" />
       </div>
     );
   }
@@ -95,7 +97,7 @@ const ExecutiveVoting = () => {
     } else if (proposal.resolved.toNumber() === 1) {
       return proposal.listed ? (
         <>
-          <button disabled className="btn btn-success btn-block">
+          <button disabled className="btn btn-success btn-block p-3">
             Accepted
           </button>
           <p className="mt-1 text-center text-secondary">
@@ -106,13 +108,15 @@ const ExecutiveVoting = () => {
         <>
           <button
             onClick={onList}
-            className="btn btn-outline-success btn-block"
+            className="btn btn-outline-success btn-block p-3"
           >
-            {loading && <div className="spinner-border spinner-border-sm" />}
-            {loading ? " Processing Transaction" : "List Round"}
+            {loading ? " Processing" : "List Round"}
+            {loading && (
+              <div className="spinner-grow spinner-grow-sm text-success ml-1" />
+            )}
           </button>
           <p className="mt-1 text-center text-black">
-            {proposal.totalFunds.toNumber() / 1000000} tz in sponsorship till
+            {proposal.totalFunds.toNumber() / 1000000} XTZ in sponsorship till
             now.
           </p>
         </>
@@ -120,7 +124,7 @@ const ExecutiveVoting = () => {
     } else {
       return (
         <>
-          <button disabled className="btn btn-danger btn-block">
+          <button disabled className="btn btn-danger btn-block p-3">
             Rejected
           </button>
           <p className="mt-1 text-center text-secondary">
@@ -132,42 +136,69 @@ const ExecutiveVoting = () => {
   };
   console.log("Sponsors:", proposal.sponsorToFunds.valueMap);
   return (
-    <div className="row">
+    <div className="row pb-5">
       {/* Proposal Details */}
       <div className="col-md-8">
-        <div className="card">
-          <div className="card-body">
-            <h2 className="card-title">
-              Proposal to conduct funding round {proposal.id.toNumber()}
+        <div className="card mt-2">
+          <div className="card-body p-5">
+            <h2
+              className="card-title text-secondary"
+              style={{ fontSize: "32px" }}
+            >
+              <strong>
+                Proposal to conduct Funding Round {proposal.id.toNumber()}
+              </strong>
             </h2>
-            <h4>Description</h4>
-            <p className="text-grey">{ipfsContent.description}</p>
-            <table>
-              <thead>
-                <tr>
-                  <td>
-                    <h4>Start</h4>
-                  </td>
-                  <td className="px-4">
-                    <h4>End</h4>
-                  </td>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>
-                    <Moment format="DD/MM/YYYY">{proposal.start}</Moment>
-                  </td>
-                  <td className="px-4">
-                    <Moment format="DD/MM/YYYY">{proposal.end}</Moment>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-            <br />
-            <h4>Categories</h4>
-            <p>{ipfsContent.categories.join(", ")}</p>
-            <br />
+            <hr />
+            <div className="p-2">
+              <h4>
+                <i>Description</i>
+              </h4>
+              <p className="text-grey">{ipfsContent.description}</p>
+            </div>
+            <div className="p-2">
+              <table>
+                <thead>
+                  <tr>
+                    <td>
+                      <h4>
+                        <i>Start</i>
+                      </h4>
+                    </td>
+                    <td className="pl-4">
+                      <h4>
+                        <i>End</i>
+                      </h4>
+                    </td>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <Moment format="DD/MM/YYYY">{proposal.start}</Moment>
+                    </td>
+                    <td className="px-4">
+                      <Moment format="DD/MM/YYYY">{proposal.end}</Moment>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div className="p-2 mt-3">
+              <h4>
+                <i>Categories</i>
+              </h4>
+              <p>
+                {ipfsContent.categories.map((category) => (
+                  <span
+                    className="badge badge-light mt-1 mr-2 pt-2 pb-2 pl-3 pr-3 text-secondary"
+                    style={{ fontSize: "16px" }}
+                  >
+                    {category}
+                  </span>
+                ))}
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -176,30 +207,41 @@ const ExecutiveVoting = () => {
       <div className="pt-2 col-md-4">
         {getVotingButton()}
         <div className="card">
-          <div className="card-body">
-            <h4>Details</h4>
+          <div className="card-body p-4 mb-2">
+            <h3>
+              <strong>Details</strong>
+            </h3>
             <table className="w-100 mb-3 details-table">
               <tbody>
                 <tr>
-                  <td className="text-grey">Creator</td>
-                  <td>
+                  <td className="text-grey">
+                    <i>Creator</i>
+                  </td>
+                  <td className="text-right">
                     <a
                       href={`https://carthagenet.tzstats.com/${proposal.creator}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
                     >
                       {proposal.creator.slice(0, 7)}...
+                      {proposal.creator.slice(32, 36)}
                     </a>
                   </td>
                 </tr>
                 <tr>
-                  <td className="text-grey">Created at</td>
-                  <td>
+                  <td className="text-grey">
+                    <i>Created at</i>
+                  </td>
+                  <td className="text-right">
                     <Moment format="DD/MM/YYYY">{proposal.created}</Moment>
                   </td>
                 </tr>
                 {proposal.resolved.toNumber() === 0 ? (
                   <tr>
-                    <td className="text-grey">Ends in</td>
-                    <td>
+                    <td className="text-grey">
+                      <i>Ends in</i>
+                    </td>
+                    <td className="text-right">
                       <Moment format="DD/MM/YYYY">{proposal.expiry}</Moment>
                     </td>
                   </tr>
@@ -209,20 +251,28 @@ const ExecutiveVoting = () => {
               </tbody>
             </table>
 
-            <h4>Voting Stats</h4>
-            <table className="w-100 mb-3 details-table">
+            <h3>
+              <strong>Voting Stats</strong>
+            </h3>
+            <table className="w-100 details-table">
               <tbody>
                 <tr>
-                  <td className="text-grey">Unique Voters</td>
-                  <td>{proposal.voters.size}</td>
+                  <td className="text-grey">
+                    <i>Unique Voters</i>
+                  </td>
+                  <td className="text-right">{proposal.voters.size}</td>
                 </tr>
                 <tr>
-                  <td className="text-grey">Yes Votes</td>
-                  <td>{proposal.votesYes.toNumber()}</td>
+                  <td className="text-grey">
+                    <i>Yes Votes</i>
+                  </td>
+                  <td className="text-right">{proposal.votesYes.toNumber()}</td>
                 </tr>
                 <tr>
-                  <td className="text-grey">No Votes</td>
-                  <td>{proposal.votesNo.toNumber()}</td>
+                  <td className="text-grey">
+                    <i>No Votes</i>
+                  </td>
+                  <td className="text-right">{proposal.votesNo.toNumber()}</td>
                 </tr>
               </tbody>
             </table>

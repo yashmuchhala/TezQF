@@ -27,14 +27,19 @@ const Disputes = () => {
     <div>
       {/* Setup Panel */}
       <div className="card">
-        <div className="card-body">
+        <div className="card-body p-5" style={{ backgroundColor: "#FAFAFA" }}>
           <div className="align-items-center row">
             <div className="col-sm-9">
-              <h5 className="card-title">Raise Dispute</h5>
-              <p className="card-text">
-                Raise a dispute against any project that violates the integrity
-                of the community. You must be a holder of at least 2000 DAO
-                tokens.
+              <h5
+                className="card-title text-secondary text-center"
+                style={{ fontSize: "32px" }}
+              >
+                <strong>DISPUTE SETTLEMENTS</strong>
+              </h5>
+              <p className="card-text text-center pl-5 pr-5">
+                Start a new dispute vote for any project that you think doesn't
+                abide to the integrity of tezGrants by clicking on "Setup" and
+                staking the appropriate number of tokens.
               </p>
             </div>
             <div className="col-sm-3">
@@ -42,7 +47,7 @@ const Disputes = () => {
                 to="/governance/disputes/new"
                 style={{ textDecoration: "none" }}
               >
-                <button className="btn btn-outline-primary btn-block">
+                <button className="btn btn-outline-primary btn-block p-3">
                   Setup
                 </button>
               </Link>
@@ -100,7 +105,7 @@ const Disputes = () => {
               aria-labelledby={`heading${index}`}
               data-parent="#accordion"
             >
-              <div className="card-body">
+              <div className="card-body m-5">
                 {disputes.size === 0 ? (
                   <p className="text-center mb-0">No disputes to show.</p>
                 ) : (

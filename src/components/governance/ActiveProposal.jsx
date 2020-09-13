@@ -5,10 +5,21 @@ import Moment from "react-moment";
 const ActiveProposal = ({ id, start, end, votesYes }) => {
   return (
     <div className="card">
-      <div className="card-body">
+      <div className="card-body p-5">
         <div className="align-items-center row">
           <div className="col-sm-9">
-            <h5 className="card-title">{`Proposal to conduct funding round ${id}`}</h5>
+            <h5
+              className="card-title text-primary"
+              style={{ fontSize: "32px", fontWeight: 600 }}
+            >
+              {`Proposal to conduct funding round ${id}`}
+              <span
+                className="badge badge-success p-2 ml-2"
+                style={{ fontSize: "14px" }}
+              >
+                ON-GOING
+              </span>
+            </h5>
             <p className="card-text">
               {`Round ${id} to be held from `}
               <Moment format="DD-MM-YYYY">{start}</Moment> {" to "}
@@ -24,7 +35,7 @@ const ActiveProposal = ({ id, start, end, votesYes }) => {
               to={`/governance/executive/${id}`}
               style={{ textDecoration: "none" }}
             >
-              <button className="btn btn-outline-success btn-block">
+              <button className="btn btn-outline-success btn-block p-3">
                 Vote for Proposal
               </button>
             </Link>

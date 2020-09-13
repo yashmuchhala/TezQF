@@ -9,23 +9,32 @@ const GovernanceNavbar = () => {
   return (
     <div>
       <nav
-        className="navbar navbar-expand fixed-top bg-light mb-4"
-        style={{ borderWidth: "1px" }}
+        className="navbar navbar-expand bg-light mb-4 p-3"
+        style={{
+          borderBottomWidth: "0px",
+        }}
       >
         <div className="container">
-          <Link className="navbar-brand" to="/governance">
-            TezQF <span className="lead">Governance</span>
+          <Link className="navbar-brand text-primary" to="/governance">
+            tezGrants{" "}
+            <span className="lead badge badge-secondary">Governance</span>
           </Link>
           <div className="collapse navbar-collapse">
             <ul className="navbar-nav ml-auto">
               <li className="nav-item">
-                <Link to="/governance/disputes" className="nav-link">
-                  Disputes
+                <Link
+                  to="/governance/executive"
+                  className="nav-link text-secondary"
+                >
+                  Executive
                 </Link>
               </li>
               <li className="nav-item">
-                <Link to="/governance/executive" className="nav-link">
-                  Executive
+                <Link
+                  to="/governance/disputes"
+                  className="nav-link text-secondary"
+                >
+                  Disputes
                 </Link>
               </li>
               <li className="nav-item">

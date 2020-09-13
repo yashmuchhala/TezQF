@@ -12,10 +12,13 @@ const ArchivedDispute = ({
 }) => {
   return (
     <div className="mb-3 card">
-      <div className="card-body">
+      <div className="card-body p-5">
         <div className="align-items-center row">
           <div className="col-sm-9">
-            <h5 className="card-title">{`Dispute Entry #${entryId}: ${reason}`}</h5>
+            <h5
+              className="card-title text-secondary"
+              style={{ fontSize: "32px" }}
+            >{`Dispute Entry #${entryId}: ${reason}`}</h5>
             <p className="card-text">
               {description.length > 100
                 ? description.substring(0, 100) + ".."

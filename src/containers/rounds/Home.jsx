@@ -20,21 +20,20 @@ const Home = () => {
         }}
       >
         <h1
-          className="font-weight-light mb-3"
-          style={{ paddingTop: "48px", fontSize: "64px" }}
+          className="font-weight-light pl-3 mb-3"
+          style={{ fontSize: "64px" }}
         >
-          <strong>TezQF Grants!</strong>
           <br />
-          Crowd funding for
-          <br />
-          public goods <br />
-          with
           <i>
-            {" "}
-            Quadratic
-            <br /> Voting.
-          </i>
-          <Link to={currentRound ? "/contribute" : "/archive"}>
+            Crowd funding for
+            <br />
+            <span style={{ fontWeight: 600 }}>public goods</span>
+            <br />
+            with
+          </i>{" "}
+          Quadratic
+          <br /> Voting.
+          <Link to={currentRound ? "/contribute" : "/archives"}>
             <button
               type="button"
               className="btn btn-primary mb-3 ml-3 p-3 pr-3 pl-3"
@@ -47,14 +46,23 @@ const Home = () => {
           className="container"
           style={{
             paddingTop: "200px",
-            paddingBottom: "20px",
+            paddingBottom: "40px",
             color: "lightgrey",
           }}
         >
           &#8595; scroll down for more info
         </div>
-        <hr />
       </div>
+      {currentRound ? (
+        <RoundActive
+          name={currentRound.name}
+          sponsors={currentRound.sponsors.size}
+          funds={currentRound.totalSponsorship.toNumber()}
+        />
+      ) : (
+        <NoActiveRound />
+      )}
+      <hr />
       <div className="text-center p-5">
         <div className="row">
           <div
@@ -80,17 +88,7 @@ const Home = () => {
         </div>
       </div>
       <hr />
-      {currentRound ? (
-        <RoundActive
-          name={currentRound.name}
-          sponsors={currentRound.sponsors.size}
-          funds={currentRound.totalSponsorship.toNumber()}
-        />
-      ) : (
-        <NoActiveRound />
-      )}
-      <hr />
-      <div className="text-center pl-5 pr-5 pt-3">
+      <div className="text-center pl-5 pr-5 pt-3 pb-5">
         <h3 className="m-5">
           Our funding rounds are governed by a{" "}
           <h1 className="text-success">
@@ -112,9 +110,8 @@ const Home = () => {
           *Our governance tokens are very restrictive and not listed on any
           exchanges;
           <br /> their primary purpose is to maintain voting weights within the
-          DAO.
+          organization.
         </h6>
-        <div className="p-5"></div>
       </div>
     </div>
   );

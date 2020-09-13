@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 
@@ -6,10 +6,15 @@ import ArchivedProposal from "../../components/governance/ArchivedProposal";
 import ActiveProposal from "../../components/governance/ActiveProposal";
 
 const Executive = () => {
+  const [isDataFetchComplete, setIsDataFetchComplete] = useState(false);
   const { newRoundProposals, newRoundProposalActive } = useSelector(
     (state) => state.governance
   );
-
+  useEffect(() => {
+    if (newRoundProposals?.length !== 0) {
+      setIsDataFetchComplete(true);
+    }
+  }, [newRoundProposals]);
   const activeProposal = newRoundProposalActive
     ? newRoundProposals[newRoundProposals.length - 1]
     : null;
@@ -25,13 +30,19 @@ const Executive = () => {
     <div>
       {/* Setup Panel */}
       <div className="card">
-        <div className="card-body">
+        <div className="card-body p-5" style={{ backgroundColor: "#FAFAFA" }}>
           <div className="align-items-center row">
             <div className="col-sm-9">
-              <h5 className="card-title">Round Proposal</h5>
-              <p className="card-text">
-                Create a proposal for a funding round. You must be a holder of
-                at least 2000 DAO tokens.
+              <h5
+                className="card-title text-secondary text-center"
+                style={{ fontSize: "32px" }}
+              >
+                <strong>NEW ROUND PROPOSAL STATUS</strong>
+              </h5>
+              <p className="card-text text-center pl-5 pr-5">
+                Information about the current new round proposals. Vote for an
+                on-going proposal or start a new proposal by staking the minimum
+                number of tokens required.
               </p>
             </div>
             <div className="col-sm-3">
@@ -41,9 +52,21 @@ const Executive = () => {
               >
                 <button
                   disabled={newRoundProposalActive}
-                  className="btn btn-outline-primary btn-block"
+                  className="btn btn-outline-primary btn-block p-3"
                 >
-                  {newRoundProposalActive ? "Proposal on-going" : "Setup"}
+                  {isDataFetchComplete ? (
+                    newRoundProposalActive ? (
+                      "Proposal on-going"
+                    ) : (
+                      "Setup"
+                    )
+                  ) : (
+                    <div>
+                      <div className="spinner-grow spinner-grow-sm text-primary"></div>
+                      <div className="spinner-grow spinner-grow-sm text-primary ml-2 mr-2"></div>
+                      <div className="spinner-grow spinner-grow-sm text-primary "></div>
+                    </div>
+                  )}
                 </button>
               </Link>
             </div>
@@ -83,7 +106,7 @@ const Executive = () => {
           />
         ))
       ) : (
-        <p className="text-center">No Archived Proposals</p>
+        <p className="text-center p-5">No Archived Proposals</p>
       )}
     </div>
   );

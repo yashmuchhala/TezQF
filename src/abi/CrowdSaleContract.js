@@ -12,7 +12,10 @@ class CrowdSaleContractABI {
     const storage = await this.contract.storage();
     return storage.totalSupply.c[0];
   }
-
+  async getIsPaused() {
+    const storage = await this.contract.storage();
+    return storage.isPaused;
+  }
   async buyTokens(value, mutezAmount) {
     const op = await this.contract.methods
       .buyTokens(value)

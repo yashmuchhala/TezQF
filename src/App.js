@@ -5,8 +5,8 @@ import { useDispatch } from "react-redux";
 import { ThanosWallet } from "@thanos-wallet/dapp";
 
 //Rounds
-import Archive from "./containers/rounds/archive/Archive";
-import ArchiveProfile from "./containers/rounds/archive/ArchiveProfile";
+import Archive from "./containers/rounds/archives/Archives";
+import ArchiveProfile from "./containers/rounds/archives/ArchiveProfile";
 import Projects from "./containers/rounds/on-going/Projects";
 import ProjectEntry from "./containers/rounds/on-going/ProjectEntry";
 import ProjectProfile from "./containers/rounds/on-going/ProjectProfile";
@@ -109,8 +109,8 @@ const App = () => {
           <Route exact path="/contribute" component={Projects} />
           <Route exact path="/enter" component={ProjectEntry} />
           <Route path="/sponsor" component={Sponsor} />
-          <Route path="/archive/:id" component={ArchiveProfile} />
-          <Route path="/archive" component={Archive} />
+          <Route path="/archives/:id" component={ArchiveProfile} />
+          <Route path="/archives" component={Archive} />
           <Route path="/profile" component={Profile} />
           {/* Governance Routes */}
           <Route

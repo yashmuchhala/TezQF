@@ -5,7 +5,7 @@ const WalletStatus = ({ wallet }) => {
   return wallet.isConnected ? (
     <Link
       to="#"
-      className="nav-link font-weight-bold text-primary"
+      className="nav-link font-weight-bold text-success"
       style={{ pointerEvents: "none" }}
     >
       &#176;{" "}
@@ -16,8 +16,8 @@ const WalletStatus = ({ wallet }) => {
   ) : (
     <Link
       to="#"
-      className="nav-link font-weight-bold text-secondary"
-      style={{ pointerEvents: "none" }}
+      className="nav-link text-muted"
+      style={{ pointerEvents: "none", fontSize: "18px" }}
     >
       &#176; no wallet connected
     </Link>

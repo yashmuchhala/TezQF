@@ -34,7 +34,7 @@ const ArchiveCard = ({ details }) => {
               </div>
             </div>
           )}
-          <Link to={`/rounds/archive/${details.id}`}>
+          <Link to={`/rounds/archives/${details.id}`}>
             <button className="btn btn-primary btn-block">View</button>
           </Link>
         </div>

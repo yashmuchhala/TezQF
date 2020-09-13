@@ -20,9 +20,7 @@ const Layout = (props) => {
   return (
     <div>
       {getNav()}
-      <div className="container" style={{ paddingTop: "72px" }}>
-        {props.children}
-      </div>
+      <div className="container">{props.children}</div>
       <Footer />
     </div>
   );

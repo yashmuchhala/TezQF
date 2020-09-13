@@ -12,9 +12,21 @@ function Footer() {
             <li>
               <strong>NAVIGATION</strong>
             </li>
-            <li>Archives</li>
-            <li>Crowdsale</li>
-            <li>Governance</li>
+            <li>
+              <a href="/" className="text-secondary">
+                Home
+              </a>
+            </li>
+            <li>
+              <a href="/governance" className="text-secondary">
+                Governance
+              </a>{" "}
+            </li>
+            <li>
+              <a href="/crowdsale" className="text-secondary">
+                Crowdsale
+              </a>{" "}
+            </li>
           </ul>
         </div>
         <div className="col-2 font-weight-light mb-3">
@@ -30,7 +42,7 @@ function Footer() {
         <div className="col-2"></div>
         <div className="col-2"></div>
       </div>
-      <div className="mb-4">
+      <div className="pb-4">
         &#169; {new Date().getFullYear()} Tezos India Foundation. All rights
         reserved.
       </div>
