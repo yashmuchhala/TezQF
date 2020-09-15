@@ -25,7 +25,7 @@ const ProjectProfile = () => {
     }
   };
 
-  const renderContributors = dummyProjects[id - 1].contributors?.map(
+  const renderContributors = dummyProjects[id].contributors?.map(
     (contribution) => (
       <li className="list-group-item row d-flex" key={contribution.address}>
         <span className="col-8">{contribution.address}</span>
@@ -42,7 +42,7 @@ const ProjectProfile = () => {
         {/* Project Image */}
         <div className="col-4">
           <img
-            src={dummyProjects[id - 1].image}
+            src={dummyProjects[id].image}
             height="100%"
             width="100%"
             alt="Project Background"
@@ -50,22 +50,22 @@ const ProjectProfile = () => {
         </div>
         {/* Project Overview */}
         <div className="col-4">
-          <h1 className="font-weight-light">{dummyProjects[id - 1].title}</h1>
-          <h3 className="font-weight-light">{dummyProjects[id - 1].pitch}</h3>
+          <h1 className="font-weight-light">{dummyProjects[id].title}</h1>
+          <h3 className="font-weight-light">{dummyProjects[id].pitch}</h3>
           <ul className="list-group list-group-flush">
-            <li className="list-group-item">{dummyProjects[id - 1].website}</li>
-            <li className="list-group-item">{dummyProjects[id - 1].github}</li>
-            <li className="list-group-item">{dummyProjects[id - 1].address}</li>
+            <li className="list-group-item">{dummyProjects[id].website}</li>
+            <li className="list-group-item">{dummyProjects[id].github}</li>
+            <li className="list-group-item">{dummyProjects[id].address}</li>
           </ul>
         </div>
         {/* Project funding */}
         <div className="col-4 d-flex flex-column align-items-center justify-content-center">
-          {dummyProjects[id - 1].disqualified ? (
+          {dummyProjects[id].disqualified ? (
             <h1 className="text-danger">*DISQUALIFIED*</h1>
           ) : (
             <>
               <h1 className="font-weight-light">
-                {dummyProjects[id - 1].amount} tz
+                {dummyProjects[id].amount} tz
               </h1>
               <p>Received from a total of 180 contributors</p>
               <input
@@ -132,7 +132,7 @@ const ProjectProfile = () => {
           className={`tab-pane ${activeTab === 0 ? `active` : null}`}
           id="description"
         >
-          {dummyProjects[id - 1].description}
+          {dummyProjects[id].description}
         </div>
 
         {/* Contributors Tab */}
@@ -140,7 +140,7 @@ const ProjectProfile = () => {
           className={`tab-pane ${activeTab === 1 ? `active` : null}`}
           id="description"
         >
-          {dummyProjects[id - 1].disqualified ? (
+          {dummyProjects[id].disqualified ? (
             <>
               <h2 className="font-weight-light text-center">
                 This project was disqualified for PLAGIARISM.
@@ -152,7 +152,7 @@ const ProjectProfile = () => {
           ) : (
             <>
               <p className="text-center text-success font-weight-bold">
-                {dummyProjects[id - 1].contributors.length} Contributors
+                {dummyProjects[id].contributors.length} Contributors
               </p>
               <ul className="list-group list-group-flush">
                 {renderContributors}

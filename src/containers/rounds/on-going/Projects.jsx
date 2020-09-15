@@ -16,15 +16,19 @@ const Projects = () => {
 
   useEffect(() => {
     const fetchProjects = async () => {
-      let tempProjects = [];
-      round.entries.forEach(async (project, key) => {
-        const ipfsContent = JSON.parse(await ipfs.cat(project.description));
-        tempProjects.push({ ...ipfsContent, id: key });
+      let ipfsDescriptions = [];
+
+      round.entries.forEach((project) => {
+        ipfsDescriptions.push(ipfs.cat(project.description));
       });
 
-      //Temporary Solution
-      await new Promise((resolve) => setTimeout(resolve, 3000));
+      ipfsDescriptions = await Promise.all(ipfsDescriptions);
 
+      let tempProjects = [];
+
+      ipfsDescriptions.forEach((description, key) => {
+        tempProjects.push({ ...JSON.parse(description), id: key });
+      });
       setProjects(tempProjects);
       setLoading(false);
     };
