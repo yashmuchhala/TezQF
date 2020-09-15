@@ -266,7 +266,7 @@ const ProjectEntry = () => {
             </div>
           ) : null}
 
-          <label className="font-weight-bold mb-0">
+          {/* <label className="font-weight-bold mb-0">
             Address<sup className="text-danger">*</sup>
           </label>
           <input
@@ -284,7 +284,7 @@ const ProjectEntry = () => {
             <div className={`text-danger mb-3`}>
               Please enter a valid Tezos Address of 36 characters
             </div>
-          ) : null}
+          ) : null} */}
 
           <div
             className={`form-check form-check-inline ${
@@ -316,6 +316,11 @@ const ProjectEntry = () => {
               Please accept the terms and conditions
             </div>
           ) : null}
+
+          <div className="text-danger mb-3 font-weight-bold">
+            NOTE: The funds will be sent to the address that is used to sign the
+            transaction for this form submission.
+          </div>
 
           <button
             className="btn btn-primary btn-block font-weight-bold"
