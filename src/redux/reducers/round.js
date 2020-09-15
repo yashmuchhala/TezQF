@@ -3,7 +3,7 @@ import { GET_ROUND_STATUS, GET_ROUNDS_DATA } from "../ActionTypes";
 export const round = (
   state = {
     isRoundActive: false,
-    currentRound: -1,
+    currentRound: null,
     rounds: [],
   },
   action

@@ -9,7 +9,7 @@ const Home = () => {
   const isRoundActive = useSelector((state) => state.round.isRoundActive);
   const rounds = useSelector((state) => state.round.rounds);
 
-  const currentRound = isRoundActive ? rounds[rounds.length - 1] : null;
+  const currentRound = isRoundActive ? rounds[rounds.length - 1] : -1;
 
   return (
     <div>
@@ -53,10 +53,15 @@ const Home = () => {
           &#8595; scroll down for more info
         </div>
       </div>
-      {currentRound ? (
+      {!currentRound ? (
+        <div className="text-center">
+          <div className="spinner-grow spinner-grow-sm text-primary"></div>
+          <div className="spinner-grow spinner-grow-sm text-primary ml-2 mr-2"></div>
+          <div className="spinner-grow spinner-grow-sm text-primary "></div>
+        </div>
+      ) : currentRound !== -1 ? (
         <RoundActive
           name={currentRound.name}
-          sponsors={currentRound.sponsors.size}
           funds={currentRound.totalSponsorship.toNumber()}
         />
       ) : (

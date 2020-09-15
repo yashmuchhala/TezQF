@@ -1,24 +1,80 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+import moment from "moment";
 
 import ProjectCard from "../../../components/rounds/ProjectCard";
 
-import { dummyProjects } from "../../../data/dummyProjects";
+const ipfs = require("nano-ipfs-store").at("https://ipfs.infura.io:5001");
 
 const Projects = () => {
-  const renderProjects = dummyProjects.map((details) => (
-    <ProjectCard details={details} key={details.id} />
-  ));
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+  //const [filter, setFilter] = useState("");
+
+  const { rounds, currentRound } = useSelector((state) => state.round);
+  const round = rounds ? rounds[rounds.length - 1] : null;
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      let tempProjects = [];
+      round.entries.forEach(async (project, key) => {
+        const ipfsContent = JSON.parse(await ipfs.cat(project.description));
+        tempProjects.push({ ...ipfsContent, id: key });
+      });
+
+      //Temporary Solution
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+
+      setProjects(tempProjects);
+      setLoading(false);
+    };
+    if (round) {
+      fetchProjects();
+    } else {
+      setLoading(true);
+    }
+  }, [round]);
+
+  const fetchDiff = () => {
+    const now = moment(new Date());
+    const end = moment(round.end);
+    var diff = moment.duration(moment(end).diff(moment(now)));
+
+    var days = parseInt(diff.asDays());
+    var hours = parseInt(diff.asHours());
+    hours = hours - days * 24;
+    var minutes = parseInt(diff.asMinutes());
+    minutes = minutes - (days * 24 * 60 + hours * 60);
+
+    return days > 0 ? `${days} D ${hours} H` : `${hours} H ${minutes} M`;
+  };
+
+  const renderProjects = projects.map((details, index) => {
+    return <ProjectCard details={details} key={index} />;
+  });
+
+  if (!currentRound) {
+    return (
+      <div className="text-center text-primary" style={{ padding: "256px" }}>
+        <div className="spinner-grow spinner-grow-sm text-info" />
+        <div className="spinner-grow spinner-grow-sm text-info ml-2 mr-2" />
+        <div className="spinner-grow spinner-grow-sm text-info" />
+      </div>
+    );
+  }
 
   return (
     <div>
       {/* Header */}
-      <h1 className="font-weight-light">Funding Round 5</h1>
+      <h1 className="font-weight-light">
+        Funding Round {currentRound.toNumber()}
+      </h1>
       <h4 className="font-weight-lighter">
         The community has contributed over $14000 till now! Help your favourite
         projects in getting ahead!
       </h4>
       <h5 className="font-weight-lighter">
-        <em>Ends in 25D 12H 20M</em>
+        <em>Ends in {fetchDiff()}</em>
       </h5>
 
       <hr />
@@ -59,7 +115,17 @@ const Projects = () => {
 
           {/* Projects */}
           <div className="container-fluid">
-            <div className="row">{renderProjects}</div>
+            {loading ? (
+              <div className="text-center py-5">
+                <div className="spinner-grow spinner-grow-sm text-success"></div>
+                <div className="spinner-grow spinner-grow-sm text-success ml-2 mr-2"></div>
+                <div className="spinner-grow spinner-grow-sm text-success "></div>
+              </div>
+            ) : projects.length !== 0 ? (
+              <div className="row">{renderProjects}</div>
+            ) : (
+              <p className="text-center">No Projects to Show</p>
+            )}
           </div>
         </div>
       </div>

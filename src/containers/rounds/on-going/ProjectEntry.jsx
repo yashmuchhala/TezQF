@@ -1,5 +1,7 @@
 import React, { useState } from "react";
+import { useEffect } from "react";
 import { useSelector } from "react-redux";
+import { useHistory } from "react-router-dom";
 
 import { projectEntryValidations as validations } from "../../../utils/validations";
 
@@ -7,7 +9,7 @@ const ipfs = require("nano-ipfs-store").at("https://ipfs.infura.io:5001");
 
 const ProjectEntry = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [isCompleted, setIsCompleted] = useState(false);
+
   const [projectDetails, setProjectDetails] = useState({
     image: "",
     title: "",
@@ -32,9 +34,26 @@ const ProjectEntry = () => {
     tnc: false,
   });
 
+  const [categories, setCategories] = useState([]);
+
   const roundManagerContract = useSelector(
     (state) => state.contract.contracts.roundManager
   );
+  const rounds = useSelector((state) => state.round.rounds);
+
+  const history = useHistory();
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const ipfsContent = JSON.parse(
+        await ipfs.cat(rounds[rounds.length - 1].description)
+      );
+      setCategories(ipfsContent.categories);
+    };
+    if (rounds?.length !== 0) {
+      fetchCategories();
+    }
+  }, [rounds]);
 
   const handleChange = ({ target: { name, value } }) => {
     setProjectDetails({
@@ -59,7 +78,7 @@ const ProjectEntry = () => {
       description: !validations["description"](projectDetails.description),
       github: !validations["github"](projectDetails.github),
       category: !validations["category"](projectDetails.category),
-      address: !validations["address"](projectDetails.category),
+      address: !validations["address"](projectDetails.address),
       tnc: !projectDetails.tnc,
       image: errors.image,
       website: errors.website,
@@ -74,19 +93,30 @@ const ProjectEntry = () => {
 
     const cid = await ipfs.add(JSON.stringify(projectDetails)); //cid is the IPFS Hash
 
-    setIsCompleted(false);
-    setIsLoading(true);
-    const success = await roundManagerContract.enterRound(cid);
-    if (success) {
-      setIsCompleted(true);
+    try {
+      setIsLoading(true);
+      await roundManagerContract.enterRound(cid);
+      history.push("/contribute");
+    } catch (err) {
+      alert(err);
     }
     setIsLoading(false);
   };
 
+  if (categories?.length === 0) {
+    return (
+      <div className="text-center text-primary" style={{ padding: "256px" }}>
+        <div className="spinner-grow spinner-grow-sm text-info" />
+        <div className="spinner-grow spinner-grow-sm text-info ml-2 mr-2" />
+        <div className="spinner-grow spinner-grow-sm text-info" />
+      </div>
+    );
+  }
+
   return (
     <div className="container d-flex align-items-center flex-column mb-5">
       {/* Header */}
-      <h1 className="font-weight-light">Enter Round 5:</h1>
+      <h1 className="font-weight-light">Enter Round {rounds.length}:</h1>
       <h4 className="text-center font-weight-light mb-3">
         List your project to receive community contribution and a possible chunk
         from the funding pool.
@@ -213,17 +243,23 @@ const ProjectEntry = () => {
           <label className="font-weight-bold mb-0">
             Category<sup className="text-danger">*</sup>
           </label>
-          <input
-            type="text"
-            className={`form-control w-100 ${
+          <select
+            onChange={handleChange}
+            value={projectDetails.category}
+            name="category"
+            className={`custom-select ${
               errors.category ? "border-danger mb-0" : "mb-3"
             }`}
-            placeholder="Category"
-            aria-label="Category"
-            name="category"
-            value={projectDetails.category}
-            onChange={handleChange}
-          />
+          >
+            <option disabled value={""}>
+              Select a Category for your project
+            </option>
+            {categories.map((category, index) => (
+              <option key={index} value={category}>
+                {category}
+              </option>
+            ))}
+          </select>
           {errors.category ? (
             <div className={`text-danger mb-3`}>
               Maximum 50 characters allowed
@@ -285,7 +321,14 @@ const ProjectEntry = () => {
             className="btn btn-primary btn-block font-weight-bold"
             onClick={handleSubmit}
           >
-            CONFIRM ENTRY
+            {isLoading ? (
+              <>
+                <div className="spinner-border spinner-border-sm" /> Processing
+                Transaction
+              </>
+            ) : (
+              "CONFIRM ENTRY"
+            )}
           </button>
         </div>
       </div>
