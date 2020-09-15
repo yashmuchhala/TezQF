@@ -27,7 +27,7 @@ const Projects = () => {
       let tempProjects = [];
 
       ipfsDescriptions.forEach((description, key) => {
-        tempProjects.push({ ...JSON.parse(description), id: key });
+        tempProjects.push({ ...JSON.parse(description), id: key + 1 });
       });
       setProjects(tempProjects);
       setLoading(false);
