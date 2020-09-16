@@ -9,7 +9,8 @@ const ipfs = require("nano-ipfs-store").at("https://ipfs.infura.io:5001");
 const Projects = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
-  //const [filter, setFilter] = useState("");
+  const [filteredProjects, setFilteredProjects] = useState([]);
+  const [categories, setCategories] = useState({});
 
   const { rounds, currentRound } = useSelector((state) => state.round);
   const round = rounds ? rounds[rounds.length - 1] : null;
@@ -30,14 +31,40 @@ const Projects = () => {
         tempProjects.push({ ...JSON.parse(description), id: key + 1 });
       });
       setProjects(tempProjects);
+      setFilteredProjects(tempProjects);
+      fetchCategories(tempProjects);
       setLoading(false);
     };
+
+    const fetchCategories = async (tempProjects) => {
+      let categoryMap = { All: tempProjects.length };
+
+      tempProjects.forEach((project) => {
+        if (categoryMap[project.category]) {
+          categoryMap[project.category] += 1;
+        } else {
+          categoryMap[project.category] = 1;
+        }
+      });
+
+      setCategories(categoryMap);
+    };
+
     if (round) {
       fetchProjects();
     } else {
       setLoading(true);
     }
   }, [round]);
+
+  const setFilter = (category) => {
+    const filtered =
+      category === "All"
+        ? projects
+        : projects.filter((project) => project.category === category);
+
+    setFilteredProjects(filtered);
+  };
 
   const fetchDiff = () => {
     const now = moment(new Date());
@@ -53,7 +80,7 @@ const Projects = () => {
     return days > 0 ? `${days} D ${hours} H` : `${hours} H ${minutes} M`;
   };
 
-  const renderProjects = projects.map((details, index) => {
+  const renderProjects = filteredProjects.map((details, index) => {
     return <ProjectCard details={details} key={index} />;
   });
 
@@ -74,8 +101,9 @@ const Projects = () => {
         Funding Round {currentRound.toNumber()}
       </h1>
       <h4 className="font-weight-lighter">
-        The community has contributed over $14000 till now! Help your favourite
-        projects in getting ahead!
+        The community has contributed over $
+        {Math.floor(round.totalContribution.toNumber() / 1000000)} till now!
+        Help your favourite projects in getting ahead!
       </h4>
       <h5 className="font-weight-lighter">
         <em>Ends in {fetchDiff()}</em>
@@ -89,9 +117,15 @@ const Projects = () => {
         {/* Filters column */}
         <div className="col-3">
           <h5>Filter Projects</h5>
-          <div>Defi</div>
-          <div>Tech</div>
-          <div>Community</div>
+          {Object.keys(categories).map((category, index) => (
+            <div
+              className="filter-link"
+              key={index}
+              onClick={() => setFilter(category)}
+            >
+              {category} ({categories[category]})
+            </div>
+          ))}
         </div>
 
         {/* Projects column */}

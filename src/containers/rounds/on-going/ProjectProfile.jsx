@@ -9,6 +9,8 @@ const ProjectProfile = () => {
     (state) => state.contract.contracts.roundManager
   );
   const { rounds } = useSelector((state) => state.round);
+  const account = useSelector((state) => state.credentials.wallet.account);
+
   const round = rounds ? rounds[rounds.length - 1] : null;
 
   const [isLoading, setIsLoading] = useState(false);
@@ -38,6 +40,7 @@ const ProjectProfile = () => {
     try {
       setIsLoading(true);
       await roundManagerContract.contribute(id, amount);
+      window.location.reload();
     } catch (err) {
       alert(err);
     } finally {
@@ -111,15 +114,21 @@ const ProjectProfile = () => {
                 value={amount}
                 onChange={({ target: { value } }) => setAmount(value)}
               />
-              <button
-                className="btn btn-primary btn-block"
-                onClick={handleSubmit}
-              >
-                {isLoading && (
-                  <div className="spinner-border spinner-border-sm" />
-                )}
-                {isLoading ? " Processing Transaction" : "Contribute"}
-              </button>
+              {project.contributions.has(account) ? (
+                <button disabled className="btn btn-outline-primary btn-block">
+                  You have already contributed
+                </button>
+              ) : (
+                <button
+                  className="btn btn-primary btn-block"
+                  onClick={handleSubmit}
+                >
+                  {isLoading && (
+                    <div className="spinner-border spinner-border-sm" />
+                  )}
+                  {isLoading ? " Processing Transaction" : "Contribute"}
+                </button>
+              )}
               <p className="align-self-end">! Dispute</p>
             </>
           )}

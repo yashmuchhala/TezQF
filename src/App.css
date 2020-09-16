@@ -23,3 +23,11 @@
 .nav-link {
   font-size: 18px;
 }
+
+.filter-link {
+  cursor: pointer;
+}
+
+.filter-link:hover {
+  color: #117298;
+}
