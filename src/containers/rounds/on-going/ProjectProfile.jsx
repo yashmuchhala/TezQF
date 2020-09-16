@@ -86,10 +86,32 @@ const ProjectProfile = () => {
         {/* Project Overview */}
         <div className="col-4">
           <h1 className="font-weight-light">{projectDescription?.title}</h1>
+
           <ul className="list-group list-group-flush">
-            <li className="list-group-item">{projectDescription?.website}</li>
-            <li className="list-group-item">{projectDescription?.github}</li>
-            <li className="list-group-item">{project?.address}</li>
+            <li className="list-group-item">
+              <a href={projectDescription?.website} className="profile-link">
+                <i className="fa fa-link" /> {projectDescription?.website}
+              </a>
+            </li>
+            <li className="list-group-item">
+              <a href={projectDescription?.github} className="profile-link">
+                <i className="fa fa-github" /> {projectDescription?.github}
+              </a>
+            </li>
+            <li className="list-group-item">
+              <a href={projectDescription?.twitter} className="profile-link">
+                <i className="fa fa-twitter" /> {projectDescription?.twitter}
+              </a>
+            </li>
+            <li className="list-group-item">
+              <a
+                href={`https://carthagenet.tzstats.com/${project?.address}`}
+                className="profile-link"
+              >
+                <i className="fa fa-address-book-o" />{" "}
+                {project?.address.slice(0, -5)}...
+              </a>
+            </li>
           </ul>
         </div>
         {/* Project funding */}
@@ -129,7 +151,9 @@ const ProjectProfile = () => {
                   {isLoading ? " Processing Transaction" : "Contribute"}
                 </button>
               )}
-              <p className="align-self-end">! Dispute</p>
+              <p className="mt-1 align-self-end">
+                <i className="fa fa-exclamation-triangle" /> Dispute
+              </p>
             </>
           )}
         </div>

@@ -174,7 +174,7 @@ const Projects = () => {
                 <div className="spinner-grow spinner-grow-sm text-success ml-2 mr-2"></div>
                 <div className="spinner-grow spinner-grow-sm text-success "></div>
               </div>
-            ) : projects.length !== 0 ? (
+            ) : filteredProjects.length !== 0 ? (
               <div className="row">{renderProjects}</div>
             ) : (
               <p className="text-center">No Projects to Show</p>

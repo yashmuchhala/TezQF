@@ -24,10 +24,20 @@
   font-size: 18px;
 }
 
+/*Links*/
+
 .filter-link {
   cursor: pointer;
 }
 
 .filter-link:hover {
   color: #117298;
+}
+
+.profile-link {
+  color: black;
+}
+
+.profile-link:hover {
+  text-decoration: none;
 }
