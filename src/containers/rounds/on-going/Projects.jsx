@@ -11,6 +11,7 @@ const Projects = () => {
   const [loading, setLoading] = useState(true);
   const [filteredProjects, setFilteredProjects] = useState([]);
   const [categories, setCategories] = useState({});
+  const [search, setSearch] = useState("");
 
   const { rounds, currentRound } = useSelector((state) => state.round);
   const round = rounds ? rounds[rounds.length - 1] : null;
@@ -62,6 +63,18 @@ const Projects = () => {
       category === "All"
         ? projects
         : projects.filter((project) => project.category === category);
+
+    setFilteredProjects(filtered);
+  };
+
+  const searchProjects = () => {
+    const filtered =
+      search === ""
+        ? projects
+        : projects.filter((project) => {
+            const regex = new RegExp(search, "gi");
+            return regex.test(project.title) || regex.test(project.description);
+          });
 
     setFilteredProjects(filtered);
   };
@@ -138,12 +151,14 @@ const Projects = () => {
                 className="form-control"
                 placeholder="Search"
                 aria-label="Search"
+                onChange={(e) => setSearch(e.target.value)}
               />
               <div className="input-group-append">
                 <button
                   className="btn btn-success"
                   type="button"
                   id="button-addon2"
+                  onClick={searchProjects}
                 >
                   Search
                 </button>
