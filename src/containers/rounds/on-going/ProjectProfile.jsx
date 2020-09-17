@@ -140,6 +140,10 @@ const ProjectProfile = () => {
                 <button disabled className="btn btn-outline-primary btn-block">
                   You have already contributed
                 </button>
+              ) : project.address === account ? (
+                <button disabled className="btn btn-outline-primary btn-block">
+                  Cannot contribute to your own project!
+                </button>
               ) : (
                 <button
                   className="btn btn-primary btn-block"
