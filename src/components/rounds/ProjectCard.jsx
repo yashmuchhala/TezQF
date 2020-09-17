@@ -12,7 +12,11 @@ const ProjectCard = ({ details }) => {
         />
         <div className="card-body">
           <h5 className="card-title">{details.title}</h5>
-          <p className="card-text">{details.description}</p>
+          <p className="card-text">
+            {details.description.length > 80
+              ? details.description.slice(0, 80) + "..."
+              : details.description}
+          </p>
           <Link to={`/contribute/${details.id}`}>
             <button className="btn btn-primary btn-block">Contribute</button>
           </Link>

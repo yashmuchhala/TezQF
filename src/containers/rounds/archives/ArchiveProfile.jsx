@@ -116,7 +116,15 @@ const ArchiveProfile = () => {
                 contributors
               </p>
               <h1 className="font-weight-light text-primary mb-0">
-                {project?.sponsorshipWon / 1} tz
+                {project
+                  ? Math.round(
+                      ((project.subsidyPower.toNumber() /
+                        round.totalSubsidyPower.toNumber()) *
+                        round.totalSponsorship) /
+                        1000000
+                    )
+                  : null}{" "}
+                tz
               </h1>
               <p className="font-weight-bold">Final CLR Match</p>
             </>

@@ -18,7 +18,6 @@ const ProjectEntry = () => {
     twitter: "",
     github: "",
     category: "",
-    address: "",
     tnc: false,
   });
 
@@ -30,7 +29,6 @@ const ProjectEntry = () => {
     twitter: false,
     github: false,
     category: false,
-    address: false,
     tnc: false,
   });
 
@@ -78,7 +76,6 @@ const ProjectEntry = () => {
       description: !validations["description"](projectDetails.description),
       github: !validations["github"](projectDetails.github),
       category: !validations["category"](projectDetails.category),
-      address: !validations["address"](projectDetails.address),
       tnc: !projectDetails.tnc,
       image: errors.image,
       website: errors.website,

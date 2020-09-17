@@ -36,14 +36,18 @@ const Projects = () => {
 
       ipfsDescriptions.forEach((description, key) => {
         console.log(round.entries.get((key + 1).toString()));
-        const { totalContribution, sponsorshipWon } = round.entries.get(
+        // Subsidy added to show CLR (Remove later)
+        // Sponsorship removed (Add later)
+        const { totalContribution, subsidyPower } = round.entries.get(
           (key + 1).toString()
         );
         tempProjects.push({
           ...JSON.parse(description),
           id: key + 1,
           totalContribution,
-          sponsorshipWon,
+          sponsorshipWon:
+            (subsidyPower.toNumber() / round.totalSubsidyPower.toNumber()) *
+            round.totalSponsorship,
         });
       });
       setProjects(tempProjects);
