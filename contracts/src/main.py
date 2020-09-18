@@ -1476,7 +1476,7 @@ if "templates" not in __name__:
 
         scenario.verify(
             roundManagerContract.data.rounds[roundManagerContract.data.currentRound].entries[1].totalContribution == sp.tez(
-                20)
+                10)
         )
         scenario.h3("\n[&#x2713] entry 1 funded 200 XTZ")
         scenario.verify(
@@ -1537,7 +1537,7 @@ if "templates" not in __name__:
         scenario += roundManagerContract.withdrawContribution(
             roundId=1, entryId=1).run(sender=trudy)
         scenario += roundManagerContract.withdrawContribution(
-            roundId=1, entryId=1).run(sender=mike)
+            roundId=1, entryId=1).run(sender=mike, valid=False)
 
         scenario.h2("End round")
         scenario += daoContract.settleRound().run(sender=alice)
