@@ -114,8 +114,8 @@ const Projects = () => {
         Funding Round {currentRound.toNumber()}
       </h1>
       <h4 className="font-weight-lighter">
-        The community has contributed over $
-        {Math.floor(round.totalContribution.toNumber() / 1000000)} till now!
+        The community has contributed over
+        {Math.floor(round.totalContribution.toNumber() / 1000000)}tz till now!
         Help your favourite projects in getting ahead!
       </h4>
       <h5 className="font-weight-lighter">

@@ -42,8 +42,18 @@ class RoundManagerContractABI {
     const result = await op.confirmation();
     return result?.confirmed;
   }
+
   async dispute(entryId) {
     const op = await this.contract.methods.dispute(entryId).send();
+
+    const result = await op.confirmation();
+    return result?.confirmed;
+  }
+
+  async withdrawContribution(roundId, entryId) {
+    const op = await this.contract.methods
+      .withdrawContribution(roundId, entryId)
+      .send();
 
     const result = await op.confirmation();
     return result?.confirmed;

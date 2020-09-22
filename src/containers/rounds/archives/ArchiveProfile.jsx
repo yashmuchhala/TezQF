@@ -6,7 +6,12 @@ const ipfs = require("nano-ipfs-store").at("https://ipfs.infura.io:5001");
 
 const ArchiveProfile = () => {
   const { id } = useParams();
+  const roundManagerContract = useSelector(
+    (state) => state.contract.contracts.roundManager
+  );
   const { rounds, isRoundActive } = useSelector((state) => state.round);
+  const account = useSelector((state) => state.credentials.wallet.account);
+
   // State to maintain active tab
   const [activeTab, setActiveTab] = useState(0);
 
@@ -17,10 +22,26 @@ const ArchiveProfile = () => {
     : null;
 
   const [projectLoading, setProjectLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   const project = round?.entries?.get(id);
 
   const [projectDescription, setProjectDescription] = useState();
+
+  const handleWithdraw = async () => {
+    try {
+      setIsLoading(true);
+      await roundManagerContract.withdrawContribution(
+        isRoundActive ? rounds.length - 1 : rounds.length,
+        id
+      );
+      window.location.reload();
+    } catch (err) {
+      alert(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (project?.description) {
@@ -105,7 +126,22 @@ const ArchiveProfile = () => {
         {/* Project funding */}
         <div className="col-4 d-flex flex-column align-items-center justify-content-center">
           {project?.disqualified ? (
-            <h1 className="text-danger">*DISQUALIFIED*</h1>
+            <>
+              <h1 className="text-danger">*DISQUALIFIED*</h1>
+              {project.contributions.has(account) ? (
+                <button
+                  className="btn btn-primary btn-block"
+                  onClick={handleWithdraw}
+                >
+                  {isLoading && (
+                    <div className="spinner-border spinner-border-sm" />
+                  )}
+                  {isLoading
+                    ? " Processing Transaction"
+                    : "Withdraw Contribution"}
+                </button>
+              ) : null}
+            </>
           ) : (
             <>
               <h1 className="font-weight-light">

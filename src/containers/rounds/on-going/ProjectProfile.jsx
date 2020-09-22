@@ -48,6 +48,18 @@ const ProjectProfile = () => {
     }
   };
 
+  const handleWithdraw = async () => {
+    try {
+      setIsLoading(true);
+      await roundManagerContract.withdrawContribution(rounds.length, id);
+      window.location.reload();
+    } catch (err) {
+      alert(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const renderContributors = () => {
     const contributors = [];
     if (project) {
@@ -117,7 +129,22 @@ const ProjectProfile = () => {
         {/* Project funding */}
         <div className="col-4 d-flex flex-column align-items-center justify-content-center">
           {project?.disqualified ? (
-            <h1 className="text-danger">*DISQUALIFIED*</h1>
+            <>
+              <h1 className="text-danger">*DISQUALIFIED*</h1>
+              {project.contributions.has(account) ? (
+                <button
+                  className="btn btn-primary btn-block"
+                  onClick={handleWithdraw}
+                >
+                  {isLoading && (
+                    <div className="spinner-border spinner-border-sm" />
+                  )}
+                  {isLoading
+                    ? " Processing Transaction"
+                    : "Withdraw Contribution"}
+                </button>
+              ) : null}
+            </>
           ) : (
             <>
               <h1 className="font-weight-light">
@@ -211,7 +238,7 @@ const ProjectProfile = () => {
           className={`tab-pane ${activeTab === 1 ? `active` : null}`}
           id="description"
         >
-          {project?.disqualified ? (
+          {/* {project?.disqualified ? (
             <>
               <h2 className="font-weight-light text-center">
                 This project was disqualified for PLAGIARISM.
@@ -220,16 +247,16 @@ const ProjectProfile = () => {
                 View the dispute statement here.
               </h2>
             </>
-          ) : (
-            <>
-              <p className="text-center text-success font-weight-bold">
-                {project?.contributions.size} Contributor(s)
-              </p>
-              <ul className="list-group list-group-flush">
-                {renderContributors()}
-              </ul>
-            </>
-          )}
+          ) : ( */}
+          <>
+            <p className="text-center text-success font-weight-bold">
+              {project?.contributions.size} Contributor(s)
+            </p>
+            <ul className="list-group list-group-flush">
+              {renderContributors()}
+            </ul>
+          </>
+          {/* )} */}
         </div>
 
         {/* Comments Tab */}
