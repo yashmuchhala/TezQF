@@ -11,7 +11,7 @@ const Executive = () => {
     (state) => state.governance
   );
   useEffect(() => {
-    if (newRoundProposals?.length !== 0) {
+    if (newRoundProposals !== null) {
       setIsDataFetchComplete(true);
     }
   }, [newRoundProposals]);

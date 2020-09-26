@@ -6,11 +6,11 @@ class TokenContractABI {
   // Returns a BigMap
   async getBalances() {
     const storage = await this.contract.storage();
-    return storage.balances;
+    return storage.ledger;
   }
   async getBalance(address) {
     const storage = await this.contract.storage();
-    const balanceMap = await storage.balances.get(address);
+    const balanceMap = await storage.ledger.get(address);
 
     if (balanceMap === undefined) {
       // Not in the map

@@ -47,26 +47,29 @@ const App = () => {
     const configureWallet = async () => {
       if (await ThanosWallet.isAvailable()) {
         const w = new ThanosWallet("TezQF");
-        await w.connect("carthagenet");
+        await w.connect({
+          name: "delphinet",
+          rpc: "https://delphinet.smartpy.io",
+        });
         const tezos = w.toTezos();
         const accountPkh = await tezos.wallet.pkh();
 
         const [
           daoContract,
-          crowdSaleContract,
+          //crowdSaleContract,
           tokenContract,
           roundManagerContract,
         ] = await Promise.all([
           tezos.wallet.at(process.env.REACT_APP_DAO_CONTRACT_ADDRESS),
-          tezos.wallet.at(process.env.REACT_APP_CROWDSALE_CONTRACT_ADDRESS),
+          //tezos.wallet.at(process.env.REACT_APP_CROWDSALE_CONTRACT_ADDRESS),
           tezos.wallet.at(process.env.REACT_APP_TOKEN_CONTRACT_ADDRESS),
           tezos.wallet.at(process.env.REACT_APP_ROUND_MANAGER_CONTRACT_ADDRESS),
         ]);
         console.log(process.env.REACT_APP_TOKEN_CONTRACT_ADDRESS);
         const daoContractObject = new ABIs.DAOContractABI(daoContract);
-        const crowdSaleContractObject = new ABIs.CrowdSaleContractABI(
-          crowdSaleContract
-        );
+        // const crowdSaleContractObject = new ABIs.CrowdSaleContractABI(
+        //   crowdSaleContract
+        // );
         const tokenContractObject = new ABIs.TokenContractABI(tokenContract);
         const roundManagerContractObject = new ABIs.RoundManagerContractABI(
           roundManagerContract
@@ -82,7 +85,7 @@ const App = () => {
           payload: {
             contracts: {
               dao: daoContractObject,
-              crowdSale: crowdSaleContractObject,
+              //crowdSale: crowdSaleContractObject,
               token: tokenContractObject,
               roundManager: roundManagerContractObject,
             },

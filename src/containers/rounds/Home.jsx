@@ -16,7 +16,7 @@ const Home = () => {
       <div
         style={{
           backgroundImage: `url(assets/images/home-background5.jpg)`,
-          backgroundSize: "cover",
+          backgroundSize: "contain",
         }}
       >
         <h1
@@ -31,12 +31,12 @@ const Home = () => {
             <br />
             with
           </i>{" "}
-          Quadratic
-          <br /> Voting.
+          CLR
+          <br /> matching. <br />
           <Link to={currentRound ? "/contribute" : "/archives"}>
             <button
               type="button"
-              className="btn btn-primary mb-3 ml-3 p-3 pr-3 pl-3"
+              className="btn btn-primary mb-3 p-3 pr-3 pl-3"
             >
               Browse Projects
             </button>
@@ -106,11 +106,11 @@ const Home = () => {
             Go to Governance
           </button>
         </a>
-        <Link to="/crowdsale">
+        {/* <Link to="/crowdsale">
           <button className="btn btn-success p-3 mb-5">
             Buy Governance Tokens*
           </button>
-        </Link>
+        </Link> */}
         <h6 className="text-muted">
           *Our governance tokens are very restrictive and not listed on any
           exchanges;
