@@ -22,11 +22,11 @@ function Footer() {
                 Governance
               </a>{" "}
             </li>
-            <li>
+            {/* <li>
               <a href="/crowdsale" className="text-secondary">
                 Crowdsale
               </a>{" "}
-            </li>
+            </li> */}
           </ul>
         </div>
         <div className="col-2 font-weight-light mb-3">

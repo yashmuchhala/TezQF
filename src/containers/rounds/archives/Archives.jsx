@@ -119,7 +119,7 @@ const Projects = () => {
   }
 
   return rounds.length === 0 || (isRoundActive && rounds.length === 1) ? (
-    <div>
+    <div className="text-center" style={{ padding: "256px" }}>
       <h1 className="font-weight-light">There are no Archives yet!</h1>
     </div>
   ) : (

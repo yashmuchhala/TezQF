@@ -37,7 +37,7 @@ const ProjectEntry = () => {
   const roundManagerContract = useSelector(
     (state) => state.contract.contracts.roundManager
   );
-  const rounds = useSelector((state) => state.round.rounds);
+  const { rounds, isRoundActive } = useSelector((state) => state.round);
 
   const history = useHistory();
 
@@ -100,12 +100,18 @@ const ProjectEntry = () => {
     setIsLoading(false);
   };
 
-  if (categories?.length === 0) {
+  if (isRoundActive === null) {
     return (
       <div className="text-center text-primary" style={{ padding: "256px" }}>
         <div className="spinner-grow spinner-grow-sm text-info" />
         <div className="spinner-grow spinner-grow-sm text-info ml-2 mr-2" />
         <div className="spinner-grow spinner-grow-sm text-info" />
+      </div>
+    );
+  } else if (!isRoundActive) {
+    return (
+      <div className="text-center" style={{ padding: "256px" }}>
+        <h1 className="font-weight-light">There is no active funding round.</h1>
       </div>
     );
   }

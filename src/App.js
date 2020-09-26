@@ -38,7 +38,7 @@ import {
   GET_WALLET_DATA,
 } from "./redux/ActionTypes";
 import ABIs from "./abi/index";
-import CrowdSale from "./containers/CrowdSale";
+//import CrowdSale from "./containers/CrowdSale";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -105,7 +105,7 @@ const App = () => {
       <Layout>
         <Switch>
           {/* Crowdsale Route*/}
-          <Route path="/crowdsale" exact component={CrowdSale} />
+          {/* <Route path="/crowdsale" exact component={CrowdSale} /> */}
           {/* Rounds Routes */}
           <Route path="/" exact component={Home} />
           <Route exact path="/contribute/:id" component={ProjectProfile} />

@@ -13,7 +13,9 @@ const Projects = () => {
   const [categories, setCategories] = useState({});
   const [search, setSearch] = useState("");
 
-  const { rounds, currentRound } = useSelector((state) => state.round);
+  const { rounds, currentRound, isRoundActive } = useSelector(
+    (state) => state.round
+  );
   const round = rounds ? rounds[rounds.length - 1] : null;
 
   useEffect(() => {
@@ -103,6 +105,12 @@ const Projects = () => {
         <div className="spinner-grow spinner-grow-sm text-info" />
         <div className="spinner-grow spinner-grow-sm text-info ml-2 mr-2" />
         <div className="spinner-grow spinner-grow-sm text-info" />
+      </div>
+    );
+  } else if (currentRound && !isRoundActive) {
+    return (
+      <div className="text-center" style={{ padding: "256px" }}>
+        <h1 className="font-weight-light">There is no active funding round.</h1>
       </div>
     );
   }

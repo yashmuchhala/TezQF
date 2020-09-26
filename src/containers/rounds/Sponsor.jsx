@@ -90,10 +90,13 @@ const Sponsor = () => {
         </div>
       )}
       {!proposal && (
-        <p className="text-center lead">
+        <div
+          className="text-center lead"
+          style={{ paddingTop: "120px", paddingBottom: "100px" }}
+        >
           No Funding Round is active right now. Head over to the governance page
           to view or propose a new round.
-        </p>
+        </div>
       )}
     </div>
   );

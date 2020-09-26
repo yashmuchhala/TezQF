@@ -83,55 +83,59 @@ const Disputes = () => {
 
       {/* Archived Disputes */}
       <div id="accordian">
-        {archivedDisputes.map((disputes, index) => (
-          <div key={index} className="card">
-            <div className="card-header" id={`heading${index}`}>
-              {/* <h1 className="mb-0"> */}
-              <button
-                className="d-flex align-items-center justify-content-between btn btn-block collapsed"
-                data-toggle="collapse"
-                data-target={`#collapse${index}`}
-                aria-expanded="true"
-                aria-controls={`collapse${index}`}
+        {archivedDisputes.length === 0 ? (
+          <p className="p-5 text-center">No Archived Disputes.</p>
+        ) : (
+          archivedDisputes.map((disputes, index) => (
+            <div key={index} className="card">
+              <div className="card-header" id={`heading${index}`}>
+                {/* <h1 className="mb-0"> */}
+                <button
+                  className="d-flex align-items-center justify-content-between btn btn-block collapsed"
+                  data-toggle="collapse"
+                  data-target={`#collapse${index}`}
+                  aria-expanded="true"
+                  aria-controls={`collapse${index}`}
+                >
+                  <span style={accordionHeaderStyle}>Round {index + 1}</span>
+                </button>
+                {/* </h1> */}
+              </div>
+
+              <div
+                id={`collapse${index}`}
+                className="collapse"
+                aria-labelledby={`heading${index}`}
+                data-parent="#accordion"
               >
-                <span style={accordionHeaderStyle}>Round {index + 1}</span>
-              </button>
-              {/* </h1> */}
-            </div>
+                <div className="card-body m-5">
+                  {disputes.size === 0 ? (
+                    <p className="text-center mb-0">No disputes to show.</p>
+                  ) : (
+                    disputes.forEach(async (dispute, id) => {
+                      const ipfsContent = JSON.parse(
+                        await ipfs.cat(dispute.description)
+                      );
 
-            <div
-              id={`collapse${index}`}
-              className="collapse"
-              aria-labelledby={`heading${index}`}
-              data-parent="#accordion"
-            >
-              <div className="card-body m-5">
-                {disputes.size === 0 ? (
-                  <p className="text-center mb-0">No disputes to show.</p>
-                ) : (
-                  disputes.forEach(async (dispute, id) => {
-                    const ipfsContent = JSON.parse(
-                      await ipfs.cat(dispute.description)
-                    );
-
-                    return (
-                      <ArchivedDispute
-                        roundId={currentRound}
-                        entryId={id}
-                        key={id}
-                        reason={ipfsContent.reason}
-                        description={ipfsContent.description}
-                        votesYes={dispute.votesYes.toNumber()}
-                        votesNo={dispute.votesNo.toNumber()}
-                        resolved={dispute.resolved.toNumber()}
-                      />
-                    );
-                  })
-                )}
+                      return (
+                        <ArchivedDispute
+                          roundId={currentRound}
+                          entryId={id}
+                          key={id}
+                          reason={ipfsContent.reason}
+                          description={ipfsContent.description}
+                          votesYes={dispute.votesYes.toNumber()}
+                          votesNo={dispute.votesNo.toNumber()}
+                          resolved={dispute.resolved.toNumber()}
+                        />
+                      );
+                    })
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );
