@@ -11,7 +11,7 @@ const Executive = () => {
     (state) => state.governance
   );
   useEffect(() => {
-    if (newRoundProposals !== null) {
+    if (newRoundProposals?.length) {
       setIsDataFetchComplete(true);
     }
   }, [newRoundProposals]);
@@ -54,7 +54,7 @@ const Executive = () => {
                   disabled={newRoundProposalActive}
                   className="btn btn-outline-primary btn-block p-3"
                 >
-                  {isDataFetchComplete ? (
+                  {isDataFetchComplete || newRoundProposalActive ? (
                     newRoundProposalActive ? (
                       "Proposal on-going"
                     ) : (

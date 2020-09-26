@@ -239,7 +239,7 @@ const ExecutiveVoting = () => {
                 {proposal.resolved.toNumber() === 0 ? (
                   <tr>
                     <td className="text-grey">
-                      <i>Ends in</i>
+                      <i>Ends on</i>
                     </td>
                     <td className="text-right">
                       <Moment format="DD/MM/YYYY">{proposal.expiry}</Moment>

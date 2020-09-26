@@ -11,13 +11,9 @@ const Sponsor = () => {
     (state) => state.governance
   );
 
-  //MUST UNCOMMENT LATER ON
-
   const proposal = newRoundProposalActive
     ? newRoundProposals[newRoundProposals.length - 1]
     : null;
-
-  // const proposal = newRoundProposals[newRoundProposals.length - 1];
 
   const onSubmit = async () => {
     setIsCompleted(false);
@@ -25,6 +21,7 @@ const Sponsor = () => {
     const success = await daoContract.donateToRound(name, amount * 1000000);
     if (success) {
       setIsCompleted(true);
+      window.location.reload();
     }
     setIsLoading(false);
   };
@@ -32,7 +29,7 @@ const Sponsor = () => {
     <div className="container d-flex align-items-center flex-column mb-5">
       {/* Header */}
       <h1 className="font-weight-light">
-        {proposal ? `Sponsor Round ${proposal.name}` : `Become a Sponsor`}
+        {proposal ? `Sponsor Round ${proposal.id}` : `Become a Sponsor`}
       </h1>
       <h4 className="text-center font-weight-light mb-3">
         Help young projects grow by sponsoring a match funding round.
@@ -50,7 +47,7 @@ const Sponsor = () => {
               XTZ {proposal.totalFunds.toNumber() / 1000000}
             </h2>
             <h4 className="text-center mb-3">
-              donated by {proposal.sponsorToFunds.size} unique contributors
+              donated by {proposal.sponsorToFunds.size} unique contributor(s)
             </h4>
 
             <label className="font-weight-bold mb-0">Name</label>
@@ -72,31 +69,36 @@ const Sponsor = () => {
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
             />
-            {isLoading ? (
-              "Loading"
-            ) : (
-              <>
-                <button
-                  className="btn btn-primary btn-block font-weight-bold"
-                  onClick={onSubmit}
-                >
-                  CONFIRM
-                </button>
+            <button
+              className="btn btn-primary btn-block font-weight-bold"
+              onClick={onSubmit}
+            >
+              {isLoading && (
+                <div className="spinner-border spinner-border-sm" />
+              )}
+              {isLoading ? " PROCESSING TRANSACTION" : "CONFIRM"}
+            </button>
 
-                <h1>{isCompleted ? "Success!" : ""}</h1>
-              </>
-            )}
+            <h1>{isCompleted ? "Success!" : ""}</h1>
           </div>
         </div>
       )}
-      {!proposal && (
-        <div
-          className="text-center lead"
-          style={{ paddingTop: "120px", paddingBottom: "100px" }}
-        >
-          No Funding Round is active right now. Head over to the governance page
-          to view or propose a new round.
+      {newRoundProposals?.length === 0 ? (
+        <div className="text-center text-primary" style={{ padding: "128px" }}>
+          <div className="spinner-grow spinner-grow-sm text-info" />
+          <div className="spinner-grow spinner-grow-sm text-info ml-2 mr-2" />
+          <div className="spinner-grow spinner-grow-sm text-info" />
         </div>
+      ) : (
+        !proposal && (
+          <div
+            className="text-center lead"
+            style={{ paddingTop: "120px", paddingBottom: "100px" }}
+          >
+            No Funding Round is accepting sponsors right now. Head over to the
+            governance page to view or propose a new round.
+          </div>
+        )
       )}
     </div>
   );

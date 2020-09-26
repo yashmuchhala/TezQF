@@ -39,7 +39,7 @@ const ProjectProfile = () => {
   const handleSubmit = async () => {
     try {
       setIsLoading(true);
-      await roundManagerContract.contribute(id, amount);
+      await roundManagerContract.contribute(id, amount * 1000000);
       window.location.reload();
     } catch (err) {
       alert(err);
@@ -157,7 +157,7 @@ const ProjectProfile = () => {
               <input
                 type="text"
                 className="form-control w-100 mb-3"
-                placeholder="Enter amount in mutez"
+                placeholder="Enter amount in tez"
                 aria-label="Amount"
                 name="amount"
                 value={amount}

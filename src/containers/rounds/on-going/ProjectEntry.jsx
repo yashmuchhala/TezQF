@@ -33,6 +33,7 @@ const ProjectEntry = () => {
   });
 
   const [categories, setCategories] = useState([]);
+  const [pageLoading, setPageLoading] = useState(true);
 
   const roundManagerContract = useSelector(
     (state) => state.contract.contracts.roundManager
@@ -50,6 +51,7 @@ const ProjectEntry = () => {
     };
     if (rounds?.length !== 0) {
       fetchCategories();
+      setPageLoading(false);
     }
   }, [rounds]);
 
@@ -100,7 +102,7 @@ const ProjectEntry = () => {
     setIsLoading(false);
   };
 
-  if (isRoundActive === null) {
+  if (pageLoading) {
     return (
       <div className="text-center text-primary" style={{ padding: "256px" }}>
         <div className="spinner-grow spinner-grow-sm text-info" />
@@ -128,7 +130,9 @@ const ProjectEntry = () => {
       {/* Form */}
       <div className="card w-75">
         <div className="card-body form-group">
-          <label className="font-weight-bold mb-0">Project Image</label>
+          <label className="font-weight-bold mb-0">
+            Project Image (Preferrably a square fit)
+          </label>
           <input
             type="text"
             className={`form-control w-100 ${
