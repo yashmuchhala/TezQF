@@ -22,7 +22,7 @@ const DisputeVoting = () => {
 
   const addIpfs = async () => {
     const ipfsContent = JSON.parse(await ipfs.cat(dispute.description));
-    dispute.description = ipfsContent.description;
+    dispute.mainDescription = ipfsContent.description;
     dispute.reason = ipfsContent.reason;
     dispute.links = ipfsContent.links;
     dispute.entryId = id;
@@ -123,7 +123,7 @@ const DisputeVoting = () => {
               Dispute Entry #{id}: {dispute.reason}
             </h2>
             <h4>Description</h4>
-            <p className="text-grey">{dispute.description}</p>
+            <p className="text-grey">{dispute.mainDescription}</p>
             <h4>Relevants Links</h4>
             <a href={dispute.links}>{dispute.links}</a>
             <br />

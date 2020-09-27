@@ -24,7 +24,6 @@ const Disputes = () => {
 
       active.forEach((dispute, key) => {
         ipfsDescriptions.push(ipfs.cat(dispute.description));
-        delete dispute.description;
         dispute.entryId = key;
         metaDescription.push(dispute);
       });
@@ -32,9 +31,12 @@ const Disputes = () => {
       ipfsDescriptions = await Promise.all(ipfsDescriptions);
 
       let tempActiveDisputes = [];
-      ipfsDescriptions.forEach((description, key) => {
+      ipfsDescriptions.forEach((data, key) => {
+        const parsedData = JSON.parse(data);
         tempActiveDisputes.push({
-          ...JSON.parse(description),
+          mainDescription: parsedData.description,
+          reason: parsedData.reason,
+          links: parsedData.links,
           ...metaDescription[key],
         });
       });
@@ -55,7 +57,6 @@ const Disputes = () => {
 
         archived.forEach((dispute, key) => {
           ipfsDescriptions.push(ipfs.cat(dispute.description));
-          delete dispute.description;
           dispute.entryId = key;
           metaDescription.push(dispute);
         });
@@ -63,9 +64,12 @@ const Disputes = () => {
         ipfsDescriptions = await Promise.all(ipfsDescriptions);
 
         let tempArchived = [];
-        ipfsDescriptions.forEach((description, key) => {
+        ipfsDescriptions.forEach((data, key) => {
+          const parsedData = JSON.parse(data);
           tempArchived.push({
-            ...JSON.parse(description),
+            mainDescription: parsedData.description,
+            reason: parsedData.reason,
+            links: parsedData.links,
             ...metaDescription[key],
           });
         });
@@ -140,7 +144,7 @@ const Disputes = () => {
               key={id}
               reason={dispute.reason}
               disputer={dispute.disputer}
-              description={dispute.description}
+              description={dispute.mainDescription}
               votesYes={dispute.votesYes.toNumber()}
               votesNo={dispute.votesNo.toNumber()}
               resolved={dispute.resolved.toNumber()}
@@ -190,7 +194,7 @@ const Disputes = () => {
                           key={id}
                           reason={dispute.reason}
                           disputer={dispute.disputer}
-                          description={dispute.description}
+                          description={dispute.mainDescription}
                           votesYes={dispute.votesYes.toNumber()}
                           votesNo={dispute.votesNo.toNumber()}
                           resolved={dispute.resolved.toNumber()}
