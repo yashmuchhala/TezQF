@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+import { useHistory } from "react-router-dom";
 
 import { disputeValidations as validations } from "../../utils/validations";
 
@@ -12,6 +14,45 @@ const DisputeProposal = () => {
   const [entryError, setEntryError] = useState(false);
   const [reasonError, setReasonError] = useState(false);
   const [descriptionError, setDescriptionError] = useState(false);
+  const [loading, setIsLoading] = useState(false);
+  const [pageLoading, setPageLoading] = useState(true);
+  const [projects, setProjects] = useState([]);
+
+  const history = useHistory();
+
+  const { rounds, isRoundActive } = useSelector((state) => state.round);
+  const daoContract = useSelector((state) => state.contract.contracts.dao);
+
+  const round = rounds ? rounds[rounds.length - 1] : null;
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      let ipfsDescriptions = [];
+      let entryIds = [];
+
+      round.entries.forEach((project, id) => {
+        if (!project.disputed) {
+          ipfsDescriptions.push(ipfs.cat(project.description));
+          entryIds.push(id);
+        }
+      });
+
+      ipfsDescriptions = await Promise.all(ipfsDescriptions);
+
+      let tempProjects = [];
+
+      ipfsDescriptions.forEach((description, key) => {
+        const project = JSON.parse(description);
+        tempProjects.push({ title: project.title, id: entryIds[key] });
+      });
+      setProjects(tempProjects);
+      setPageLoading(false);
+    };
+
+    if (round) {
+      fetchProjects();
+    }
+  }, [round]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -41,8 +82,32 @@ const DisputeProposal = () => {
 
     const cid = await ipfs.add(JSON.stringify(ipfsObject));
     console.log(cid);
-    console.log(await ipfs.cat(cid));
+    try {
+      setIsLoading(true);
+      await daoContract.raiseDispute(entry, cid);
+      history.push("/governance/disputes");
+    } catch (err) {
+      console.log(err);
+      alert(err);
+    }
+    setIsLoading(false);
   };
+
+  if (pageLoading) {
+    return (
+      <div className="text-center text-primary" style={{ padding: "256px" }}>
+        <div className="spinner-grow spinner-grow-sm text-info" />
+        <div className="spinner-grow spinner-grow-sm text-info ml-2 mr-2" />
+        <div className="spinner-grow spinner-grow-sm text-info" />
+      </div>
+    );
+  } else if (!isRoundActive) {
+    return (
+      <div className="text-center" style={{ padding: "256px" }}>
+        <h1 className="font-weight-light">There is no active funding round.</h1>
+      </div>
+    );
+  }
 
   return (
     <div className="container w-75 mb-5">
@@ -69,9 +134,11 @@ const DisputeProposal = () => {
           <option disabled value={0}>
             Select an entry to dispute
           </option>
-          <option value={1}>Entry 1: MakerDAO</option>
-          <option value={2}>Entry 2: Uniswap</option>
-          <option value={3}>Entry 3: Tether</option>
+          {projects.map((project) => (
+            <option key={project.id} value={project.id}>
+              Entry {project.id}: {project.title}
+            </option>
+          ))}
         </select>
         {entryError ? (
           <div className={`text-danger mb-3`}>Please select a valid entry</div>
@@ -122,7 +189,8 @@ const DisputeProposal = () => {
         ) : null}
 
         <button className="btn btn-lg btn-outline-danger font-weight-bold">
-          Stake & Confirm
+          {loading && <div className="spinner-border" />}
+          {loading ? " PROCESSING TRANSACTION" : "STAKE & CONFIRM"}
         </button>
       </form>
     </div>

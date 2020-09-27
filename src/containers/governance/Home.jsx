@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-const ADMIN_PKH = process.env.REACT_APP_ADMIN_PKH;
+const DAO = process.env.REACT_APP_DAO_CONTRACT_ADDRESS;
 function Home() {
   const [accountTokenBalance, setAccountTokenBalance] = useState(0);
   const [numberOfApproveTokens, setNumberOfApproveTokens] = useState(0);
@@ -36,10 +36,7 @@ function Home() {
     setIsApproveCompleted(false);
     setIsApproveLoading(true);
     try {
-      const success = await tokenContract.approve(
-        ADMIN_PKH,
-        numberOfApproveTokens
-      );
+      const success = await tokenContract.approve(DAO, numberOfApproveTokens);
       if (success === true) {
         setIsApproveCompleted(true);
       }

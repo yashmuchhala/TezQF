@@ -1,46 +1,68 @@
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
+
 import PropTypes from "prop-types";
 
 const DisputeVotingModal = ({ dispute }) => {
   const [weight, setWeight] = useState();
   const [inFavor, setFavor] = useState(true);
+  const [loading, setLoading] = useState(false);
+
+  const daoContract = useSelector((state) => state.contract.contracts.dao);
+
+  const onVote = async () => {
+    if (weight === 0) {
+      alert("You must vote using at least 1 token!");
+    } else {
+      try {
+        setLoading(true);
+        await daoContract.voteForDispute(dispute.entryId, inFavor, weight);
+        window.location.reload();
+      } catch (err) {
+        console.log(err);
+        alert(err);
+      }
+    }
+
+    setLoading(false);
+  };
 
   return (
     <div
-      class="modal fade"
+      className="modal fade"
       id="dispute-voting-model"
-      tabindex="-1"
+      tabIndex="-1"
       role="dialog"
       aria-labelledby="dispute-voting-modelLabel"
       aria-hidden="true"
     >
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="dispute-voting-modelLabel">
+      <div className="modal-dialog" role="document">
+        <div className="modal-content">
+          <div className="modal-header">
+            <h5 className="modal-title" id="dispute-voting-modelLabel">
               Voting Confirmation
             </h5>
             <button
               type="button"
-              class="close"
+              className="close"
               data-dismiss="modal"
               aria-label="Close"
             >
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
-          <div class="modal-body">
+          <div className="modal-body">
             By confirming, you will be choosing to vote for/against{" "}
             <strong>
-              Dispute Entry #{dispute.entryId}: {dispute.title}
-            </strong>
-            , by depositing your tokens, which shall be returned once dispute is
+              Dispute Entry #{dispute.entryId}: {dispute.reason},
+            </strong>{" "}
+            by depositing your tokens, which shall be returned once dispute is
             resolved
             <div className="row align-items-center no-gutters my-2">
               <div className="col-8">
                 <input
                   type="number"
-                  class="form-control"
+                  className="form-control"
                   value={weight}
                   name="weight"
                   placeholder="Voting weight..."
@@ -61,9 +83,16 @@ const DisputeVotingModal = ({ dispute }) => {
               </div>
             </div>
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-block btn-primary">
-              Confirm Vote using Tokens
+          <div className="modal-footer">
+            <button
+              onClick={onVote}
+              type="button"
+              className="btn btn-block btn-primary"
+            >
+              {loading && <div className="spinner-border spinner-border-sm" />}
+              {loading
+                ? " PROCESSING TRANSACTION"
+                : "CONFIRM VOTE USING TOKENS"}
             </button>
           </div>
         </div>

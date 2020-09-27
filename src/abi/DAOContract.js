@@ -77,8 +77,10 @@ class DAOContractABI {
     return result?.confirmed;
   }
 
-  async raiseDispute(entryId) {
-    const op = await this.contract.methods.raiseDispute(entryId).send();
+  async raiseDispute(entryId, description) {
+    const op = await this.contract.methods
+      .raiseDispute(description, entryId)
+      .send();
 
     const result = await op.confirmation();
     return result?.confirmed;

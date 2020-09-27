@@ -8,18 +8,80 @@ import ArchivedDispute from "../../components/governance/ArchivedDispute";
 const ipfs = require("nano-ipfs-store").at("https://ipfs.infura.io:5001");
 
 const Disputes = () => {
-  const [activeDisputes, setActiveDisputes] = useState(null);
+  const [activeDisputes, setActiveDisputes] = useState([]);
   const [archivedDisputes, setArchivedDisputes] = useState([]);
+  const [pageLoading, setPageLoading] = useState(true);
 
   const { disputes } = useSelector((state) => state.governance);
   const { isRoundActive, currentRound } = useSelector((state) => state.round);
 
   useEffect(() => {
-    if (disputes) {
-      if (isRoundActive) {
-        setActiveDisputes(disputes[disputes.length - 1]);
+    const fetchActiveDisputes = async () => {
+      let ipfsDescriptions = [];
+      let metaDescription = [];
+
+      const active = disputes[disputes.length - 1];
+
+      active.forEach((dispute, key) => {
+        ipfsDescriptions.push(ipfs.cat(dispute.description));
+        delete dispute.description;
+        dispute.entryId = key;
+        metaDescription.push(dispute);
+      });
+
+      ipfsDescriptions = await Promise.all(ipfsDescriptions);
+
+      let tempActiveDisputes = [];
+      ipfsDescriptions.forEach((description, key) => {
+        tempActiveDisputes.push({
+          ...JSON.parse(description),
+          ...metaDescription[key],
+        });
+      });
+
+      setActiveDisputes(tempActiveDisputes);
+    };
+
+    const fetchArchivedDisputes = async () => {
+      const allArchivedDisputes = isRoundActive
+        ? disputes.slice(0, -1)
+        : disputes;
+      const tempAllArchived = [];
+      for (let i = 0; i < allArchivedDisputes.length; i++) {
+        let ipfsDescriptions = [];
+        let metaDescription = [];
+
+        const archived = allArchivedDisputes[i];
+
+        archived.forEach((dispute, key) => {
+          ipfsDescriptions.push(ipfs.cat(dispute.description));
+          delete dispute.description;
+          dispute.entryId = key;
+          metaDescription.push(dispute);
+        });
+
+        ipfsDescriptions = await Promise.all(ipfsDescriptions);
+
+        let tempArchived = [];
+        ipfsDescriptions.forEach((description, key) => {
+          tempArchived.push({
+            ...JSON.parse(description),
+            ...metaDescription[key],
+          });
+        });
+
+        tempAllArchived.push(tempArchived);
       }
-      setArchivedDisputes(isRoundActive ? disputes.slice(0, -1) : disputes);
+
+      setArchivedDisputes(tempAllArchived);
+    };
+
+    if (disputes.length >= 1) {
+      if (isRoundActive) {
+        fetchActiveDisputes();
+        fetchArchivedDisputes();
+        setPageLoading(false);
+      }
     }
   }, [disputes, isRoundActive]);
 
@@ -48,7 +110,15 @@ const Disputes = () => {
                 style={{ textDecoration: "none" }}
               >
                 <button className="btn btn-outline-primary btn-block p-3">
-                  Setup
+                  {pageLoading ? (
+                    <div>
+                      <div className="spinner-grow spinner-grow-sm text-primary"></div>
+                      <div className="spinner-grow spinner-grow-sm text-primary ml-2 mr-2"></div>
+                      <div className="spinner-grow spinner-grow-sm text-primary "></div>
+                    </div>
+                  ) : (
+                    "SETUP"
+                  )}
                 </button>
               </Link>
             </div>
@@ -60,18 +130,17 @@ const Disputes = () => {
 
       {/* Active Disputes */}
 
-      {/* Remove roundId after contract contract integration */}
-      {activeDisputes &&
-        activeDisputes.forEach(async (dispute, id) => {
-          const ipfsContent = JSON.parse(await ipfs.cat(dispute.description));
-
+      {activeDisputes.length !== 0 &&
+        activeDisputes.map((dispute, id) => {
           return (
             <ActiveDispute
               roundId={currentRound}
-              entryId={id}
+              entryId={dispute.entryId}
+              index={id}
               key={id}
-              reason={ipfsContent.reason}
-              description={ipfsContent.description}
+              reason={dispute.reason}
+              disputer={dispute.disputer}
+              description={dispute.description}
               votesYes={dispute.votesYes.toNumber()}
               votesNo={dispute.votesNo.toNumber()}
               resolved={dispute.resolved.toNumber()}
@@ -112,18 +181,16 @@ const Disputes = () => {
                   {disputes.size === 0 ? (
                     <p className="text-center mb-0">No disputes to show.</p>
                   ) : (
-                    disputes.forEach(async (dispute, id) => {
-                      const ipfsContent = JSON.parse(
-                        await ipfs.cat(dispute.description)
-                      );
-
+                    disputes.map((dispute, id) => {
                       return (
                         <ArchivedDispute
-                          roundId={currentRound}
-                          entryId={id}
+                          roundId={index + 1}
+                          entryId={dispute.entryId}
+                          index={id}
                           key={id}
-                          reason={ipfsContent.reason}
-                          description={ipfsContent.description}
+                          reason={dispute.reason}
+                          disputer={dispute.disputer}
+                          description={dispute.description}
                           votesYes={dispute.votesYes.toNumber()}
                           votesNo={dispute.votesNo.toNumber()}
                           resolved={dispute.resolved.toNumber()}
