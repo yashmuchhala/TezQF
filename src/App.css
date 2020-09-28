@@ -41,3 +41,19 @@
 .profile-link:hover {
   text-decoration: none;
 }
+
+/*MidLine*/
+.midline-text {
+  position: relative;
+  display: inline-block;
+  background: white;
+  font-weight: 800;
+  padding: 0px 20px;
+  top: 18px;
+}
+
+.midline {
+  height: 2px;
+  background: black;
+  margin-bottom: 2.5rem;
+}

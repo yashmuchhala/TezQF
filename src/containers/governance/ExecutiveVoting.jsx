@@ -222,8 +222,9 @@ const ExecutiveVoting = () => {
                 <i>Categories</i>
               </h4>
               <p>
-                {ipfsContent.categories.map((category) => (
+                {ipfsContent.categories.map((category, index) => (
                   <span
+                    key={index}
                     className="badge badge-light mt-1 mr-2 pt-2 pb-2 pl-3 pr-3 text-secondary"
                     style={{ fontSize: "16px" }}
                   >
@@ -237,9 +238,9 @@ const ExecutiveVoting = () => {
       </div>
 
       {/* Voting details */}
-      <div className="pt-2 col-md-4">
+      <div className="d-flex flex-column pt-2 col-md-4">
         {getVotingButton()}
-        <div className="card">
+        <div className="card h-100">
           <div className="card-body p-4 mb-2">
             <h3>
               <strong>Details</strong>

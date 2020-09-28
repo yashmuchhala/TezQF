@@ -90,7 +90,10 @@ const Executive = () => {
         <></>
       )}
 
-      <hr className="my-4" />
+      <div className="text-center">
+        <h4 className="midline-text">Archived Proposals</h4>
+        <div className="midline" />
+      </div>
 
       {/* Archived Proposals */}
       {archivedProposals.length !== 0 ? (
