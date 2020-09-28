@@ -20,6 +20,8 @@ const ProjectProfile = () => {
   const { id } = useParams();
   const project = round?.entries?.get(id);
 
+  if (project) console.log(project.contributions.get(account));
+
   const [projectDescription, setProjectDescription] = useState();
 
   useEffect(() => {

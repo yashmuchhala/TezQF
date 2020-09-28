@@ -26,6 +26,22 @@ class DAOContractABI {
     return disputes;
   }
 
+  async withdrawTokensDispute(entryId, roundId) {
+    const op = await this.contract.methods
+      .withdrawTokensDispute(entryId, roundId)
+      .send();
+    const result = await op.confirmation();
+    return result?.confirmed;
+  }
+
+  async withdrawTokensProposal(roundId) {
+    const op = await this.contract.methods
+      .withdrawTokensProposal(roundId)
+      .send();
+    const result = await op.confirmation();
+    return result?.confirmed;
+  }
+
   async proposeNewRound(description, startTime, endTime) {
     const op = await this.contract.methods
       .proposeNewRound(description, endTime, startTime)

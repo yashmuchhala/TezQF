@@ -12,6 +12,7 @@ const ExecutiveVoting = () => {
 
   const [loading, setLoading] = useState(false);
   const [ipfsContent, setIpfsContent] = useState({});
+  const [withdrawLoading, setWithdrawLoading] = useState(false);
 
   const account = useSelector((state) => state.credentials.wallet.account);
   const daoContract = useSelector((state) => state.contract.contracts.dao);
@@ -63,6 +64,35 @@ const ExecutiveVoting = () => {
     setLoading(false);
   };
 
+  const onWithdraw = async () => {
+    try {
+      setWithdrawLoading(true);
+      await daoContract.withdrawTokensProposal(id);
+      window.location.reload();
+    } catch (err) {
+      alert(err);
+    }
+
+    setWithdrawLoading(false);
+  };
+
+  const withdrawButton = () => {
+    const voterDetails = proposal.voters.has(account)
+      ? proposal.voters.get(account)
+      : null;
+
+    return voterDetails !== null && !voterDetails.returned ? (
+      <button onClick={onWithdraw} className="btn btn-block btn-primary mb-3">
+        {withdrawLoading && (
+          <div className="spinner-border spinner-border-sm" />
+        )}
+        {withdrawLoading ? " PROCESSING TRANSACTION" : "WITHDRAW TOKENS"}
+      </button>
+    ) : (
+      <></>
+    );
+  };
+
   //Check for resolved status and generate the relevant button
   const getVotingButton = () => {
     if (proposal.resolved.toNumber() === 0) {
@@ -103,6 +133,7 @@ const ExecutiveVoting = () => {
           <p className="mt-1 text-center text-secondary">
             {proposal.votesYes.toNumber()} votes in support.
           </p>
+          {withdrawButton()}
         </>
       ) : (
         <>
@@ -119,6 +150,7 @@ const ExecutiveVoting = () => {
             {proposal.totalFunds.toNumber() / 1000000} XTZ in sponsorship till
             now.
           </p>
+          {withdrawButton()}
         </>
       );
     } else {
@@ -130,6 +162,7 @@ const ExecutiveVoting = () => {
           <p className="mt-1 text-center text-secondary">
             {proposal.votesNo.toNumber()} votes against.
           </p>
+          {withdrawButton()}
         </>
       );
     }

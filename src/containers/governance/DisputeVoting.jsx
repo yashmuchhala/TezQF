@@ -12,6 +12,7 @@ const DisputeVoting = () => {
 
   const [isLoading, setIsLoading] = useState(true);
   const [buttonLoading, setButtonLoading] = useState(false);
+  const [withdrawLoading, setWithdrawLoading] = useState(false);
 
   const account = useSelector((state) => state.credentials.wallet.account);
   const daoContract = useSelector((state) => state.contract.contracts.dao);
@@ -55,6 +56,34 @@ const DisputeVoting = () => {
     setButtonLoading(false);
   };
 
+  const onWithdraw = async () => {
+    try {
+      setWithdrawLoading(true);
+      await daoContract.withdrawTokensDispute(id, roundId);
+      window.location.reload();
+    } catch (err) {
+      alert(err);
+    }
+
+    setWithdrawLoading(false);
+  };
+
+  const withdrawButton = () => {
+    const voterDetails = dispute.voters.has(account)
+      ? dispute.voters.get(account)
+      : null;
+    return voterDetails !== null && !voterDetails.returned ? (
+      <button onClick={onWithdraw} className="btn btn-block btn-primary mb-3">
+        {withdrawLoading && (
+          <div className="spinner-border spinner-border-sm" />
+        )}
+        {withdrawLoading ? " PROCESSING TRANSACTION" : "WITHDRAW TOKENS"}
+      </button>
+    ) : (
+      <></>
+    );
+  };
+
   //Check for resolved status and generate the relevant button
   const getVotingButton = () => {
     if (dispute.resolved.toNumber() === 0) {
@@ -94,9 +123,10 @@ const DisputeVoting = () => {
           <button disabled className="btn btn-danger btn-block">
             Entry Disqualified
           </button>
-          <p className="mt-1 text-center text-secondary">
+          <p className="mt-1 mb-1 text-center text-secondary">
             {dispute.votesYes.toNumber()} votes in support.
           </p>
+          {withdrawButton()}
         </>
       );
     } else {
@@ -105,9 +135,10 @@ const DisputeVoting = () => {
           <button disabled className="btn btn-success btn-block">
             Dispute Rejected
           </button>
-          <p className="mt-1 text-center text-secondary">
+          <p className="mt-1 mb-1 text-center text-secondary">
             {dispute.votesNo.toNumber()} votes against.
           </p>
+          {withdrawButton()}
         </>
       );
     }
