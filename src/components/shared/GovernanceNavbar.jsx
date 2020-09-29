@@ -16,8 +16,7 @@ const GovernanceNavbar = () => {
       >
         <div className="container">
           <Link className="navbar-brand text-primary" to="/governance">
-            tezGrants{" "}
-            <span className="lead badge badge-secondary">Governance</span>
+            tezQF <span className="lead badge badge-secondary">Governance</span>
           </Link>
           <div className="collapse navbar-collapse">
             <ul className="navbar-nav ml-auto">

@@ -15,7 +15,7 @@ const Navbar = () => {
       >
         <div className="container">
           <Link className="navbar-brand text-primary" to="/">
-            tezGrants
+            tezQF
           </Link>
 
           <div className="collapse navbar-collapse">

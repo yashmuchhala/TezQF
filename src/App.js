@@ -10,7 +10,6 @@ import ArchiveProfile from "./containers/rounds/archives/ArchiveProfile";
 import Projects from "./containers/rounds/on-going/Projects";
 import ProjectEntry from "./containers/rounds/on-going/ProjectEntry";
 import ProjectProfile from "./containers/rounds/on-going/ProjectProfile";
-import Profile from "./containers/rounds/on-going/Profile";
 import Home from "./containers/rounds/Home";
 import Sponsor from "./containers/rounds/Sponsor";
 
@@ -56,20 +55,14 @@ const App = () => {
 
         const [
           daoContract,
-          //crowdSaleContract,
           tokenContract,
           roundManagerContract,
         ] = await Promise.all([
           tezos.wallet.at(process.env.REACT_APP_DAO_CONTRACT_ADDRESS),
-          //tezos.wallet.at(process.env.REACT_APP_CROWDSALE_CONTRACT_ADDRESS),
           tezos.wallet.at(process.env.REACT_APP_TOKEN_CONTRACT_ADDRESS),
           tezos.wallet.at(process.env.REACT_APP_ROUND_MANAGER_CONTRACT_ADDRESS),
         ]);
-        console.log(process.env.REACT_APP_TOKEN_CONTRACT_ADDRESS);
         const daoContractObject = new ABIs.DAOContractABI(daoContract);
-        // const crowdSaleContractObject = new ABIs.CrowdSaleContractABI(
-        //   crowdSaleContract
-        // );
         const tokenContractObject = new ABIs.TokenContractABI(tokenContract);
         const roundManagerContractObject = new ABIs.RoundManagerContractABI(
           roundManagerContract
@@ -104,9 +97,6 @@ const App = () => {
     <Router>
       <Layout>
         <Switch>
-          {/* Crowdsale Route*/}
-          {/* <Route path="/crowdsale" exact component={CrowdSale} /> */}
-          {/* Rounds Routes */}
           <Route path="/" exact component={Home} />
           <Route exact path="/contribute/:id" component={ProjectProfile} />
           <Route exact path="/contribute" component={Projects} />
@@ -114,8 +104,6 @@ const App = () => {
           <Route path="/sponsor" component={Sponsor} />
           <Route path="/archives/:id" component={ArchiveProfile} />
           <Route path="/archives" component={Archive} />
-          <Route path="/profile" component={Profile} />
-          {/* Governance Routes */}
           <Route
             exact
             path="/governance/executive/new"

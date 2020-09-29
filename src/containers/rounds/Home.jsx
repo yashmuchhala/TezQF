@@ -3,8 +3,8 @@ import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 import RoundActive from "../../components/rounds/RoundActive";
-// import SponsorActiveRound from "../../components/rounds/SponsorRoundActive";
 import NoActiveRound from "../../components/rounds/NoActiveRound";
+
 const Home = () => {
   const isRoundActive = useSelector((state) => state.round.isRoundActive);
   const rounds = useSelector((state) => state.round.rounds);
@@ -106,11 +106,6 @@ const Home = () => {
             Go to Governance
           </button>
         </a>
-        {/* <Link to="/crowdsale">
-          <button className="btn btn-success p-3 mb-5">
-            Buy Governance Tokens*
-          </button>
-        </Link> */}
         <h6 className="text-muted">
           *Our governance tokens are very restrictive and not listed on any
           exchanges;

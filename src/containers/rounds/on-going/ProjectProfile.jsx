@@ -184,9 +184,9 @@ const ProjectProfile = () => {
                   {isLoading ? " Processing Transaction" : "Contribute"}
                 </button>
               )}
-              <p className="mt-1 align-self-end">
+              {/* <p className="mt-1 align-self-end">
                 <i className="fa fa-exclamation-triangle" /> Dispute
-              </p>
+              </p> */}
             </>
           )}
         </div>
