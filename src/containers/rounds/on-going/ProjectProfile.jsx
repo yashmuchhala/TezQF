@@ -69,8 +69,12 @@ const ProjectProfile = () => {
         contributors.push(
           <li className="list-group-item row d-flex" key={key}>
             <span className="col-8">{key}</span>
-            <span className="col-2">{(contributor.amount || 0) / 1}tz</span>
-            <span className="col-2">${2.6 * contributor.amount}</span>
+            <span className="col-2">
+              {(contributor.amount || 0) / 1000000}tz
+            </span>
+            <span className="col-2">
+              ${(2.6 * contributor.amount) / 1000000}
+            </span>
           </li>
         );
       });

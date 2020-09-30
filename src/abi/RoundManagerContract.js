@@ -52,7 +52,7 @@ class RoundManagerContractABI {
 
   async withdrawContribution(roundId, entryId) {
     const op = await this.contract.methods
-      .withdrawContribution(roundId, entryId)
+      .withdrawContribution(entryId, roundId)
       .send();
 
     const result = await op.confirmation();

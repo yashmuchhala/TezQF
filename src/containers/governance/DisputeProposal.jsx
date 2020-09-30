@@ -114,7 +114,7 @@ const DisputeProposal = () => {
       <h1>Dispute an Entry</h1>
       <p className="lead">
         You are about to dispute an entry in an on-going funding round. You have
-        to stake a total of 500 tokens in order to confirm the transaction. If
+        to stake a total of 200 tokens in order to confirm the transaction. If
         the entry is thereby proved to be fair by the community, you shall lose
         your stake, otherwise the tokens shall be returned.
       </p>
