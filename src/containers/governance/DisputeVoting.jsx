@@ -148,7 +148,7 @@ const DisputeVoting = () => {
     <div className="row">
       {/* dispute Details */}
       <div className="d-flex col-md-8">
-        <div className="card align-self-stretch">
+        <div className="card w-100">
           <div className="card-body flex-column">
             <h2 className="card-title">
               Dispute Entry #{id}: {dispute.reason}
