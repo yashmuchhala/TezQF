@@ -129,13 +129,13 @@ const Projects = () => {
         Funding Round {isRoundActive ? rounds.length - 1 : rounds.length}{" "}
         Archive
       </h1>
-      <h4 className="font-weight-lighter">
+      <h4 className="font-weight-light">
         The community has contributed over{" "}
         {Math.floor(round?.totalContribution / 1000000)}
         tz and a sum of {round?.totalSponsorship / 1000000}tz was distributed
         through CLR Matching!
       </h4>
-      <h5 className="font-weight-lighter">
+      <h5 className="font-weight-light">
         <em>Ended on {fetchEnd()}</em>
       </h5>
 

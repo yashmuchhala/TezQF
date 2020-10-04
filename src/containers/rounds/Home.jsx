@@ -7,7 +7,7 @@ import NoActiveRound from "../../components/rounds/NoActiveRound";
 
 const Home = () => {
   const isRoundActive = useSelector((state) => state.round.isRoundActive);
-  const rounds = useSelector((state) => state.round.rounds);
+  const { rounds } = useSelector((state) => state.round);
 
   const currentRound = isRoundActive ? rounds[rounds.length - 1] : -1;
 
@@ -61,7 +61,7 @@ const Home = () => {
         </div>
       ) : currentRound !== -1 ? (
         <RoundActive
-          name={currentRound.name}
+          name={rounds.length}
           funds={currentRound.totalSponsorship.toNumber()}
         />
       ) : (

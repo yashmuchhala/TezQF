@@ -37,7 +37,6 @@ import {
   GET_WALLET_DATA,
 } from "./redux/ActionTypes";
 import ABIs from "./abi/index";
-//import CrowdSale from "./containers/CrowdSale";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -78,7 +77,6 @@ const App = () => {
           payload: {
             contracts: {
               dao: daoContractObject,
-              //crowdSale: crowdSaleContractObject,
               token: tokenContractObject,
               roundManager: roundManagerContractObject,
             },
@@ -114,7 +112,6 @@ const App = () => {
             path="/governance/executive/:id"
             component={ExecutiveVoting}
           />
-          {/* NOTE: Replace with appropraite parameters once the contract is integrated */}
           <Route
             exact
             path="/governance/disputes/new"
