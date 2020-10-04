@@ -17,10 +17,7 @@ const RoundProposal = () => {
   const [loading, setLoading] = useState(false);
 
   const daoContract = useSelector((state) => state.contract.contracts.dao);
-  console.log(daoContract);
-  /*
-    TODO: Replace with a page load call
-  */
+
   const history = useHistory();
 
   const handleSubmit = async (e) => {
@@ -148,8 +145,8 @@ const RoundProposal = () => {
         ) : null}
 
         <button className="btn btn-lg btn-outline-primary font-weight-bold">
-          {loading && <div className="spinner-border" />}
-          {loading ? " Processing Transaction" : "Confirm Proposal"}
+          {loading ? "Processing Transaction " : "Confirm Proposal"}
+          {loading && <div className="spinner-grow spinner-grow-sm mb-1" />}
         </button>
       </form>
     </div>

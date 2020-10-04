@@ -18,13 +18,16 @@ const Sponsor = () => {
   const onSubmit = async () => {
     setIsCompleted(false);
     setIsLoading(true);
-    const success = await daoContract.donateToRound(name, amount * 1000000);
-    if (success) {
+    try {
+      await daoContract.donateToRound(name, amount * 1000000);
       setIsCompleted(true);
       window.location.reload();
+    } catch (err) {
+      alert(err);
     }
     setIsLoading(false);
   };
+
   return (
     <div className="container d-flex align-items-center flex-column mb-5">
       {/* Header */}
@@ -73,10 +76,8 @@ const Sponsor = () => {
               className="btn btn-primary btn-block font-weight-bold"
               onClick={onSubmit}
             >
-              {isLoading && (
-                <div className="spinner-border spinner-border-sm" />
-              )}
-              {isLoading ? " PROCESSING TRANSACTION" : "CONFIRM"}
+              {isLoading ? "PROCESSING TRANSACTION " : "CONFIRM"}
+              {isLoading && <div className="spinner-grow spinner-grow-sm" />}
             </button>
 
             <h1>{isCompleted ? "Success!" : ""}</h1>

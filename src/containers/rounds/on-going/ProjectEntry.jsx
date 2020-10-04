@@ -335,8 +335,8 @@ const ProjectEntry = () => {
           >
             {isLoading ? (
               <>
-                <div className="spinner-border spinner-border-sm" /> Processing
-                Transaction
+                Processing Transaction{" "}
+                <div className="spinner-grow spinner-grow-sm" />
               </>
             ) : (
               "CONFIRM ENTRY"

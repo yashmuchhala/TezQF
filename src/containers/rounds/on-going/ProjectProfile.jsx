@@ -182,10 +182,10 @@ const ProjectProfile = () => {
                   className="btn btn-primary btn-block"
                   onClick={handleSubmit}
                 >
+                  {isLoading ? "Processing Transaction " : "Contribute"}
                   {isLoading && (
-                    <div className="spinner-border spinner-border-sm" />
+                    <div className="spinner-grow spinner-grow-sm" />
                   )}
-                  {isLoading ? " Processing Transaction" : "Contribute"}
                 </button>
               )}
               {/* <p className="mt-1 align-self-end">

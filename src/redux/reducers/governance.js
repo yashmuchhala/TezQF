@@ -10,6 +10,7 @@ export const governance = (
     newRoundProposalActive: false,
     currentOnGoingRoundProposalId: -1,
     disputes: [],
+    loading: true,
   },
   action
 ) => {
@@ -22,12 +23,14 @@ export const governance = (
         newRoundProposalActive: action.payload.newRoundProposalActive,
         currentOnGoingRoundProposalId:
           action.payload.currentOnGoingRoundProposalId,
+        loading: false,
       };
     }
     case GET_DISPUTES_DATA: {
       return {
         ...state,
         disputes: action.payload,
+        loading: false,
       };
     }
     default:

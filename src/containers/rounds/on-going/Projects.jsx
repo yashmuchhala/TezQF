@@ -84,6 +84,9 @@ const Projects = () => {
   const fetchDiff = () => {
     const now = moment(new Date());
     const end = moment(round.end);
+
+    if (now > end) return "0 H 0 M";
+
     var diff = moment.duration(moment(end).diff(moment(now)));
 
     var days = parseInt(diff.asDays());

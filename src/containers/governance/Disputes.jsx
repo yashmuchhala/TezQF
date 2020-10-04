@@ -10,9 +10,9 @@ const ipfs = require("nano-ipfs-store").at("https://ipfs.infura.io:5001");
 const Disputes = () => {
   const [activeDisputes, setActiveDisputes] = useState([]);
   const [archivedDisputes, setArchivedDisputes] = useState([]);
-  const [pageLoading, setPageLoading] = useState(true);
+  const [pageLoading, setPageLoading] = useState(false);
 
-  const { disputes } = useSelector((state) => state.governance);
+  const { disputes, loading } = useSelector((state) => state.governance);
   const { isRoundActive, currentRound } = useSelector((state) => state.round);
 
   useEffect(() => {
@@ -82,6 +82,7 @@ const Disputes = () => {
 
     if (disputes.length >= 1) {
       if (isRoundActive) {
+        setPageLoading(true);
         fetchActiveDisputes();
         fetchArchivedDisputes();
         setPageLoading(false);
@@ -114,7 +115,7 @@ const Disputes = () => {
                 style={{ textDecoration: "none" }}
               >
                 <button className="btn btn-outline-primary btn-block p-3">
-                  {pageLoading ? (
+                  {loading || pageLoading ? (
                     <div>
                       <div className="spinner-grow spinner-grow-sm text-primary"></div>
                       <div className="spinner-grow spinner-grow-sm text-primary ml-2 mr-2"></div>

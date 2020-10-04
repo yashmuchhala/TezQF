@@ -85,10 +85,10 @@ const ExecutiveVotingModal = ({ id }) => {
               type="button"
               className="btn btn-block btn-primary"
             >
-              {loading && <div className="spinner-border spinner-border-sm" />}
               {loading
-                ? " Processing Transaction"
+                ? "Processing Transaction "
                 : "Confirm Vote using Tokens"}
+              {loading && <div className="spinner-grow spinner-grow-sm" />}
             </button>
           </div>
         </div>

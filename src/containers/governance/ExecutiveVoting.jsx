@@ -83,10 +83,8 @@ const ExecutiveVoting = () => {
 
     return voterDetails !== null && !voterDetails.returned ? (
       <button onClick={onWithdraw} className="btn btn-block btn-primary mb-3">
-        {withdrawLoading && (
-          <div className="spinner-border spinner-border-sm" />
-        )}
-        {withdrawLoading ? " PROCESSING TRANSACTION" : "WITHDRAW TOKENS"}
+        {withdrawLoading ? "PROCESSING TRANSACTION " : "WITHDRAW TOKENS"}
+        {withdrawLoading && <div className="spinner-grow spinner-grow-sm" />}
       </button>
     ) : (
       <></>
@@ -102,8 +100,8 @@ const ExecutiveVoting = () => {
             onClick={onExecute}
             className="btn btn-outline-primary btn-block"
           >
-            {loading && <div className="spinner-border spinner-border-sm" />}
-            {loading ? " Processing Transaction" : "Execute Proposal"}
+            {loading ? "PROCESSING TRANSACTION " : "EXECUTE PROPOSAL"}
+            {loading && <div className="spinner-grow spinner-grow-sm" />}
           </button>
           <p className="mt-1 text-center text-secondary">
             {proposal.votesYes.toNumber()} votes in support.
@@ -141,9 +139,9 @@ const ExecutiveVoting = () => {
             onClick={onList}
             className="btn btn-outline-success btn-block p-3"
           >
-            {loading ? " Processing" : "List Round"}
+            {loading ? "PROCESSING " : "LIST ROUND"}
             {loading && (
-              <div className="spinner-grow spinner-grow-sm text-success ml-1" />
+              <div className="spinner-grow spinner-grow-sm text-success" />
             )}
           </button>
           <p className="mt-1 text-center text-black">

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 
@@ -6,25 +6,16 @@ import ArchivedProposal from "../../components/governance/ArchivedProposal";
 import ActiveProposal from "../../components/governance/ActiveProposal";
 
 const Executive = () => {
-  const [isDataFetchComplete, setIsDataFetchComplete] = useState(false);
-  const { newRoundProposals, newRoundProposalActive } = useSelector(
+  const { newRoundProposals, newRoundProposalActive, loading } = useSelector(
     (state) => state.governance
   );
-  useEffect(() => {
-    if (newRoundProposals?.length) {
-      setIsDataFetchComplete(true);
-    }
-  }, [newRoundProposals]);
+
   const activeProposal = newRoundProposalActive
     ? newRoundProposals[newRoundProposals.length - 1]
     : null;
   const archivedProposals = newRoundProposalActive
     ? newRoundProposals.slice(0, -1)
     : newRoundProposals;
-
-  /*
-    TODO: Add a loader for proposal loading
-  */
 
   return (
     <div>
@@ -54,7 +45,7 @@ const Executive = () => {
                   disabled={newRoundProposalActive}
                   className="btn btn-outline-primary btn-block p-3"
                 >
-                  {isDataFetchComplete || newRoundProposalActive ? (
+                  {!loading ? (
                     newRoundProposalActive ? (
                       "Proposal on-going"
                     ) : (
