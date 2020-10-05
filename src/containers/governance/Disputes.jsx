@@ -1,28 +1,112 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 import ActiveDispute from "../../components/governance/ActiveDispute";
 import ArchivedDispute from "../../components/governance/ArchivedDispute";
 
-//Dummy data
-import { disputes } from "../../data/disputes";
+const ipfs = require("nano-ipfs-store").at("https://ipfs.infura.io:5001");
 
 const Disputes = () => {
-  const activeDisputes = disputes[disputes.length - 1];
-  const archivedDisputes = disputes.slice(0, -1);
+  const [activeDisputes, setActiveDisputes] = useState([]);
+  const [archivedDisputes, setArchivedDisputes] = useState([]);
+  const [pageLoading, setPageLoading] = useState(false);
+
+  const { disputes, loading } = useSelector((state) => state.governance);
+  const { isRoundActive, currentRound } = useSelector((state) => state.round);
+
+  useEffect(() => {
+    const fetchActiveDisputes = async () => {
+      let ipfsDescriptions = [];
+      let metaDescription = [];
+
+      const active = disputes[disputes.length - 1];
+
+      active.forEach((dispute, key) => {
+        ipfsDescriptions.push(ipfs.cat(dispute.description));
+        dispute.entryId = key;
+        metaDescription.push(dispute);
+      });
+
+      ipfsDescriptions = await Promise.all(ipfsDescriptions);
+
+      let tempActiveDisputes = [];
+      ipfsDescriptions.forEach((data, key) => {
+        const parsedData = JSON.parse(data);
+        tempActiveDisputes.push({
+          mainDescription: parsedData.description,
+          reason: parsedData.reason,
+          links: parsedData.links,
+          ...metaDescription[key],
+        });
+      });
+
+      setActiveDisputes(tempActiveDisputes);
+    };
+
+    const fetchArchivedDisputes = async () => {
+      const allArchivedDisputes = isRoundActive
+        ? disputes.slice(0, -1)
+        : disputes;
+      const tempAllArchived = [];
+      for (let i = 0; i < allArchivedDisputes.length; i++) {
+        let ipfsDescriptions = [];
+        let metaDescription = [];
+
+        const archived = allArchivedDisputes[i];
+
+        archived.forEach((dispute, key) => {
+          ipfsDescriptions.push(ipfs.cat(dispute.description));
+          dispute.entryId = key;
+          metaDescription.push(dispute);
+        });
+
+        ipfsDescriptions = await Promise.all(ipfsDescriptions);
+
+        let tempArchived = [];
+        ipfsDescriptions.forEach((data, key) => {
+          const parsedData = JSON.parse(data);
+          tempArchived.push({
+            mainDescription: parsedData.description,
+            reason: parsedData.reason,
+            links: parsedData.links,
+            ...metaDescription[key],
+          });
+        });
+
+        tempAllArchived.push(tempArchived);
+      }
+
+      setArchivedDisputes(tempAllArchived);
+    };
+
+    if (disputes.length >= 1) {
+      if (isRoundActive) {
+        setPageLoading(true);
+        fetchActiveDisputes();
+        fetchArchivedDisputes();
+        setPageLoading(false);
+      }
+    }
+  }, [disputes, isRoundActive]);
 
   return (
     <div>
       {/* Setup Panel */}
       <div className="card">
-        <div className="card-body">
+        <div className="card-body p-5" style={{ backgroundColor: "#FAFAFA" }}>
           <div className="align-items-center row">
             <div className="col-sm-9">
-              <h5 className="card-title">Raise Dispute</h5>
-              <p className="card-text">
-                Raise a dispute against any project that violates the integrity
-                of the community. You must be a holder of at least 2000 DAO
-                tokens.
+              <h5
+                className="card-title text-secondary text-center"
+                style={{ fontSize: "32px" }}
+              >
+                <strong>DISPUTE SETTLEMENTS</strong>
+              </h5>
+              <p className="card-text text-center pl-5 pr-5">
+                Start a new dispute vote for any project that you think doesn't
+                abide to the integrity of tezGrants by clicking on "Setup" and
+                staking the appropriate number of tokens.
               </p>
             </div>
             <div className="col-sm-3">
@@ -30,8 +114,16 @@ const Disputes = () => {
                 to="/governance/disputes/new"
                 style={{ textDecoration: "none" }}
               >
-                <button className="btn btn-outline-primary btn-block">
-                  Setup
+                <button className="btn btn-outline-primary btn-block p-3">
+                  {loading || pageLoading ? (
+                    <div>
+                      <div className="spinner-grow spinner-grow-sm text-primary"></div>
+                      <div className="spinner-grow spinner-grow-sm text-primary ml-2 mr-2"></div>
+                      <div className="spinner-grow spinner-grow-sm text-primary "></div>
+                    </div>
+                  ) : (
+                    "SETUP"
+                  )}
                 </button>
               </Link>
             </div>
@@ -43,57 +135,82 @@ const Disputes = () => {
 
       {/* Active Disputes */}
 
-      {/* Remove roundId after contract contract integration */}
-      {activeDisputes.disputes.map((dispute) => (
-        <ActiveDispute
-          roundId={activeDisputes.roundId}
-          key={dispute.entryId}
-          dispute={dispute}
-        />
-      ))}
+      {activeDisputes.length !== 0 &&
+        activeDisputes.map((dispute, id) => {
+          return (
+            <ActiveDispute
+              roundId={currentRound}
+              entryId={dispute.entryId}
+              index={id}
+              key={id}
+              reason={dispute.reason}
+              disputer={dispute.disputer}
+              description={dispute.mainDescription}
+              votesYes={dispute.votesYes.toNumber()}
+              votesNo={dispute.votesNo.toNumber()}
+              resolved={dispute.resolved.toNumber()}
+            />
+          );
+        })}
 
-      <hr className="my-4" />
+      <div className="text-center">
+        <h4 className="midline-text">Archived Disputes</h4>
+        <div className="midline" />
+      </div>
 
       {/* Archived Disputes */}
       <div id="accordian">
-        {archivedDisputes.map((round) => (
-          <div key={round.roundId} className="card">
-            <div className="card-header" id={`heading${round.roundId}`}>
-              {/* <h1 className="mb-0"> */}
-              <button
-                className="d-flex align-items-center justify-content-between btn btn-block collapsed"
-                data-toggle="collapse"
-                data-target={`#collapse${round.roundId}`}
-                aria-expanded="true"
-                aria-controls={`collapse${round.roundId}`}
-              >
-                <span style={accordionHeaderStyle}>Round {round.roundId}</span>
-              </button>
-              {/* </h1> */}
-            </div>
+        {archivedDisputes.length === 0 ? (
+          <p className="p-5 text-center">No Archived Disputes.</p>
+        ) : (
+          archivedDisputes.map((disputes, index) => (
+            <div key={index} className="card">
+              <div className="card-header" id={`heading${index}`}>
+                {/* <h1 className="mb-0"> */}
+                <button
+                  className="d-flex align-items-center justify-content-between btn btn-block collapsed"
+                  data-toggle="collapse"
+                  data-target={`#collapse${index}`}
+                  aria-expanded="true"
+                  aria-controls={`collapse${index}`}
+                >
+                  <span style={accordionHeaderStyle}>Round {index + 1}</span>
+                </button>
+                {/* </h1> */}
+              </div>
 
-            <div
-              id={`collapse${round.roundId}`}
-              className="collapse"
-              aria-labelledby={`heading${round.roundId}`}
-              data-parent="#accordion"
-            >
-              <div className="card-body">
-                {round.disputes.length === 0 ? (
-                  <p className="text-center mb-0">No disputes to show.</p>
-                ) : (
-                  round.disputes.map((dispute) => (
-                    <ArchivedDispute
-                      roundId={round.roundId}
-                      key={dispute.entryId}
-                      dispute={dispute}
-                    />
-                  ))
-                )}
+              <div
+                id={`collapse${index}`}
+                className="collapse"
+                aria-labelledby={`heading${index}`}
+                data-parent="#accordion"
+              >
+                <div className="card-body m-5">
+                  {disputes.size === 0 ? (
+                    <p className="text-center mb-0">No disputes to show.</p>
+                  ) : (
+                    disputes.map((dispute, id) => {
+                      return (
+                        <ArchivedDispute
+                          roundId={index + 1}
+                          entryId={dispute.entryId}
+                          index={id}
+                          key={id}
+                          reason={dispute.reason}
+                          disputer={dispute.disputer}
+                          description={dispute.mainDescription}
+                          votesYes={dispute.votesYes.toNumber()}
+                          votesNo={dispute.votesNo.toNumber()}
+                          resolved={dispute.resolved.toNumber()}
+                        />
+                      );
+                    })
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );

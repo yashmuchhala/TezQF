@@ -1,138 +1,311 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Moment from "react-moment";
 import ExecutiveVotingModal from "../../components/governance/ExecutiveVotingModal";
 
-//Dummy data
-import { executive } from "../../data/executive";
+import { useSelector } from "react-redux";
+
+const ipfs = require("nano-ipfs-store").at("https://ipfs.infura.io:5001");
 
 const ExecutiveVoting = () => {
   const { id } = useParams();
 
-  //Retrieve Proposal Object (Replace with contract retrieval)
-  const proposal = executive[id - 1];
+  const [loading, setLoading] = useState(false);
+  const [ipfsContent, setIpfsContent] = useState({});
+  const [withdrawLoading, setWithdrawLoading] = useState(false);
+
+  const account = useSelector((state) => state.credentials.wallet.account);
+  const daoContract = useSelector((state) => state.contract.contracts.dao);
+  const proposal = useSelector(
+    (state) => state.governance.newRoundProposals[id - 1]
+  );
+  const currentId = useSelector(
+    (state) => state.governance.currentOnGoingRoundProposalId
+  );
+
+  useEffect(() => {
+    const getContent = async () => {
+      setIpfsContent(JSON.parse(await ipfs.cat(proposal.description)));
+    };
+
+    if (proposal) getContent();
+  }, [proposal]);
+
+  if (!proposal || Object.keys(ipfsContent).length === 0) {
+    return (
+      <div className="text-center text-primary" style={{ padding: "256px" }}>
+        <div className="spinner-grow spinner-grow-sm text-info" />
+        <div className="spinner-grow spinner-grow-sm text-info ml-2 mr-2" />
+        <div className="spinner-grow spinner-grow-sm text-info" />
+      </div>
+    );
+  }
+
+  console.log(proposal.id, currentId);
+
+  const onExecute = async () => {
+    try {
+      setLoading(true);
+      await daoContract.executeNewRoundProposal();
+      window.location.reload();
+    } catch (err) {
+      console.log(err);
+      alert(err);
+    }
+
+    setLoading(false);
+  };
+
+  const onSettle = async () => {
+    try {
+      setLoading(true);
+      await daoContract.settleRound();
+      window.location.reload();
+    } catch (err) {
+      console.log(err);
+      alert(err);
+    }
+
+    setLoading(false);
+  };
+
+  const onList = async () => {
+    try {
+      setLoading(true);
+      await daoContract.listNewRound();
+      window.location.reload();
+    } catch (err) {
+      console.log(err);
+      alert(err);
+    }
+
+    setLoading(false);
+  };
+
+  const onWithdraw = async () => {
+    try {
+      setWithdrawLoading(true);
+      await daoContract.withdrawTokensProposal(id);
+      window.location.reload();
+    } catch (err) {
+      alert(err);
+    }
+
+    setWithdrawLoading(false);
+  };
+
+  const withdrawButton = () => {
+    const voterDetails = proposal.voters.has(account)
+      ? proposal.voters.get(account)
+      : null;
+
+    return voterDetails !== null && !voterDetails.returned ? (
+      <button onClick={onWithdraw} className="btn btn-block btn-primary mb-3">
+        {withdrawLoading ? "PROCESSING TRANSACTION " : "WITHDRAW TOKENS"}
+        {withdrawLoading && <div className="spinner-grow spinner-grow-sm" />}
+      </button>
+    ) : (
+      <></>
+    );
+  };
 
   //Check for resolved status and generate the relevant button
   const getVotingButton = () => {
-    if (proposal.resolved === 0) {
-      return (
+    if (proposal.resolved.toNumber() === 0) {
+      return Date.now() > new Date(proposal.expiry) ? (
+        <>
+          <button
+            onClick={onExecute}
+            className="btn btn-outline-primary btn-block"
+          >
+            {loading ? "PROCESSING TRANSACTION " : "EXECUTE PROPOSAL"}
+            {loading && <div className="spinner-grow spinner-grow-sm" />}
+          </button>
+          <p className="mt-1 text-center text-secondary">
+            {proposal.votesYes.toNumber()} votes in support.
+          </p>
+        </>
+      ) : (
         <>
           <button
             data-toggle="modal"
             data-target="#executive-voting-model"
             className="btn btn-outline-success btn-block"
+            disabled={proposal.voters.has(account)}
           >
-            Vote
+            {proposal.voters.has(account) ? "You have already voted" : "Vote"}
           </button>
           <p className="mt-1 text-center text-secondary">
-            {proposal.votesYes} votes in support.
+            {proposal.votesYes.toNumber()} votes in support.
           </p>
         </>
       );
-    } else if (proposal.resolved === 1) {
-      return (
+    } else if (proposal.resolved.toNumber() === 1) {
+      return proposal.listed ? (
+        Date.now() > new Date(proposal.expiry) &&
+        currentId.toNumber() === proposal.id.toNumber() ? (
+          <>
+            <button
+              onClick={onSettle}
+              className="btn btn-outline-primary btn-block p-3 mb-3"
+            >
+              {loading ? "PROCESSING TRANSACTION " : "SETTLE ROUND"}
+              {loading && <div className="spinner-grow spinner-grow-sm" />}
+            </button>
+            {withdrawButton()}
+          </>
+        ) : (
+          <>
+            <button disabled className="btn btn-success btn-block p-3">
+              Accepted
+            </button>
+            <p className="mt-1 text-center text-secondary">
+              {proposal.votesYes.toNumber()} votes in support.
+            </p>
+            {withdrawButton()}
+          </>
+        )
+      ) : (
         <>
-          <button disabled className="btn btn-success btn-block">
-            Accepted
+          <button
+            onClick={onList}
+            className="btn btn-outline-success btn-block p-3"
+          >
+            {loading ? "PROCESSING " : "LIST ROUND"}
+            {loading && (
+              <div className="spinner-grow spinner-grow-sm text-success" />
+            )}
           </button>
-          <p className="mt-1 text-center text-secondary">
-            {proposal.votesYes} votes in support.
+          <p className="mt-1 text-center text-black">
+            {proposal.totalFunds.toNumber() / 1000000} XTZ in sponsorship till
+            now.
           </p>
+          {withdrawButton()}
         </>
       );
     } else {
       return (
         <>
-          <button disabled className="btn btn-danger btn-block">
+          <button disabled className="btn btn-danger btn-block p-3">
             Rejected
           </button>
           <p className="mt-1 text-center text-secondary">
-            {proposal.votesNo} votes against.
+            {proposal.votesNo.toNumber()} votes against.
           </p>
+          {withdrawButton()}
         </>
       );
     }
   };
-
+  console.log("Sponsors:", proposal.sponsorToFunds.valueMap);
   return (
-    <div className="row">
+    <div className="row pb-5">
       {/* Proposal Details */}
       <div className="col-md-8">
-        <div className="card">
-          <div className="card-body">
-            <h2 className="card-title">
-              Proposal to conduct funding round {proposal.id}
+        <div className="card mt-2">
+          <div className="card-body p-5">
+            <h2
+              className="card-title text-secondary"
+              style={{ fontSize: "32px" }}
+            >
+              <strong>
+                Proposal to conduct Funding Round {proposal.id.toNumber()}
+              </strong>
             </h2>
-            <h4>Description</h4>
-            <p className="text-grey">
-              Sed ut perspiciatis unde omnis iste natus error sit voluptatem
-              accusantium doloremque laudantium, totam rem aperiam, eaque ipsa
-              quae ab illo inventore veritatis et quasi architecto beatae vitae
-              dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit
-              aspernatur aut odit aut fugit, sed quia consequuntur magni dolores
-              eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam
-              est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci
-              velit, sed quia non numquam eius modi tempora incidunt ut labore
-              et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima
-              veniam, quis nostrum exercitationem ullam corporis suscipit
-              laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem
-              vel eum iure reprehenderit qui in ea voluptate velit esse quam
-              nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo
-              voluptas nulla pariatur
-            </p>
-            <table>
-              <thead>
-                <tr>
-                  <td>
-                    <h4>Start</h4>
-                  </td>
-                  <td className="px-4">
-                    <h4>End</h4>
-                  </td>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>
-                    <Moment format="DD/MM/YYYY">{proposal.start}</Moment>
-                  </td>
-                  <td className="px-4">
-                    <Moment format="DD/MM/YYYY">{proposal.end}</Moment>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-            <br />
-            <h4>Categories</h4>
-            <p>{proposal.categories}</p>
-            <br />
+            <hr />
+            <div className="p-2">
+              <h4>
+                <i>Description</i>
+              </h4>
+              <p className="text-grey">{ipfsContent.description}</p>
+            </div>
+            <div className="p-2">
+              <table>
+                <thead>
+                  <tr>
+                    <td>
+                      <h4>
+                        <i>Start</i>
+                      </h4>
+                    </td>
+                    <td className="pl-4">
+                      <h4>
+                        <i>End</i>
+                      </h4>
+                    </td>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <Moment format="DD/MM/YYYY">{proposal.start}</Moment>
+                    </td>
+                    <td className="px-4">
+                      <Moment format="DD/MM/YYYY">{proposal.end}</Moment>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div className="p-2 mt-3">
+              <h4>
+                <i>Categories</i>
+              </h4>
+              <p>
+                {ipfsContent.categories.map((category, index) => (
+                  <span
+                    key={index}
+                    className="badge badge-light mt-1 mr-2 pt-2 pb-2 pl-3 pr-3 text-secondary"
+                    style={{ fontSize: "16px" }}
+                  >
+                    {category}
+                  </span>
+                ))}
+              </p>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Voting details */}
-      <div className="pt-2 col-md-4">
+      <div className="d-flex flex-column pt-2 col-md-4">
         {getVotingButton()}
-        <div className="card">
-          <div className="card-body">
-            <h4>Details</h4>
+        <div className="card h-100">
+          <div className="card-body p-4 mb-2">
+            <h3>
+              <strong>Details</strong>
+            </h3>
             <table className="w-100 mb-3 details-table">
               <tbody>
                 <tr>
-                  <td className="text-grey">Creator</td>
-                  {/* Link to tzStats */}
-                  <td>{proposal.creator.slice(0, 10)}...</td>
+                  <td className="text-grey">
+                    <i>Creator</i>
+                  </td>
+                  <td className="text-right">
+                    <a
+                      href={`https://carthagenet.tzstats.com/${proposal.creator}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {proposal.creator.slice(0, 7)}...
+                      {proposal.creator.slice(32, 36)}
+                    </a>
+                  </td>
                 </tr>
                 <tr>
-                  <td className="text-grey">Created at</td>
-                  <td>
+                  <td className="text-grey">
+                    <i>Created at</i>
+                  </td>
+                  <td className="text-right">
                     <Moment format="DD/MM/YYYY">{proposal.created}</Moment>
                   </td>
                 </tr>
-                {proposal.resolved === 0 ? (
+                {proposal.resolved.toNumber() === 0 ? (
                   <tr>
-                    <td className="text-grey">Ends in</td>
-                    <td>
+                    <td className="text-grey">
+                      <i>Ends on</i>
+                    </td>
+                    <td className="text-right">
                       <Moment format="DD/MM/YYYY">{proposal.expiry}</Moment>
                     </td>
                   </tr>
@@ -142,20 +315,28 @@ const ExecutiveVoting = () => {
               </tbody>
             </table>
 
-            <h4>Voting Stats</h4>
-            <table className="w-100 mb-3 details-table">
+            <h3>
+              <strong>Voting Stats</strong>
+            </h3>
+            <table className="w-100 details-table">
               <tbody>
                 <tr>
-                  <td className="text-grey">Total Votes</td>
-                  <td>{proposal.votes}</td>
+                  <td className="text-grey">
+                    <i>Unique Voters</i>
+                  </td>
+                  <td className="text-right">{proposal.voters.size}</td>
                 </tr>
                 <tr>
-                  <td className="text-grey">Yes Votes</td>
-                  <td>{proposal.votesYes}</td>
+                  <td className="text-grey">
+                    <i>Yes Votes</i>
+                  </td>
+                  <td className="text-right">{proposal.votesYes.toNumber()}</td>
                 </tr>
                 <tr>
-                  <td className="text-grey">No Votes</td>
-                  <td>{proposal.votesNo}</td>
+                  <td className="text-grey">
+                    <i>No Votes</i>
+                  </td>
+                  <td className="text-right">{proposal.votesNo.toNumber()}</td>
                 </tr>
               </tbody>
             </table>
@@ -164,7 +345,7 @@ const ExecutiveVoting = () => {
       </div>
 
       {/* Voting Modal */}
-      <ExecutiveVotingModal proposal={proposal} />
+      <ExecutiveVotingModal id={proposal.id.toNumber()} />
     </div>
   );
 };

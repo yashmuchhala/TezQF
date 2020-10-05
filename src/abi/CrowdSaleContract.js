@@ -1,17 +1,27 @@
 class CrowdSaleContractABI {
-  constructor(tezos, address) {
-    this.contract = tezos.wallet.at(address);
+  constructor(contract) {
+    this.contract = contract;
   }
 
   async getPrice() {
     const storage = await this.contract.storage();
-    return storage.price;
+    return storage.price.c[0];
+  }
+
+  async getTotalSupply() {
+    const storage = await this.contract.storage();
+    return storage.totalSupply.c[0];
+  }
+  async getIsPaused() {
+    const storage = await this.contract.storage();
+    return storage.isPaused;
   }
   async buyTokens(value, mutezAmount) {
     const op = await this.contract.methods
       .buyTokens(value)
       .send({ amount: mutezAmount, mutez: true });
-    return op.confirmation();
+    const result = await op.confirmation();
+    return result?.completed;
   }
 }
 

@@ -1,64 +1,69 @@
 var fs = require("fs");
 const compileContract = require("./compile");
 const deployContract = require("./deploy");
-const config = require("../../contractsConfig.json");
 const setupContracts = require("./setupContracts");
+const config = require("../../contractsConfig.json");
 const admin = require(`../keystore/${config.keyName}`);
 
-require.extensions[".tz"] = function (module, filename) {
-  module.exports = fs.readFileSync(filename, "utf8");
-};
-
 async function main() {
-  // Compile and deploy DAO Contract
   try {
+    const DEBUG = true;
+    // Compile token Contract
+    console.log("Compiling QuadToken Contract");
+    await compileContract(
+      "main",
+      "QuadToken",
+      `(sp.address('${admin.publicKeyHash}'), ${DEBUG ? "True" : "False"})`
+    );
+    // Deploy token Contract
+    console.log("Deploying token Contract");
+    const tokenContract = await deployContract("main", "QuadToken", "admin");
+    console.log("Deployed token Contract at:", tokenContract.address);
+
+    // Compile DAO
     console.log("Compiling DAO Contract");
     await compileContract(
       "main",
       "DAO",
-      `(sp.address('${admin.publicKeyHash}'))`
+      `(sp.address('${admin.publicKeyHash}'), sp.address('${
+        tokenContract.address
+      }'), ${DEBUG ? "True" : "False"})`
     );
+
+    // Deploy DAO
     console.log("Deploying DAO Contract");
     const daoContract = await deployContract("main", "DAO", "admin");
-    const daoContractAddress = daoContract.address;
-    console.log("Deployed DAO Contract at:", daoContractAddress);
+    console.log("Deployed DAO Contract at:", daoContract.address);
 
-    console.log("Compiling CrowdSale Contract");
+    // Compile CrowdSale Contract
+    console.log("Compiling CrowdSale contract");
     await compileContract(
       "main",
       "CrowdSale",
-      `(sp.address('${admin.publicKeyHash}'), 1000000, sp.address('${daoContractAddress}'))`
+      `(sp.address('${admin.publicKeyHash}'), sp.address('${
+        tokenContract.address
+      }'), 1000000, 30, sp.address('${admin.publicKeyHash}'), ${
+        DEBUG ? "True" : "False"
+      } )`
     );
-
-    // CrowdSale deployment
-    console.log("Deploying CrowdSale Contract");
+    // Deploy crowdSale Contract
+    console.log("Deploying crowdSale Contract");
     const crowdSaleContract = await deployContract(
       "main",
       "CrowdSale",
       "admin"
     );
-    console.log("Deployed CrowdSale Contract at:", crowdSaleContract.address);
+    console.log("Deployed crowdSale contract at:", crowdSaleContract.address);
 
-    console.log("Compiling QuadToken Contract");
-    await compileContract(
-      "main",
-      "QuadToken",
-      `(sp.address('${crowdSaleContract.address}'), sp.address('${daoContractAddress}'))`
-    );
-
+    // Compile RM
     console.log("Compiling RM Contract");
     await compileContract(
       "main",
       "RoundManager",
-      `(sp.address('${daoContractAddress}'))`
+      `(sp.address('${daoContract.address}'), ${DEBUG ? "True" : "False"})`
     );
 
-    // QuadToken deployment
-    console.log("Deploying QuadToken Contract");
-    const tokenContract = await deployContract("main", "QuadToken", "admin");
-    console.log("Deployed QuadToken Contract at:", tokenContract.address);
-
-    // RM deployment
+    // Deploy RM
     console.log("Deploying RM contract");
     const roundManagerContract = await deployContract(
       "main",
@@ -67,29 +72,46 @@ async function main() {
     );
     console.log("Deployed RM Contract at:", roundManagerContract.address);
 
+    //Update Config
     console.log("Updating config file");
-    // Update the contract addresses
+
     var configFile = JSON.parse(
       fs.readFileSync("./contractsConfig.json").toString()
     );
 
     configFile.daoContractAddress = daoContract.address;
-    configFile.crowdSaleContractAddress = crowdSaleContract.address;
-    configFile.tokenContractAddress = tokenContract.address;
+    configFile.tokenContract = crowdSaleContract.address;
+    configFile.crowdSaleContract = crowdSaleContract.address;
     configFile.roundManagerContractAddress = roundManagerContract.address;
+
     fs.writeFile(
       "./contractsConfig.json",
       JSON.stringify(configFile, null, 2),
       () => {}
     );
+
     console.log("Updated config file");
     console.log("Setting contract addresses in dependant contracts");
+
     await setupContracts(
       daoContract.address,
       tokenContract.address,
       crowdSaleContract.address,
       roundManagerContract.address
     );
+
+    console.log("Updating env variables for React App");
+    const envVariableFileData =
+      `REACT_APP_ADMIN_PKH=${admin.publicKeyHash}\n` +
+      `REACT_APP_DAO_CONTRACT_ADDRESS=${daoContract.address}\n` +
+      `REACT_APP_TOKEN_CONTRACT_ADDRESS=${tokenContract.address}\n` +
+      `REACT_APP_CROWDSALE_CONTRACT_ADDRESS=${crowdSaleContract.address}\n` +
+      `REACT_APP_ROUND_MANAGER_CONTRACT_ADDRESS=${roundManagerContract.address}`;
+    fs.writeFile("./.env", envVariableFileData, function (err) {
+      if (err) throw err;
+      console.log("Saved all contract addresses to env variables");
+    });
+
     console.log("COMPLETE");
   } catch (error) {
     if (!error.response) {

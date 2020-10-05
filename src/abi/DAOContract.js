@@ -1,74 +1,120 @@
 class DAOContractABI {
-  constructor(tezos, address) {
-    this.contract = tezos.wallet.at(address);
+  constructor(contract) {
+    this.contract = contract;
   }
 
-  async getNewRoundProposalData() {
+  async getNewRoundProposalsData() {
     const storage = await this.contract.storage();
+    const newRoundProposals = [];
+    for (var i = 1; i <= storage.newRoundProposalId; i++) {
+      newRoundProposals.push(await storage.newRoundProposals.get(i.toString()));
+    }
     return {
-      newRoundProposals: storage.newRoundProposals,
+      newRoundProposals: newRoundProposals,
       newRoundProposalId: storage.newRoundProposalId,
       newRoundProposalActive: storage.newRoundProposalActive,
       currentOnGoingRoundProposalId: storage.currentOnGoingRoundProposalId,
     };
   }
 
-  async getDisputes() {
+  async getDisputesData() {
     const storage = await this.contract.storage();
-    return storage.disputes.valueMap;
+    const disputes = [];
+    for (var i = 1; i <= storage.lastAcceptedRound; i++) {
+      disputes.push(await storage.disputes.get(i.toString()));
+    }
+    return disputes;
   }
 
-  async proposeNewRound(name, startTime, endTime, expiry) {
-    // startTime and endTime in milliseconds sinze 1970 format
+  async withdrawTokensDispute(entryId, roundId) {
     const op = await this.contract.methods
-      .proposeNewRound(name, startTime, endTime, expiry)
+      .withdrawTokensDispute(entryId, roundId)
       .send();
-    return await op.confirmation();
+    const result = await op.confirmation();
+    return result?.confirmed;
+  }
+
+  async withdrawTokensProposal(roundId) {
+    const op = await this.contract.methods
+      .withdrawTokensProposal(roundId)
+      .send();
+    const result = await op.confirmation();
+    return result?.confirmed;
+  }
+
+  async proposeNewRound(description, startTime, endTime) {
+    const op = await this.contract.methods
+      .proposeNewRound(description, endTime, startTime)
+      .send();
+    const result = await op.confirmation();
+    console.log(result);
+    return result?.confirmed;
   }
 
   async voteForNewRoundProposal(inFavor, value) {
     const op = await this.contract.methods
       .voteForNewRoundProposal(inFavor, value)
       .send();
-    return await op.confirmation();
+    const result = await op.confirmation();
+    return result?.confirmed;
   }
 
   async executeNewRoundProposal() {
-    const op = await this.contract.methods.executeNewRoundProposal().send();
-    return await op.confirmation();
+    const op = await this.contract.methods
+      .executeNewRoundProposal([["unit"]])
+      .send();
+
+    const result = await op.confirmation();
+    return result?.confirmed;
   }
 
   async donateToRound(name, mutezAmount) {
     const op = await this.contract.methods
       .donateToRound(name)
       .send({ amount: mutezAmount, mutez: true });
-    return await op.confirmation();
+
+    const result = await op.confirmation();
+    return result?.confirmed;
   }
 
   async listNewRound() {
-    const op = await this.contract.methods.listNewRound().send();
-    return await op.confirmation();
+    const op = await this.contract.methods
+      .listNewRound([["unit"]])
+      .send({ gasLimit: 1040000 });
+
+    const result = await op.confirmation();
+    return result?.confirmed;
   }
 
   async settleRound() {
-    const op = await this.contract.methods.settleRound().send();
-    return await op.confirmation();
+    const op = await this.contract.methods.settleRound([["unit"]]).send();
+
+    const result = await op.confirmation();
+    return result?.confirmed;
   }
 
-  async raiseDispute(entryId) {
-    const op = await this.contract.methods.raiseDispute(entryId).send();
-    return await op.confirmation();
+  async raiseDispute(entryId, description) {
+    const op = await this.contract.methods
+      .raiseDispute(description, entryId)
+      .send();
+
+    const result = await op.confirmation();
+    return result?.confirmed;
   }
   async voteForDispute(entryId, inFavor, value) {
     const op = await this.contract.methods
       .voteForDispute(entryId, inFavor, value)
       .send();
-    return await op.confirmation();
+
+    const result = await op.confirmation();
+    return result?.confirmed;
   }
 
   async settleDispute(entryId) {
     const op = await this.contract.methods.settleDispute(entryId).send();
-    return await op.confirmation();
+
+    const result = await op.confirmation();
+    return result?.confirmed;
   }
 }
 

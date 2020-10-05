@@ -18,15 +18,15 @@ export const dummyProjects = [
         amount: 25,
       },
       {
-        address: "tz1VWWRqfpoFjP1qDF5oAk22A8bg9WP1Mp2L",
+        address: "tz1VWWRqfpoFjP1qDF5oAk12A8bg9WP1Mp2L",
         amount: 29,
       },
       {
-        address: "tz1VWWRqfpoFjP1qDF5oAk22A8bg9WP1Mp2L",
+        address: "tz1VWWRqfpoFjP1qDF5oAk42A8bg9WP1Mp2L",
         amount: 25,
       },
       {
-        address: "tz1VWWRqfpoFjP1qDF5oAk22A8bg9WP1Mp2L",
+        address: "tz1VWWRqfpoFjP1qDF5oAk02A8bg9WP1Mp2L",
         amount: 25,
       },
     ],
@@ -49,15 +49,15 @@ export const dummyProjects = [
         amount: 25,
       },
       {
-        address: "tz1VWWRqfpoFjP1qDF5oAk22A8bg9WP1Mp2L",
+        address: "tz1VWWRqfpoFjP1qDF5oAk12A8bg9WP1Mp2L",
         amount: 29,
       },
       {
-        address: "tz1VWWRqfpoFjP1qDF5oAk22A8bg9WP1Mp2L",
+        address: "tz1VWWRqfpoFjP1qDF5oAk42A8bg9WP1Mp2L",
         amount: 25,
       },
       {
-        address: "tz1VWWRqfpoFjP1qDF5oAk22A8bg9WP1Mp2L",
+        address: "tz1VWWRqfpoFjP1qDF5oAk02A8bg9WP1Mp2L",
         amount: 25,
       },
     ],

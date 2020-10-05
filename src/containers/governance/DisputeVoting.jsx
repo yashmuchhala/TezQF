@@ -1,45 +1,132 @@
-import React from "react";
+import React, { useState } from "react";
 import { useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
+
 import Moment from "react-moment";
 import DisputeVotingModal from "../../components/governance/DisputeVotingModal";
 
-//Dummy data
-import { disputes } from "../../data/disputes";
+const ipfs = require("nano-ipfs-store").at("https://ipfs.infura.io:5001");
 
 const DisputeVoting = () => {
   const { roundId, id } = useParams();
 
-  //Retrieve Dispute Object (Replace with contract retrieval)
-  const dispute = disputes[roundId - 1].disputes.filter(
-    (dispute) => dispute.entryId === parseInt(id)
-  )[0];
+  const [isLoading, setIsLoading] = useState(true);
+  const [buttonLoading, setButtonLoading] = useState(false);
+  const [withdrawLoading, setWithdrawLoading] = useState(false);
+
+  const account = useSelector((state) => state.credentials.wallet.account);
+  const daoContract = useSelector((state) => state.contract.contracts.dao);
+  const { disputes } = useSelector((state) => state.governance);
+
+  const disputesThis = disputes ? disputes[roundId - 1] : null;
+  const dispute = disputesThis ? disputesThis.get(id) : null;
+
+  const addIpfs = async () => {
+    const ipfsContent = JSON.parse(await ipfs.cat(dispute.description));
+    dispute.mainDescription = ipfsContent.description;
+    dispute.reason = ipfsContent.reason;
+    dispute.links = ipfsContent.links;
+    dispute.entryId = id;
+    setIsLoading(false);
+  };
+
+  if (dispute) {
+    addIpfs();
+  }
+
+  if (isLoading) {
+    return (
+      <div className="text-center" style={{ padding: "256px" }}>
+        <div className="spinner-grow spinner-grow-sm text-primary"></div>
+        <div className="spinner-grow spinner-grow-sm text-primary ml-2 mr-2"></div>
+        <div className="spinner-grow spinner-grow-sm text-primary "></div>
+      </div>
+    );
+  }
+
+  const onSettle = async () => {
+    try {
+      setButtonLoading(true);
+      await daoContract.settleDispute(id);
+      window.location.reload();
+    } catch (err) {
+      alert(err);
+    }
+
+    setButtonLoading(false);
+  };
+
+  const onWithdraw = async () => {
+    try {
+      setWithdrawLoading(true);
+      await daoContract.withdrawTokensDispute(id, roundId);
+      window.location.reload();
+    } catch (err) {
+      alert(err);
+    }
+
+    setWithdrawLoading(false);
+  };
+
+  const withdrawButton = () => {
+    const voterDetails = dispute.voters.has(account)
+      ? dispute.voters.get(account)
+      : null;
+    return voterDetails !== null && !voterDetails.returned ? (
+      <button onClick={onWithdraw} className="btn btn-block btn-primary mb-3">
+        {withdrawLoading && (
+          <div className="spinner-border spinner-border-sm" />
+        )}
+        {withdrawLoading ? " PROCESSING TRANSACTION" : "WITHDRAW TOKENS"}
+      </button>
+    ) : (
+      <></>
+    );
+  };
 
   //Check for resolved status and generate the relevant button
   const getVotingButton = () => {
-    if (dispute.resolved === 0) {
-      return (
+    if (dispute.resolved.toNumber() === 0) {
+      return Date.now() < new Date(dispute.expiry) ? (
         <>
           <button
             data-toggle="modal"
             data-target="#dispute-voting-model"
             className="btn btn-outline-success btn-block"
+            disabled={dispute.voters.has(account)}
           >
-            Vote
+            {dispute.voters.has(account) ? "You have already voted" : "VOTE"}
           </button>
           <p className="mt-1 text-center text-secondary">
-            {dispute.votesYes} votes in support.
+            {dispute.votesYes.toNumber()} votes in support.
+          </p>
+        </>
+      ) : (
+        <>
+          <button
+            onClick={onSettle}
+            className="btn btn-outline-primary btn-block"
+          >
+            {buttonLoading && (
+              <div className="spinner-border spinner-border-sm" />
+            )}
+            {buttonLoading ? " Processing Transaction" : "Settle Dispute"}
+          </button>
+          <p className="mt-1 text-center text-secondary">
+            {dispute.votesYes.toNumber()} votes in support.
           </p>
         </>
       );
-    } else if (dispute.resolved === 1) {
+    } else if (dispute.resolved.toNumber() === 1) {
       return (
         <>
           <button disabled className="btn btn-danger btn-block">
             Entry Disqualified
           </button>
-          <p className="mt-1 text-center text-secondary">
-            {dispute.votesYes} votes in support.
+          <p className="mt-1 mb-1 text-center text-secondary">
+            {dispute.votesYes.toNumber()} votes in support.
           </p>
+          {withdrawButton()}
         </>
       );
     } else {
@@ -48,9 +135,10 @@ const DisputeVoting = () => {
           <button disabled className="btn btn-success btn-block">
             Dispute Rejected
           </button>
-          <p className="mt-1 text-center text-secondary">
-            {dispute.votesNo} votes against.
+          <p className="mt-1 mb-1 text-center text-secondary">
+            {dispute.votesNo.toNumber()} votes against.
           </p>
+          {withdrawButton()}
         </>
       );
     }
@@ -59,31 +147,16 @@ const DisputeVoting = () => {
   return (
     <div className="row">
       {/* dispute Details */}
-      <div className="col-md-8">
-        <div className="card">
-          <div className="card-body">
+      <div className="d-flex col-md-8">
+        <div className="card w-100">
+          <div className="card-body flex-column">
             <h2 className="card-title">
-              Dispute Entry #{dispute.entryId}: {dispute.title}
+              Dispute Entry #{id}: {dispute.reason}
             </h2>
             <h4>Description</h4>
-            <p className="text-grey">
-              Sed ut perspiciatis unde omnis iste natus error sit voluptatem
-              accusantium doloremque laudantium, totam rem aperiam, eaque ipsa
-              quae ab illo inventore veritatis et quasi architecto beatae vitae
-              dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit
-              aspernatur aut odit aut fugit, sed quia consequuntur magni dolores
-              eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam
-              est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci
-              velit, sed quia non numquam eius modi tempora incidunt ut labore
-              et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima
-              veniam, quis nostrum exercitationem ullam corporis suscipit
-              laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem
-              vel eum iure reprehenderit qui in ea voluptate velit esse quam
-              nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo
-              voluptas nulla pariatur
-            </p>
+            <p className="text-grey">{dispute.mainDescription}</p>
             <h4>Relevants Links</h4>
-            <a href={dispute.link}>{dispute.link}</a>
+            <a href={dispute.links}>{dispute.links}</a>
             <br />
           </div>
         </div>
@@ -99,8 +172,11 @@ const DisputeVoting = () => {
               <tbody>
                 <tr>
                   <td className="text-grey">Disputer</td>
-                  {/* Link to tzStats */}
-                  <td>{dispute.disputer.slice(0, 10)}...</td>
+                  <td>
+                    <a href={`https://delphi.tzkt.io/${dispute.disputer}`}>
+                      {dispute.disputer.slice(0, 10)}...
+                    </a>
+                  </td>
                 </tr>
                 <tr>
                   <td className="text-grey">Created at</td>
@@ -125,16 +201,16 @@ const DisputeVoting = () => {
             <table className="w-100 mb-3 details-table">
               <tbody>
                 <tr>
-                  <td className="text-grey">Total Votes</td>
-                  <td>{dispute.votes}</td>
+                  <td className="text-grey">Total Voters</td>
+                  <td>{dispute.voters.size}</td>
                 </tr>
                 <tr>
                   <td className="text-grey">Yes Votes</td>
-                  <td>{dispute.votesYes}</td>
+                  <td>{dispute.votesYes.toNumber()}</td>
                 </tr>
                 <tr>
                   <td className="text-grey">No Votes</td>
-                  <td>{dispute.votesNo}</td>
+                  <td>{dispute.votesNo.toNumber()}</td>
                 </tr>
               </tbody>
             </table>

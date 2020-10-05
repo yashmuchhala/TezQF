@@ -1,16 +1,16 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import Layout from "./components/shared/Layout";
-import Home from "./containers/Home";
+import { useDispatch } from "react-redux";
+import { ThanosWallet } from "@thanos-wallet/dapp";
 
 //Rounds
-import Archive from "./containers/rounds/archive/Archive";
-import ArchiveProfile from "./containers/rounds/archive/ArchiveProfile";
+import Archive from "./containers/rounds/archives/Archives";
+import ArchiveProfile from "./containers/rounds/archives/ArchiveProfile";
 import Projects from "./containers/rounds/on-going/Projects";
 import ProjectEntry from "./containers/rounds/on-going/ProjectEntry";
 import ProjectProfile from "./containers/rounds/on-going/ProjectProfile";
-import Profile from "./containers/rounds/on-going/Profile";
-import RoundsHome from "./containers/rounds/RoundsHome";
+import Home from "./containers/rounds/Home";
 import Sponsor from "./containers/rounds/Sponsor";
 
 //Governance
@@ -20,27 +20,88 @@ import ExecutiveVoting from "./containers/governance/ExecutiveVoting";
 import DisputeVoting from "./containers/governance/DisputeVoting";
 import RoundProposal from "./containers/governance/RoundProposal";
 import DisputeProposal from "./containers/governance/DisputeProposal";
+import GovernanceHome from "./containers/governance/Home";
+
+import {
+  getRoundStatusAction,
+  getRoundsDataAction,
+} from "./redux/actions/round";
+
+import {
+  getNewRoundProposalsDataAction,
+  getDisputesDataAction,
+} from "./redux/actions/governance";
+import {
+  UPDATE_TEZOS,
+  SET_CONTRACTS,
+  GET_WALLET_DATA,
+} from "./redux/ActionTypes";
+import ABIs from "./abi/index";
 
 const App = () => {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const configureWallet = async () => {
+      if (await ThanosWallet.isAvailable()) {
+        const w = new ThanosWallet("TezQF");
+        await w.connect({
+          name: "delphinet",
+          rpc: "https://delphinet.smartpy.io",
+        });
+        const tezos = w.toTezos();
+        const accountPkh = await tezos.wallet.pkh();
+
+        const [
+          daoContract,
+          tokenContract,
+          roundManagerContract,
+        ] = await Promise.all([
+          tezos.wallet.at(process.env.REACT_APP_DAO_CONTRACT_ADDRESS),
+          tezos.wallet.at(process.env.REACT_APP_TOKEN_CONTRACT_ADDRESS),
+          tezos.wallet.at(process.env.REACT_APP_ROUND_MANAGER_CONTRACT_ADDRESS),
+        ]);
+        const daoContractObject = new ABIs.DAOContractABI(daoContract);
+        const tokenContractObject = new ABIs.TokenContractABI(tokenContract);
+        const roundManagerContractObject = new ABIs.RoundManagerContractABI(
+          roundManagerContract
+        );
+
+        dispatch({
+          type: GET_WALLET_DATA,
+          payload: { isConnected: true, account: accountPkh },
+        });
+        dispatch({ type: UPDATE_TEZOS, payload: { tezos } });
+        dispatch({
+          type: SET_CONTRACTS,
+          payload: {
+            contracts: {
+              dao: daoContractObject,
+              token: tokenContractObject,
+              roundManager: roundManagerContractObject,
+            },
+          },
+        });
+        dispatch(await getRoundStatusAction(roundManagerContractObject));
+        dispatch(await getRoundsDataAction(roundManagerContractObject));
+        dispatch(await getNewRoundProposalsDataAction(daoContractObject));
+        dispatch(await getDisputesDataAction(daoContractObject));
+      }
+    };
+    configureWallet();
+  }, [dispatch]);
+
   return (
     <Router>
       <Layout>
         <Switch>
           <Route path="/" exact component={Home} />
-          {/* Rounds Routes */}
-          <Route path="/rounds" exact component={RoundsHome} />
-          <Route
-            exact
-            path="/rounds/contribute/:id"
-            component={ProjectProfile}
-          />
-          <Route exact path="/rounds/contribute" component={Projects} />
-          <Route exact path="/rounds/enter" component={ProjectEntry} />
-          <Route path="/rounds/sponsor" component={Sponsor} />
-          <Route path="/rounds/archive/:id" component={ArchiveProfile} />
-          <Route path="/rounds/archive" component={Archive} />
-          <Route path="/rounds/profile" component={Profile} />
-          {/* Governance Routes */}
+          <Route exact path="/contribute/:id" component={ProjectProfile} />
+          <Route exact path="/contribute" component={Projects} />
+          <Route exact path="/enter" component={ProjectEntry} />
+          <Route path="/sponsor" component={Sponsor} />
+          <Route path="/archives/:id" component={ArchiveProfile} />
+          <Route path="/archives" component={Archive} />
           <Route
             exact
             path="/governance/executive/new"
@@ -51,7 +112,6 @@ const App = () => {
             path="/governance/executive/:id"
             component={ExecutiveVoting}
           />
-          {/* NOTE: Replace with appropraite parameters once the contract is integrated */}
           <Route
             exact
             path="/governance/disputes/new"
@@ -64,6 +124,7 @@ const App = () => {
           />
           <Route exact path="/governance/executive" component={Executive} />
           <Route exact path="/governance/disputes" component={Disputes} />
+          <Route exec path="/governance" component={GovernanceHome} />
         </Switch>
       </Layout>
     </Router>

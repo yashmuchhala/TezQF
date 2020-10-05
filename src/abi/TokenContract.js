@@ -1,17 +1,34 @@
 class TokenContractABI {
-  constructor(tezos, address) {
-    this.contract = tezos.wallet.at(address);
+  constructor(contract) {
+    this.contract = contract;
   }
 
   // Returns a BigMap
   async getBalances() {
     const storage = await this.contract.storage();
-    return storage.balances;
+    return storage.ledger;
+  }
+  async getBalance(address) {
+    const storage = await this.contract.storage();
+    const balanceMap = await storage.ledger.get(address);
+
+    if (balanceMap === undefined) {
+      // Not in the map
+      return {
+        balance: 0,
+        approvals: {},
+      };
+    }
+
+    return {
+      balance: balanceMap === null ? 0 : balanceMap?.balance.c[0],
+      approvals: balanceMap?.approvals?.valueMap,
+    };
   }
 
   async getTotalSuppy() {
     const storage = await this.contract.storage();
-    return storage.totalSupply;
+    return storage.totalSupply.c[0];
   }
 
   async getPaused() {
@@ -21,12 +38,15 @@ class TokenContractABI {
 
   async transfer(from, to, value) {
     const op = await this.contract.methods.transfer(from, to, value).send();
-    return await op.confirmation();
+
+    const result = await op.confirmation();
+    return result?.confirmed;
   }
 
   async approve(spender, value) {
     const op = await this.contract.methods.approve(spender, value).send();
-    return await op.confirmation();
+    const result = await op.confirmation();
+    return result?.completed;
   }
 
   // Others are admin only entry points

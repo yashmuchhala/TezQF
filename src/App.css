@@ -12,3 +12,48 @@
 .details-table td {
   padding: 10px;
 }
+
+.navbar-brand {
+  font-size: 36px;
+}
+.navbar-brand .lead {
+  font-size: 24px;
+}
+
+.nav-link {
+  font-size: 18px;
+}
+
+/*Links*/
+
+.filter-link {
+  cursor: pointer;
+}
+
+.filter-link:hover {
+  color: #117298;
+}
+
+.profile-link {
+  color: black;
+}
+
+.profile-link:hover {
+  text-decoration: none;
+}
+
+/*MidLine*/
+.midline-text {
+  position: relative;
+  display: inline-block;
+  background: white;
+  font-weight: 800;
+  padding: 0px 20px;
+  top: 18px;
+}
+
+.midline {
+  height: 2px;
+  background: black;
+  margin-bottom: 2.5rem;
+}

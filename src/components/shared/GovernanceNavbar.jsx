@@ -1,30 +1,43 @@
 import React from "react";
 import { Link } from "react-router-dom";
-
+import { useSelector } from "react-redux";
 import WalletStatus from "./WalletStatus";
 
-const GovernanceNavbar = (props) => {
+const GovernanceNavbar = () => {
+  const wallet = useSelector((state) => state.credentials.wallet);
+
   return (
     <div>
-      <nav className="navbar navbar-expand bg-light mb-4">
+      <nav
+        className="navbar navbar-expand bg-light mb-4 p-3"
+        style={{
+          borderBottomWidth: "0px",
+        }}
+      >
         <div className="container">
-          <a className="navbar-brand" href="/">
-            TezQF <span className="lead">Governance</span>
-          </a>
+          <Link className="navbar-brand text-primary" to="/governance">
+            tezQF <span className="lead badge badge-secondary">Governance</span>
+          </Link>
           <div className="collapse navbar-collapse">
             <ul className="navbar-nav ml-auto">
               <li className="nav-item">
-                <Link to="/governance/disputes" className="nav-link">
-                  Disputes
-                </Link>
-              </li>
-              <li className="nav-item">
-                <Link to="/governance/executive" className="nav-link">
+                <Link
+                  to="/governance/executive"
+                  className="nav-link text-secondary"
+                >
                   Executive
                 </Link>
               </li>
               <li className="nav-item">
-                <WalletStatus wallet={props.wallet} />
+                <Link
+                  to="/governance/disputes"
+                  className="nav-link text-secondary"
+                >
+                  Disputes
+                </Link>
+              </li>
+              <li className="nav-item">
+                <WalletStatus wallet={wallet} />
               </li>
             </ul>
           </div>

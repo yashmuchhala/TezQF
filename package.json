@@ -11,6 +11,7 @@
     "@thanos-wallet/dapp": "^0.6.0",
     "bootswatch": "^4.5.2",
     "moment": "^2.27.0",
+    "nano-ipfs-store": "^0.1.3",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-moment": "^0.9.7",
@@ -23,7 +24,8 @@
   "scripts": {
     "compile-dev": "node ./utils/scripts/compile.js",
     "deploy-dev": "node ./utils/scripts/deploy.js",
-    "deploy": "node ./utils/scripts/main.js",
+    "deploy-main": "node ./utils/scripts/main.js",
+    "deploy-ico": "node ./utils/scripts/ico_deploy.js",
     "test-contracts": "node ./utils/scripts/test.js",
     "test-contracts-verbose": "node ./utils/scripts/test.js --verbose",
     "start": "react-scripts start",
@@ -54,7 +56,8 @@
     "@taquito/signer": "^6.3.5-beta.0",
     "bs58check": "^2.1.2",
     "chalk": "^4.1.0",
-    "libsodium-wrappers-sumo": "^0.7.8"
+    "libsodium-wrappers-sumo": "^0.7.8",
+    "redux-devtools-extension": "^2.13.8"
   },
   "repository": {
     "type": "git",

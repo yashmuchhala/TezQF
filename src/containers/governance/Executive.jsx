@@ -1,26 +1,39 @@
 import React from "react";
-import Moment from "react-moment";
-import ArchivedProposal from "../../components/governance/ArchivedProposal";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
-//Dummy data
-import { executive } from "../../data/executive";
+import ArchivedProposal from "../../components/governance/ArchivedProposal";
+import ActiveProposal from "../../components/governance/ActiveProposal";
 
 const Executive = () => {
-  const activeProposal = executive[executive.length - 1];
-  const archivedProposals = executive.slice(0, -1);
+  const { newRoundProposals, newRoundProposalActive, loading } = useSelector(
+    (state) => state.governance
+  );
+
+  const activeProposal = newRoundProposalActive
+    ? newRoundProposals[newRoundProposals.length - 1]
+    : null;
+  const archivedProposals = newRoundProposalActive
+    ? newRoundProposals.slice(0, -1)
+    : newRoundProposals;
 
   return (
     <div>
       {/* Setup Panel */}
       <div className="card">
-        <div className="card-body">
+        <div className="card-body p-5" style={{ backgroundColor: "#FAFAFA" }}>
           <div className="align-items-center row">
             <div className="col-sm-9">
-              <h5 className="card-title">Round Proposal</h5>
-              <p className="card-text">
-                Create a proposal for a funding round. You must be a holder of
-                at least 2000 DAO tokens.
+              <h5
+                className="card-title text-secondary text-center"
+                style={{ fontSize: "32px" }}
+              >
+                <strong>NEW ROUND PROPOSAL STATUS</strong>
+              </h5>
+              <p className="card-text text-center pl-5 pr-5">
+                Information about the current new round proposals. Vote for an
+                on-going proposal or start a new proposal by staking the minimum
+                number of tokens required.
               </p>
             </div>
             <div className="col-sm-3">
@@ -28,8 +41,23 @@ const Executive = () => {
                 to="/governance/executive/new"
                 style={{ textDecoration: "none" }}
               >
-                <button className="btn btn-outline-primary btn-block">
-                  Setup
+                <button
+                  disabled={newRoundProposalActive}
+                  className="btn btn-outline-primary btn-block p-3"
+                >
+                  {!loading ? (
+                    newRoundProposalActive ? (
+                      "Proposal on-going"
+                    ) : (
+                      "Setup"
+                    )
+                  ) : (
+                    <div>
+                      <div className="spinner-grow spinner-grow-sm text-primary"></div>
+                      <div className="spinner-grow spinner-grow-sm text-primary ml-2 mr-2"></div>
+                      <div className="spinner-grow spinner-grow-sm text-primary "></div>
+                    </div>
+                  )}
                 </button>
               </Link>
             </div>
@@ -40,48 +68,40 @@ const Executive = () => {
       <br />
 
       {/* Active Proposal */}
-      <div className="card">
-        <div className="card-body">
-          <div className="align-items-center row">
-            <div className="col-sm-9">
-              <h5 className="card-title">{`Proposal to conduct funding round ${activeProposal.id}`}</h5>
-              <p className="card-text">
-                {`Round ${activeProposal.id} to be held from `}
-                <Moment format="DD-MM-YYYY">{activeProposal.start}</Moment>{" "}
-                {" to "}
-                <Moment format="DD-MM-YYYY">{activeProposal.end}</Moment>
-                {". "}
-                <Link
-                  to={`/governance/executive/${activeProposal.id}`}
-                  className="text-blue"
-                >
-                  Read more.
-                </Link>
-              </p>
-            </div>
-            <div className="col-sm-3">
-              <Link
-                to={`/governance/executive/${activeProposal.id}`}
-                style={{ textDecoration: "none" }}
-              >
-                <button className="btn btn-outline-success btn-block">
-                  Vote for Proposal
-                </button>
-              </Link>
-              <p className="mb-0 mt-1 text-center text-secondary">
-                {activeProposal.votesYes} votes in support.
-              </p>
-            </div>
-          </div>
-        </div>
+      {activeProposal !== null ? (
+        <ActiveProposal
+          id={activeProposal.id.toNumber()}
+          start={activeProposal.start.toString()}
+          end={activeProposal.end.toString()}
+          votesYes={activeProposal.votesYes.toNumber()}
+          votesNo={activeProposal.votesNo.toNumber()}
+          resolved={activeProposal.resolved.toNumber()}
+        />
+      ) : (
+        <></>
+      )}
+
+      <div className="text-center">
+        <h4 className="midline-text">Archived Proposals</h4>
+        <div className="midline" />
       </div>
 
-      <hr className="my-4" />
-
-      {/* Archived Proposal */}
-      {archivedProposals.map((proposal, index) => (
-        <ArchivedProposal key={index} proposal={proposal} />
-      ))}
+      {/* Archived Proposals */}
+      {archivedProposals.length !== 0 ? (
+        archivedProposals.map((proposal, index) => (
+          <ArchivedProposal
+            key={index}
+            id={proposal.id}
+            start={proposal.start.toString()}
+            end={proposal.end.toString()}
+            votesYes={proposal.votesYes.toNumber()}
+            votesNo={proposal.votesYes.toNumber()}
+            resolved={proposal.resolved.toNumber()}
+          />
+        ))
+      ) : (
+        <p className="text-center p-5">No Archived Proposals</p>
+      )}
     </div>
   );
 };

@@ -13,34 +13,26 @@ async function setupContracts(
   Tezos.setProvider({
     signer: new InMemorySigner(keystore.privateKey, keystore.seed),
   });
+
   const daoContract = await Tezos.contract.at(daoContractAddress);
-  const crowdSaleContract = await Tezos.contract.at(crowdSaleContractAddress);
-  const daoContractSetTokenOp = await daoContract.methods
-    .setTokenContract(tokenContractAddress)
-    .send();
-  await daoContractSetTokenOp.confirmation();
-  console.log(
-    "Dao Contract Set Token Contract DONE:",
-    daoContractSetTokenOp.hash
-  );
   const daoContractSetRoundManagerOp = await daoContract.methods
     .setRoundManagerContract(roundManagerContractAddress)
     .send();
   await daoContractSetRoundManagerOp.confirmation();
-  console.log("Dao Contract Set RM Contract DONE", daoContractSetTokenOp.hash);
-
-  const crowdSaleContractSetTokenOp = await crowdSaleContract.methods
-    .setTokenContract(tokenContractAddress)
-    .send();
-  await crowdSaleContractSetTokenOp.confirmation();
   console.log(
-    "CrowdSale Contract Set Token Contract DONE",
-    daoContractSetTokenOp.hash
+    "Dao Contract Set RM Contract DONE:",
+    daoContractSetRoundManagerOp.hash
+  );
+
+  const tokenContract = await Tezos.contract.at(tokenContractAddress);
+  const tokenContractAddMintAdministratorOp = await tokenContract.methods
+    .addMintAdministrator(crowdSaleContractAddress)
+    .send();
+  await tokenContractAddMintAdministratorOp.confirmation();
+  console.log(
+    "Token Contract Set CrowdSale Contract as Mint Administrator DONE:",
+    tokenContractAddMintAdministratorOp.hash
   );
 }
-
-// (async () => {
-//   await setupContracts();
-// })();
 
 module.exports = setupContracts;

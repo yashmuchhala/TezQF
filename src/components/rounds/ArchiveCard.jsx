@@ -2,17 +2,22 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 const ArchiveCard = ({ details }) => {
+  console.log(details);
   return (
-    <div className="col-4 mb-4">
-      <div class="card">
+    <div className="d-flex col-4 mb-4">
+      <div className="card">
         <img
-          class="card-img-top"
+          className="card-img-top"
           src={details.image}
           alt="Project Background"
         />
-        <div class="card-body">
-          <h5 class="card-title">{details.title}</h5>
-          <p class="card-text">{details.description}</p>
+        <div className="card-body d-flex flex-column">
+          <h5 className="card-title">{details.title}</h5>
+          <p className="card-text">
+            {details.description.length > 80
+              ? details.description.slice(0, 80) + "..."
+              : details.description}
+          </p>
 
           {/* Show contribution and CLR match only if not disqualified */}
           {details.disqualified ? (
@@ -20,11 +25,15 @@ const ArchiveCard = ({ details }) => {
           ) : (
             <div className="row">
               <div className="col">
-                <h5 className="mb-0">${details.amount}</h5>
+                <h5 className="mb-0">
+                  ${Math.floor(details.totalContribution / 1000000)}
+                </h5>
                 <span style={{ fontSize: "0.8em" }}>Contributions</span>
               </div>
               <div className="col">
-                <h5 className="mb-0 text-primary">${details.clr}</h5>
+                <h5 className="mb-0 text-primary">
+                  ${Math.floor(details.sponsorshipWon / 1000000)}
+                </h5>
                 <span
                   style={{ fontSize: "0.8em" }}
                   className="font-weight-bold"
@@ -34,8 +43,8 @@ const ArchiveCard = ({ details }) => {
               </div>
             </div>
           )}
-          <Link to={`/rounds/archive/${details.id}`}>
-            <button class="btn btn-primary btn-block">View</button>
+          <Link to={`/archives/${details.id}`} className="mt-auto">
+            <button className="btn btn-primary btn-block">View</button>
           </Link>
         </div>
       </div>
