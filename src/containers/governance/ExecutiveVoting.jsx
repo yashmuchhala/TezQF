@@ -19,6 +19,9 @@ const ExecutiveVoting = () => {
   const proposal = useSelector(
     (state) => state.governance.newRoundProposals[id - 1]
   );
+  const currentId = useSelector(
+    (state) => state.governance.currentOnGoingRoundProposalId
+  );
 
   useEffect(() => {
     const getContent = async () => {
@@ -38,10 +41,25 @@ const ExecutiveVoting = () => {
     );
   }
 
+  console.log(proposal.id, currentId);
+
   const onExecute = async () => {
     try {
       setLoading(true);
       await daoContract.executeNewRoundProposal();
+      window.location.reload();
+    } catch (err) {
+      console.log(err);
+      alert(err);
+    }
+
+    setLoading(false);
+  };
+
+  const onSettle = async () => {
+    try {
+      setLoading(true);
+      await daoContract.settleRound();
       window.location.reload();
     } catch (err) {
       console.log(err);
@@ -124,15 +142,29 @@ const ExecutiveVoting = () => {
       );
     } else if (proposal.resolved.toNumber() === 1) {
       return proposal.listed ? (
-        <>
-          <button disabled className="btn btn-success btn-block p-3">
-            Accepted
-          </button>
-          <p className="mt-1 text-center text-secondary">
-            {proposal.votesYes.toNumber()} votes in support.
-          </p>
-          {withdrawButton()}
-        </>
+        Date.now() > new Date(proposal.expiry) &&
+        currentId.toNumber() === proposal.id.toNumber() ? (
+          <>
+            <button
+              onClick={onSettle}
+              className="btn btn-outline-primary btn-block p-3 mb-3"
+            >
+              {loading ? "PROCESSING TRANSACTION " : "SETTLE ROUND"}
+              {loading && <div className="spinner-grow spinner-grow-sm" />}
+            </button>
+            {withdrawButton()}
+          </>
+        ) : (
+          <>
+            <button disabled className="btn btn-success btn-block p-3">
+              Accepted
+            </button>
+            <p className="mt-1 text-center text-secondary">
+              {proposal.votesYes.toNumber()} votes in support.
+            </p>
+            {withdrawButton()}
+          </>
+        )
       ) : (
         <>
           <button
